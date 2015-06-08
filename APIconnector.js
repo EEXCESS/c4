@@ -1,3 +1,16 @@
+/**
+ * A module to query the EEXCESS federated recommender and cache results
+ * @module c4/APIconnector
+ */
+
+/**
+ * Callback used by query
+ * @callback APIconnector~onResponse
+ * @param {String} status Indicates the status of the request, either "success" or "error". 
+ * @param {Object} data Contains the response data. In the case of an error, it is the error message and in the case of success, it is the response returned from the federated recommender in the format described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#response-format}. The profile that lead to this response is included in an additional attribute "profile".
+ */
+
+
 define(['jquery'], function($) {
     var settings = {
         url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/recommend',
@@ -14,9 +27,21 @@ define(['jquery'], function($) {
     };
 
     return {
+        /**
+         * Initializes the module with parameters other than the defaults.
+         * @param {Object} config The configuration to be set. Only the parameters to change need to be specified.
+         * @param {String} config.url The url of the endpoint.
+         * @param {Integer} config.timeout The timeout of the request in ms.
+         * @param {Integer} config.cacheSize The size of the cache.
+         */
         init: function(config) {
             settings = $.extend(settings, config);
         },
+        /**
+         * Function to query the federated recommender.
+         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#request-format}
+         * @param {APIconnector~onResponse} callback Callback function called on success or error. 
+         */
         query: function(profile, callback) {
             if (xhr && xhr.readyState !== 4) {
                 xhr.abort();
@@ -48,12 +73,20 @@ define(['jquery'], function($) {
                 }
             });
         },
+        /**
+         * Function to retrieve the contents of the cache.
+         * @returns {Array} The cache.
+         */
         getCache: function() {
             return sessionCache;
         },
+        /**
+         * Function to retrieve the last query and results.
+         * @returns {Object|null} The query/result-pair or null, if no request has been sent yet.
+         */
         getCurrent: function() {
-            if(sessionCache.length > 0) {
-                return sessionCache[sessionCache.length-1];
+            if (sessionCache.length > 0) {
+                return sessionCache[sessionCache.length - 1];
             } else {
                 return null;
             }
