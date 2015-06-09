@@ -35,14 +35,14 @@ $j(document).ready(function() {
 
    var biblography = JSON.parse(getFile(window.location.href.replace(/index.html$/, "") + "bibliography.json"));
 
-   var enAPA = CITATION_PROCESSOR(biblography);
+   var enAPA = CitationProcessor(biblography);
    $j("<p><b>APA with enUS localization (default settings):</b>").appendTo(document.body);
    for(var i=0; i<enAPA.length; i++){
       $j("<p>" + enAPA[i] + "</p>").appendTo(document.body);
    }
    $j("</p><br>").appendTo(document.body);
 
-   var deASA = CITATION_PROCESSOR(biblography,
+   var deASA = CitationProcessor(biblography,
       getFile(window.location.href.replace(/index.html$/, "") + "locales-de-DE.xml"),
       getFile(window.location.href.replace(/index.html$/, "") + "chicago-fullnote-bibliography.csl"));
    $j("<p><b>Chicago fullnote bibliography with deDE localization:</b>").appendTo(document.body);

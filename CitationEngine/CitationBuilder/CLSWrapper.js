@@ -11,8 +11,7 @@
  *                https://github.com/citation-style-language/locales
  * @param style: the path to a style csl-file. >7.000 file can be found here: https://zotero.org/styles
  */
-
-var CITATION_PROCESSOR = function(citations, locals, style){
+var CitationProcessor = function(citations, locals, style){
    //optional parameters
    if(typeof locals === 'undefined') { locals = citeprocConsts.localsUsEn }
    if(typeof style === 'undefined') { style = citeprocConsts.style }
@@ -42,14 +41,14 @@ var CITATION_PROCESSOR = function(citations, locals, style){
     * string.
     */
    var renderCitations = function(citations) {
-      var citeproc = new CSL.Engine(citeprocSys, style);
-      if(citeproc != null){
+      var citeprocEngine = new CSL.Engine(citeprocSys, style);
+      if(citeprocEngine != null){
          var itemIDs = [];
          for (var key in citations) {
             itemIDs.push(key);
          }
-         citeproc.updateItems(itemIDs);
-         var bibResult = citeproc.makeBibliography();
+         citeprocEngine.updateItems(itemIDs);
+         var bibResult = citeprocEngine.makeBibliography();
          for(i=0; i<bibResult[1].length; i++){
             bibResult[1][i] = removeSurroundingHtmlTags(bibResult[1][i].trim());
          }
@@ -60,4 +59,4 @@ var CITATION_PROCESSOR = function(citations, locals, style){
    };
 
    return renderCitations(citations);
-}
+};
