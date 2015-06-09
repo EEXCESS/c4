@@ -1,51 +1,56 @@
 $j = jQuery.noConflict();
+$j(document).ready(function() {
 
-var Example = function() {
-   getFile = function(path){
-         var request = $j.ajax({
-            type: "GET",
-            url: path,
-            async: false,
-         });
-         if(request.status == 200){
-            return request.responseText;
-         }else{
-            return null;
-         }
+   var getFile = function(path){
+      var request = $j.ajax({
+         type: "GET",
+         url: path,
+         async: false,
+      });
+      if(request.status == 200){
+         return request.responseText;
+      }else{
+         return null;
       }
+   },
 
-
-   var main = function() {
-
-      var knuthsBook = {
-         "Item-2": {
-            "id": "Item-2",
-            "type": "book",
-            "title": "Digital Typography",
-            "author": [
-               {
-                  "family": "Knuth",
-                  "given": "Donald E."
-               }
-            ],
-            "issued": {
-               "date-parts": [
-                  [
-                     "1998",
-                     6,
-                     1
-                  ]
-               ]
+   syntaxHighlight = function(json) {
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+         var cls = 'number';
+         if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+               cls = 'key';
+            } else {
+               cls = 'string';
             }
+         } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+         } else if (/null/.test(match)) {
+            cls = 'null';
          }
-      };
-      var citationText = CITATION_PROCESSOR(knuthsBook,
-         getFile(window.location.href.replace(/index.html$/, "locales-de-DE.xml")),
-         getFile(window.location.href.replace(/index.html$/, "american-sociological-association.csl")));
-      var aal = "";
+         return '<span class="' + cls + '">' + match + '</span>';
+      });
    };
 
-   main();
-}
+   var biblography = JSON.parse(getFile(window.location.href.replace(/index.html$/, "") + "bibliography.json"));
 
-Example();
+   var enAPA = CITATION_PROCESSOR(biblography);
+   $j("<p><b>APA with enUS localization (default settings):</b>").appendTo(document.body);
+   for(var i=0; i<enAPA.length; i++){
+      $j("<p>" + enAPA[i] + "</p>").appendTo(document.body);
+   }
+   $j("</p><br>").appendTo(document.body);
+
+   var deASA = CITATION_PROCESSOR(biblography,
+      getFile(window.location.href.replace(/index.html$/, "") + "locales-de-DE.xml"),
+      getFile(window.location.href.replace(/index.html$/, "") + "chicago-fullnote-bibliography.csl"));
+   $j("<p><b>Chicago fullnote bibliography with deDE localization:</b>").appendTo(document.body);
+   for(var i=0; i<deASA.length; i++){
+      $j("<p>" + deASA[i] + "</p>").appendTo(document.body);
+   }
+   $j("</p><br>").appendTo(document.body);
+
+   $j("<p><b>The XML representation of the bibliographic objects:</b></p><pre>" + syntaxHighlight(JSON.stringify(biblography, null, 4)) + "</pre><br>").appendTo(document.body);
+
+});
