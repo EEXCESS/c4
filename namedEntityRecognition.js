@@ -1,8 +1,26 @@
+/**
+ * A module to query the EEXCESS named entitiy recognition and disambiguation service.
+ * 
+ * @module c4/namedEntityRecognition
+ */
+
+/**
+ * Callback for the entitiesAndCategories function
+ * @callback namedEntityRecognition~onResponse
+ * @param {String} status Indicates the status of the request, either "success" or "error". 
+ * @param {Object} data Contains the response data. In the case of an error, it is the error message and in the case of success, it is the response returned from the named entity recognition service. TODO: add link to documentation
+ */
+
 define(['jquery'], function($) {
     var endpoint = 'http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic';
     var xhr;
 
     return {
+        /**
+         * Retrieves named entities and associated categories for a set of paragraphs.
+         * @param {Array<{id:String,headline:String,content:String}>} paragraphs The paragraphs to annotate.
+         * @param {namedEntityRecognition~onResponse} callback Callback function called on success or error.
+         */
         entitiesAndCategories: function(paragraphs, callback) {
             if (xhr && xhr.readyState !== 4) {
                 xhr.abort();
@@ -30,6 +48,11 @@ define(['jquery'], function($) {
                 }
             });
         },
+        /**
+         * Tramsforms a statistic returned from the named entity recognition service into an object, which contains the entities in attributes as persons, organizations, locations and misc. Each of those attributes contains an Array of entity-objects, with the attributes "text" (the entity's label), "weight" (#occurences in the associated paragraph), "confidence" and "uri".
+         * @param {Array} statistic Statistic returned from the named entity recognition service.
+         * @returns {{persons:Array,organizations:Array,locations:Array,misc:Array}} The entities.
+         */
         entitiesFromStatistic: function(statistic) {
             var converter = function(el) {
                 var entity = {

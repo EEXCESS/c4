@@ -1,3 +1,8 @@
+/**
+ * A module to add a search bar to the bottom of a page. Currently under development and only pushed to the repository for demo purposes. Therefore not well documented and subject to changes.
+ * 
+ * @module c4/searchBar
+ */
 define(['jquery'], function($) {
     var contentArea = $('<iframe src="' + chrome.extension.getURL('visualization-widgets/SearchResultList/index.html') + '" style="position:fixed;width:60%;height:60%;bottom:20px;right:0px;background-color:white;border:1px solid black;z-index:99999"></div>').hide();
     $('body').append(contentArea);
