@@ -13,9 +13,12 @@
 
 define(['jquery'], function($) {
     var settings = {
-        url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/recommend',
+        base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
+        favicon_url: 'http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=',
         timeout: 10000,
-        cacheSize: 10
+        cacheSize: 10,
+        suffix_recommend: 'recommend',
+        suffix_details: 'getDetails'
     };
     var xhr;
     var sessionCache = [];
@@ -47,7 +50,7 @@ define(['jquery'], function($) {
                 xhr.abort();
             }
             xhr = $.ajax({
-                url: settings.url,
+                url: settings.base_url + settings.suffix_recommend,
                 data: JSON.stringify(profile),
                 type: 'POST',
                 contentType: 'application/json; charset=UTF-8',
@@ -57,10 +60,39 @@ define(['jquery'], function($) {
             xhr.done(function(response) {
                 console.log(response);
                 response['profile'] = profile;
+                response['faviconURL'] = settings.favicon_url;
                 addToCache(response);
                 if (typeof callback !== 'undefined') {
                     callback({status: 'success', data: response});
                 }
+            });
+            xhr.fail(function(jqXHR, textStatus, errorThrown) {
+                if (textStatus !== 'abort') {
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    if (typeof callback !== 'undefined') {
+                        callback({status: 'error', data: textStatus});
+                    }
+                }
+            });
+        },
+        /**
+         * Function to retriev details for a set of returned results.
+         * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. There exists a documentbagde for each result entry in the original result set.
+         * @param {APIconnector~onResponse} callback Callback function called on success or error. 
+         */
+        getDetails: function(documentBadges, callback) {
+            var xhr = $.ajax({
+                url: settings.base_url + settings.suffix_details,
+                data: JSON.stringify({documentBadge:documentBadges}),
+                type: 'POST',
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                timeout: settings.timeout
+            });
+            xhr.done(function(response) {
+                callback({status:'success', data:response});
             });
             xhr.fail(function(jqXHR, textStatus, errorThrown) {
                 if (textStatus !== 'abort') {
