@@ -15,6 +15,22 @@ define(function() {
             for (var i = 0; i < iframes.length; i++) {
                 iframes[i].contentWindow.postMessage(msg, '*');
             }
+        },
+        /**
+         * Sends a message to a list of embedded iframes.
+         * @param {Object} msg The message to send.
+         * @param {Array} ids of destination frames.
+         */
+        sendMsg: function(msg, ids){
+            if(Array.isArray(ids)){
+                var len = ids.length;
+                for (var i = 0; i < len; i++) {
+                    var iframe = document.getElementById(ids[i]);
+                    if(iframe != null && iframe.tagName === 'IFRAME'){
+                        iframe.contentWindow.postMessage(msg, '*');
+                    }
+                }
+            }
         }
     };
 });
