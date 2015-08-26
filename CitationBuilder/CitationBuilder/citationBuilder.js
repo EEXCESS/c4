@@ -1,3 +1,4 @@
+define([], function(){
 if ("undefined" === typeof CSL_IS_IE) {
     var CSL_IS_IE;
 };
@@ -15027,7 +15028,7 @@ localsUsEn: '<?xml version="1.0" encoding="utf-8"?> \
  * @param citations: An object containing the information to be cited.
  * @param locals: Content of of locales-xml file. example:
  *                https://bitbucket.org/fbennett/citeproc-js/src/01429717257da70cb8cef6dccbde51fdf6fa763d/demo/locales-en-US.xml?at=default
- *                Additonal informatino
+ *                Additonal information
  *                http://docs.citationstyles.org/en/latest/primer.html#locale-files
  *                locales files repository
  *                https://github.com/citation-style-language/locales
@@ -15082,3 +15083,5 @@ var CitationProcessor = function(citations, locals, style){
 
    return renderCitations(citations);
 };
+return CitationProcessor;
+});
