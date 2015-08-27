@@ -3,7 +3,7 @@ cd js
 if [ "$1" == "--amd" ] && [ "$#" == 1 ]; then
    echo "define([], function(){" > ../citationBuilder.js
    cat xmldom.js citeproc.js citeprocConsts.js CLSWrapper.js >> ../citationBuilder.js
-   echo "});" >> ../citationBuilder.js
+   printf "return CitationProcessor;\n});" >> ../citationBuilder.js
 else
    if [ $# == 0 ]; then
       cat xmldom.js citeproc.js citeprocConsts.js CLSWrapper.js > ../citationBuilder.js

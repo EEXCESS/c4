@@ -15083,5 +15083,5 @@ var CitationProcessor = function(citations, locals, style){
 
    return renderCitations(citations);
 };
-return CitationProcessor;
+   return CitationProcessor;
 });
