@@ -11,6 +11,7 @@
  * @param {{contextKeywords:Array<{weight:Number,text:String}>}|{contextKeywords:Array<{weight:Number,text:String}>,contextNamedEntities:Object}} profile Contains the linktext of the augmented link in contextKeywords and may contain named entities in contextNamedEntities.
  */
 define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
+    var extracted_paragraphs = [];
     var settings = {
         prefix: 'eexcess',
         classname: 'eexcess_detected_par'
@@ -160,6 +161,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     i = j;
                 }
             }
+            extracted_paragraphs = paragraphs;
             return paragraphs;
         },
         /**
@@ -186,6 +188,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 }
                 val.entities = ner.entitiesFromStatistic(extended.statistic);
             });
+            extracted_paragraphs = paragraphs;
             return paragraphs;
         },
         /**
@@ -278,6 +281,153 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     });
                     el.wrap(wrapper);
                 }
+            });
+        },
+        findFocusedParagraph: function(paragraphs) {
+            var w1 = 0.1; // weight for size relation
+            var w2 = 1; // weight for distance to top left corner
+            var w3 = 3; // weight for distance to cursor
+            var mouseEvtCounter = 0;
+            var scrollTimer;
+            var resizeTimer;
+            var mouseTimer;
+            var diagonal = Math.sqrt($(window).height() * $(window).height() + $(window).width() * $(window).width());
+            var biggestArea = 0;
+            if (typeof paragraphs !== 'undefined') {
+                extracted_paragraphs = paragraphs;
+            }
+            calculateSizeRelation();
+            var visiblePars = getVisible(extracted_paragraphs);
+            updateDistance();
+
+            // initalize
+            updateCursorDistance(0, 0);
+            updateProbabilities();
+
+
+            // TODO: calculate dynamically for elements in viewport?
+            function calculateSizeRelation() {
+                // calculate areas 
+                $(extracted_paragraphs).each(function() {
+                    var width = 0;
+                    var height = 0;
+                    $(this.elements).each(function() {
+                        if ($(this).width() > width) {
+                            width = $(this).width();
+                        }
+                        height += $(this).height();
+                    });
+                    this.area = width * height;
+                    if (this.area > biggestArea) {
+                        biggestArea = this.area;
+                    }
+                });
+                // calculate size relation`
+                $(extracted_paragraphs).each(function() {
+                    this.sizeRelation = this.area / biggestArea;
+                });
+            }
+
+            function getVisible(paragraphs) {
+                var visibleElements = new Set();
+                var offset = $(window).scrollTop() + $(window).height();
+                $(paragraphs).each(function() {
+                    var top = $(this.elements[0]).offset().top;
+                    if (offset > top && top > $(window).scrollTop()) {
+                        this.cursorDistance = 0;
+                        visibleElements.add(this);
+                    }
+                });
+                return visibleElements;
+            }
+
+            function updateProbabilities() {
+                var highestProb = 0;
+                var focusedPar;
+                visiblePars.forEach(function(v1) {
+                    v1.pGotRead = w1 * v1.sizeRelation + w2 * v1.distance + w3 * v1.cursorDistance;
+//                var out = w1 * v1.sizeRelation + '+' + w2 * v1.distance + '+' + w3 * v1.cursorDistance + '=' + v1.pGotRead;
+//                if ($(v1.elements[0]).find($('.pgotread')).length > 0) {
+//                    $(v1.elements[0]).find($('.pgotread')).text(out);
+//                } else {
+//                    $(v1.elements[0]).prepend('<span class="pgotread" style="color:red;">' + out + '</span>');
+//                }
+                    if (v1.pGotRead > highestProb) {
+                        highestProb = v1.pGotRead;
+                        focusedPar = v1;
+                    }
+                });
+                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                document.dispatchEvent(event);
+            }
+
+            function updateDistance() {
+                visiblePars.forEach(function(v1) {
+                    var offset = $(v1.elements[0]).offset();
+                    var left = offset.left - $(window).scrollLeft();
+                    var top = offset.top - $(window).scrollTop();
+                    if (top < 0) {
+                        top = $(window).height();
+                    }
+                    var distToTopLeft = Math.sqrt(left * left + top * top);
+                    v1.distance = 1 - (distToTopLeft / diagonal);
+                });
+            }
+
+            function updateCursorDistance(pageX, pageY) {
+                visiblePars.forEach(function(v1) {
+                    var center = {
+                        x: 0,
+                        y: 0
+                    };
+                    var offset = $(v1.elements[0]).offset();
+                    var height = 0;
+                    var width = 0;
+                    $(v1.elements).each(function() {
+                        height += $(this).height();
+                        if (width < $(this).width()) {
+                            width = $(this).width();
+                        }
+                    });
+                    // anchor center at bottom left corner
+                    center.y = offset.top + height;
+                    center.x = offset.left;
+                    v1.cursorDistance = 1 - Math.sqrt(Math.pow(center.x - pageX, 2) + Math.pow(center.y - pageY, 2)) / diagonal;
+                });
+            }
+
+            $(document).scroll(function(evt) {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function() {
+                    w3 = 0.2; // reduce weight for mouse distance probability
+                    visiblePars = getVisible(extracted_paragraphs);
+                    updateDistance();
+                    updateProbabilities();
+                }, 100);
+            });
+
+            $(document).mousemove(function(e) {
+                clearTimeout(mouseTimer);
+                mouseEvtCounter++;
+                mouseTimer = setTimeout(function() {
+                    if (mouseEvtCounter > 10) {
+                        w3 = 3; // increase weight for mouse distance probability
+                        updateCursorDistance(e.pageX, e.pageY);
+                        updateProbabilities();
+                    }
+                    mouseEvtCounter = 0;
+                }, 100);
+            });
+
+            $(window).resize(function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    diagonal = Math.sqrt($(window).height() * $(window).height() + $(window).width() * $(window).width());
+                    calculateSizeRelation();
+                    visiblePars = getVisible(extracted_paragraphs);
+                    updateDistance();
+                    updateProbabilities();
+                }, 100);
             });
         }
     };
