@@ -12,7 +12,7 @@
  */
 
 define(['jquery'], function($) {
-    var endpoint = 'http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic';
+    var endpoint = 'https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/entityRecognition';
     var xhr;
 
     return {
