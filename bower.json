@@ -1,0 +1,34 @@
+{
+    "name": "c4",
+    "version": "0.1.0",
+    "homepage": "https://github.com/EEXCESS/c4",
+    "authors": [
+        "Jörg Schlötterer <joerg.schloetterer@uni-passau.de>",
+        "Nils Witt"
+    ],
+    "description": "tools for context detection, query generation and result usage in web pages",
+    "main": "APIconnector.js",
+    "moduleType": [
+        "amd"
+    ],
+    "keywords": [
+        "context",
+        "query",
+        "citation",
+        "named",
+        "entity",
+        "recognition",
+        "paragraph"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "jquery": ">=2.1.4"
+    }
+}
