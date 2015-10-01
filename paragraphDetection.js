@@ -206,7 +206,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     // add main topic
                     var mainTopic = {
                         text: res.data.paragraphs[0].topic.text,
-                        entityUri: res.data.paragraphs[0].topic.entityUri,
+                        uri: res.data.paragraphs[0].topic.entityUri,
                         type: res.data.paragraphs[0].topic.type,
                         isMainTopic: true
                     };
@@ -216,7 +216,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         if (this.key.text !== mainTopic.text) {
                             profile.contextKeywords.push({
                                 text: this.key.text,
-                                entityUri: this.key.entityUri,
+                                uri: this.key.entityUri,
                                 type: this.key.type,
                                 isMainTopic: false
                             });
