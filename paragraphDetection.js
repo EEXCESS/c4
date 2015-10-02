@@ -21,7 +21,6 @@
 
 define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
     var extracted_paragraphs = [];
-    var focusedParagraph = {};
     var settings = {
         prefix: 'eexcess',
         classname: 'eexcess_detected_par'
@@ -199,6 +198,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     content: paragraphContent
                 }];
             ner.entitiesAndCategories(paragraphs, function(res) {
+                // TODO: there might not be any mainTopic nor entities
                 if (res.status === 'success') {
                     var profile = {
                         contextKeywords: []
@@ -395,12 +395,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         focusedPar = v1;
                     }
                 });
-                // dispatch event only once (i.e. when paragraph changes)
-                if (focusedParagraph !== focusedPar) {
-                    focusedParagraph = focusedPar;
-                    var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
-                    document.dispatchEvent(event);
-                }
+                // event might be dispatched multiple times, leave the handling to the listener
+                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                document.dispatchEvent(event);
             }
 
             function updateDistance() {
