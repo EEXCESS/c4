@@ -4,11 +4,10 @@
  */
 
 requirejs.config({
-	baseUrl: "./bower_components/",
     paths: {
-    	jquery: "jquery/dist/jquery", 
-    	peas_indist: "peas/peas_indist"
-    }
+    	jquery: "./bower_components/jquery/dist/jquery", 
+    	peas: "./bower_components/peas"
+    }, 
 });
 
 /**
@@ -19,7 +18,7 @@ requirejs.config({
  */
 
 
-define(['peas_indist', 'jquery'], function(peas_indist, $) {
+define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
         //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
     	base_url: 'http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/',
@@ -29,6 +28,12 @@ define(['peas_indist', 'jquery'], function(peas_indist, $) {
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails'
     };
+    // Initialization of PEAS
+    var baseUrl = "http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/";
+	var mcsService = baseUrl + "getMaximalCliques";
+	var cogService = baseUrl + "getCoOccurrenceGraph";
+	peas_indist.init(mcsService, cogService);
+	
     var xhr;
     var sessionCache = [];
     var addToCache = function(element) {
@@ -90,8 +95,8 @@ define(['peas_indist', 'jquery'], function(peas_indist, $) {
          * TODO documentation
          */
         queryPeas: function(profile, k, callback) {
-        	console.log(require('peas_indist'));
-        	callback({value: "ok" + k});
+        	console.log(peas_indist);
+        	callback(this.query(profile));
         },
         /**
          * Function to retrieve details for a set of returned results.
