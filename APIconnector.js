@@ -3,6 +3,14 @@
  * @module c4/APIconnector
  */
 
+requirejs.config({
+	baseUrl: "./bower_components/",
+    paths: {
+    	jquery: "jquery/dist/jquery", 
+    	peas_indist: "peas/peas_indist"
+    }
+});
+
 /**
  * Callback used by query
  * @callback APIconnector~onResponse
@@ -11,10 +19,11 @@
  */
 
 
-define(['jquery'], function($) {
+define(['peas_indist', 'jquery'], function(peas_indist, $) {
     var settings = {
-        base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
-        favicon_url: 'http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=',
+        //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
+    	base_url: 'http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/',
+        favicon_url: 'http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=', // XXX This service is also provided by 
         timeout: 10000,
         cacheSize: 10,
         suffix_recommend: 'recommend',
@@ -58,7 +67,7 @@ define(['jquery'], function($) {
                 timeout: settings.timeout
             });
             xhr.done(function(response) {
-                console.log(response);
+                //console.log(response);
                 response['profile'] = profile;
                 response['faviconURL'] = settings.favicon_url;
                 addToCache(response);
@@ -78,7 +87,14 @@ define(['jquery'], function($) {
             });
         },
         /**
-         * Function to retriev details for a set of returned results.
+         * TODO documentation
+         */
+        queryPeas: function(profile, k, callback) {
+        	console.log(require('peas_indist'));
+        	callback({value: "ok" + k});
+        },
+        /**
+         * Function to retrieve details for a set of returned results.
          * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. There exists a documentbagde for each result entry in the original result set.
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
