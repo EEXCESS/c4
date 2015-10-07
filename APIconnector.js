@@ -29,10 +29,10 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         suffix_details: 'getDetails'
     };
     // Initialization of PEAS
-    var baseUrl = "http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/";
+    /*var baseUrl = "http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/";
 	var mcsService = baseUrl + "getMaximalCliques";
 	var cogService = baseUrl + "getCoOccurrenceGraph";
-	peas_indist.init(mcsService, cogService);
+	peas_indist.init(mcsService, cogService);*/
 	
     var xhr;
     var sessionCache = [];
@@ -95,8 +95,11 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * TODO documentation
          */
         queryPeas: function(profile, k, callback) {
-        	console.log(peas_indist);
-        	callback(this.query(profile));
+        	var obfuscatedProfile = peas_indist.obfuscateQuery(profile, k);
+        	this.query(obfuscatedProfile, function(results){
+        		var filteredResults = peas_indist.filterResults(results.data, profile);
+        		callback(filteredResults);
+        	})
         },
         /**
          * Function to retrieve details for a set of returned results.
