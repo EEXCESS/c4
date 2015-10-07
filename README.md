@@ -5,22 +5,13 @@ Cultural and sCientific Content in Context
 
 * init
 * query
-* queryPeas: allows to send obfuscated queries the Federated Recommender through the Privacy Proxy. It uses the indistinguishability protocol of PEAS (the PEAS component is described here). This example shows how to use it: 
+* ```queryPeas```: allows to send obfuscated queries the Federated Recommender through the Privacy Proxy. It uses the indistinguishability protocol of PEAS (the PEAS component is described here). This example shows how to use it: 
 ```javascript
-document.getElementById("go").addEventListener("click", function(){ 
-					var queryStr = document.getElementById("query").value;
-					var nbFakeQueries = document.getElementById("nbFakeQueries").value;
-					var query = JSON.parse(queryStr);
-					if (nbFakeQueries <= 0){
-						api.query(query, function(results){
-							document.getElementById("results").innerHTML = JSON.stringify(results);
-						});
-					} else {
-						api.queryPeas(query, nbFakeQueries, function(results){
-							document.getElementById("results").innerHTML = JSON.stringify(results.data);
-						});
-					}
-				});
+var nbFakeQueries = 2;
+var query = JSON.parse('{"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"}, "numResults": 3, "contextKeywords": [{"text": "graz","weight": 0.1}, {"text": "vienna","weight": 0.3}]');
+api.queryPeas(query, nbFakeQueries, function(results){
+	var resultsObj = results.data;
+});
 ```
 * getDetails
 * getCache
