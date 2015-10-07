@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+			require(["APIconnector"], function(api){				
+				document.getElementById("go").addEventListener("click", function(){ 
+					var queryStr = document.getElementById("query").value;
+					var nbFakeQueries = document.getElementById("nbFakeQueries").value;
+					var query = JSON.parse(queryStr);
+					if (nbFakeQueries <= 0){
+						api.query(query, function(results){
+							document.getElementById("results").innerHTML = JSON.stringify(results);
+						});
+					} else {
+						api.queryPeas(query, nbFakeQueries, function(results){
+							document.getElementById("results").innerHTML = JSON.stringify(results.data);
+						});
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>
+				Original query: <br/>
+				<textarea id="query" rows="10" cols="150">{
+    "origin": {
+        "userID": "E993A29B-A063-426D-896E-131F85193EB7",
+        "clientType": "EEXCESS - Google Chrome Extension",
+        "clientVersion": "2beta",
+        "module": "testing"
+    },
+    "numResults": 3,
+    "contextKeywords": [{
+        "text": "graz",
+        "weight": 0.1
+    }, {
+        "text": "vienna",
+        "weight": 0.3
+    }]
+}</textarea>
+			</p>
+			<p>
+				Number of fake queries: 
+				<select id="nbFakeQueries">
+					<option value="0">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select>
+			</p>
+			<p>
+				<button id="go" type="button">Go!</button>
+			</p>
+			<p>Results: <span id="results"></span>
+		</form>
+	</body>
+</html>

@@ -4,11 +4,10 @@
  */
 
 requirejs.config({
-	baseUrl: "./bower_components/",
     paths: {
-    	jquery: "jquery/dist/jquery", 
-    	peas_indist: "peas/peas_indist"
-    }
+    	jquery: "./bower_components/jquery/dist/jquery", 
+    	peas: "./bower_components/peas"
+    }, 
 });
 
 /**
@@ -19,16 +18,17 @@ requirejs.config({
  */
 
 
-define(['peas_indist', 'jquery'], function(peas_indist, $) {
+define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
         //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
-    	base_url: 'http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/',
+        base_url: "http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
         favicon_url: 'http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=', // XXX This service is also provided by 
         timeout: 10000,
         cacheSize: 10,
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails'
     };
+    peas_indist.initUrl(settings.base_url);
     var xhr;
     var sessionCache = [];
     var addToCache = function(element) {
@@ -67,7 +67,6 @@ define(['peas_indist', 'jquery'], function(peas_indist, $) {
                 timeout: settings.timeout
             });
             xhr.done(function(response) {
-                //console.log(response);
                 response['profile'] = profile;
                 response['faviconURL'] = settings.favicon_url;
                 addToCache(response);
@@ -87,11 +86,21 @@ define(['peas_indist', 'jquery'], function(peas_indist, $) {
             });
         },
         /**
-         * TODO documentation
+         * Function to query the federated recommender using the PEAS indistinguishability protocol. 
+         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#request-format}
+         * @param {Integer} k Number of fake queries to add to the profile. Must be greater than zero. 
+         * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         queryPeas: function(profile, k, callback) {
-        	console.log(require('peas_indist'));
-        	callback({value: "ok" + k});
+        	var obfuscatedProfile = peas_indist.obfuscateQuery(profile, k);
+	        this.query(obfuscatedProfile, function(results){
+	        	if (results.status == "success"){
+	        		var filteredResults = peas_indist.filterResults(results.data, profile);
+	               	callback({status: results.status, data: filteredResults});
+	        	} else {
+	        		callback({status: results.status, data: results.data});
+	        	}
+	        });
         },
         /**
          * Function to retrieve details for a set of returned results.
