@@ -164,6 +164,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             });
         },
         afterTagAdded: function(e, ui) {
+            ui.tag.find('.ui-icon-close').css('background-image', 'url("' + settings.imgPATH + 'ui-icons_cd0a0a_256x240.png")');
             if (!util.preventQuery) {
                 util.queryUpdater();
             }
