@@ -7,7 +7,6 @@
         "Nils Witt"
     ],
     "description": "tools for context detection, query generation and result usage in web pages",
-    "main": "APIconnector.js",
     "moduleType": [
         "amd"
     ],
