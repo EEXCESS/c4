@@ -4,6 +4,14 @@
 		<title></title>
 		<script src="bower_components/requirejs/require.js"></script>
 		<script>
+		requirejs.config({
+		    paths: {
+		    	jquery: "./bower_components/jquery/dist/jquery", 
+		    	peas: "./bower_components/peas"
+		    }, 
+		});
+		</script>
+		<script>
 			require(["APIconnector"], function(api){				
 				document.getElementById("go").addEventListener("click", function(){ 
 					var queryStr = document.getElementById("query").value;
