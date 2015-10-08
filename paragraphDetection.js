@@ -321,6 +321,14 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 }
             });
         },
+        /**
+         * Find the paragraph the user is currently looking at.
+         * 
+         * If the focused paragraph changes, a 'paragraphFocused' event will be dispatched with he focused paragraph attached.
+         * 
+         * @param {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} paragraphs
+         * @returns {undefined}
+         */
         findFocusedParagraph: function(paragraphs) {
             var w1 = 0.1; // weight for size relation
             var w2 = 1; // weight for distance to top left corner

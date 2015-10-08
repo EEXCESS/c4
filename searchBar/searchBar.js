@@ -269,8 +269,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
         /**
          * Initialize the searchBar with the set of visualization widgets to display and custom settings (optional). 
          * 
-         * @param {} tabs
-         * @param {object} config
+         * @param {array<Tab Object>} tabs the widgets to include. Should look like:
+         * {
+         *  name:"<name>" // the name of the widget, will be displayed as tab entry
+         *  url:"<url>" // the url of the widgets main page, will be included as iframe
+         *  icon:"<icon path>" // optional, will be displayed instead of the name
+         * }
+         * @param {object} config Custom settings
          * @returns {undefined}
          */
         init: function(tabs, config) {
@@ -295,7 +300,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             });
             $jQueryTabsHeader.append($close_button);
 
-            //generates jquery-ui tabs TODO: icons? and move into external json
+            //generates jquery-ui tabs TODO: icons
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
                 tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
@@ -373,6 +378,19 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 });
             });
         },
+        /**
+         * Displays the provided contextKeywords in the searchBar and automatically
+         * triggers a query with them after the delay specified by settings.queryDelay.
+         * 
+         * @param {array<keyword>} contextKeywords A keyword must look like:
+         * {
+         *  text:"<textual label>" // the keyword (type:String)
+         *  type:"<entity type>" // either person, location, organization, misc (type:String, optional)
+         *  uri:"<entity uri" // uri of the entity (type:String, optional)
+         *  isMainTopic:"<true,false>" // indicator whether this keyword is the main topic
+         * }
+         * @returns {undefined}
+         */
         setQuery: function(contextKeywords) {
             util.preventQuery = true;
             taglist.tagit('removeAll');

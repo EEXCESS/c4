@@ -1,5 +1,5 @@
 /**
- * A module to query the EEXCESS federated recommender and cache results
+ * A module to query the EEXCESS privacy proxy and cache results
  * @module c4/APIconnector
  */
 
@@ -7,17 +7,16 @@
  * Callback used by query
  * @callback APIconnector~onResponse
  * @param {String} status Indicates the status of the request, either "success" or "error". 
- * @param {Object} data Contains the response data. In the case of an error, it is the error message and in the case of success, it is the response returned from the federated recommender in the format described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#response-format}. The profile that lead to this response is included in an additional attribute "profile".
+ * @param {Object} data Contains the response data. In the case of an error, it is the error message and in the case of success, it is the response returned from the federated recommender in the format described at {@link https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format}. The profile that lead to this response is included in an additional attribute "profile".
  */
 define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
-        //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
         base_url: "https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
-        favicon_url: 'https://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=', // XXX This service is also provided by 
         timeout: 10000,
         cacheSize: 10,
         suffix_recommend: 'recommend',
-        suffix_details: 'getDetails'
+        suffix_details: 'getDetails',
+        suffix_favicon: 'getPartnerFavIcon?partnerId='
     };
     peas_indist.initUrl(settings.base_url);
     var xhr;
@@ -35,14 +34,17 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {Object} config The configuration to be set. Only the parameters to change need to be specified.
          * @param {String} config.url The url of the endpoint.
          * @param {Integer} config.timeout The timeout of the request in ms.
-         * @param {Integer} config.cacheSize The size of the cache.
+         * @param {Integer} config.cacheSize The number of queries/responses to cache.
+         * @param {String} config.suffix_recommend The query endpoint.
+         * @param {String} config.suffix_detals The endpoint for gathering details about response items.
+         * @param {String} config.suffix_favicon The endpoint for gathering the favicon of a provider.
          */
         init: function(config) {
             settings = $.extend(settings, config);
         },
         /**
-         * Function to query the federated recommender.
-         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#request-format}
+         * Function to query the privacy proxy.
+         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format}
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         query: function(profile, callback) {
@@ -59,7 +61,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
             });
             xhr.done(function(response) {
                 response['profile'] = profile;
-                response['faviconURL'] = settings.favicon_url;
+                response['faviconURL'] = settings.base_url + settings.suffix_favicon;
                 addToCache(response);
                 if (typeof callback !== 'undefined') {
                     callback({status: 'success', data: response});
@@ -77,15 +79,15 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
             });
         },
         /**
-         * Function to query the federated recommender using the PEAS indistinguishability protocol. 
-         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#request-format}
+         * Function to query the privacy proxy using the PEAS indistinguishability protocol. 
+         * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format}
          * @param {Integer} k Number of fake queries to add to the profile. Must be greater than zero. 
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         queryPeas: function(profile, k, callback) {
         	var obfuscatedProfile = peas_indist.obfuscateQuery(profile, k);
 	        this.query(obfuscatedProfile, function(results){
-	        	if (results.status == "success"){
+	        	if (results.status === "success"){
 	        		var filteredResults = peas_indist.filterResults(results.data, profile);
 	               	callback({status: results.status, data: filteredResults});
 	        	} else {
