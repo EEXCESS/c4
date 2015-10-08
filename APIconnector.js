@@ -21,8 +21,8 @@ requirejs.config({
 define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
         //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
-        base_url: "http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
-        favicon_url: 'http://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=', // XXX This service is also provided by 
+        base_url: "https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
+        favicon_url: 'https://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId=', // XXX This service is also provided by 
         timeout: 10000,
         cacheSize: 10,
         suffix_recommend: 'recommend',
