@@ -10,6 +10,15 @@
  * @callback paragraphDetection~linkTrigger
  * @param {{contextKeywords:Array<{weight:Number,text:String}>}|{contextKeywords:Array<{weight:Number,text:String}>,contextNamedEntities:Object}} profile Contains the linktext of the augmented link in contextKeywords and may contain named entities in contextNamedEntities.
  */
+
+/**
+ * Callback for the paragraphToQuery function
+ * @callback paragraphToQuery~callback
+ * @param {query:Object,error:String} The result of the extraction. If the extraction was successful,
+ * the generated query profile will be present in the attribute 'query'. Otherwise,
+ * if an error message is available, it will be present in the 'error' attribute.
+ */
+
 define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
     var extracted_paragraphs = [];
     var settings = {
@@ -74,7 +83,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
         for (var i = 0; i < pars.length; i++) {
             text += $(pars[i]).text();
         }
-        $(pars).wrapAll('<div id="' + settings.prefix + '_par_' + idx + '" data-idx="' + idx + '" class="' + settings.classname + '" style="border:1px solid green"></div>');
+        $(pars).wrapAll('<div id="' + settings.prefix + '_par_' + idx + '" data-idx="' + idx + '" class="' + settings.classname + '"></div>');
         return {
             elements: pars,
             headline: $(getHeadline(pars[0])).text(),
@@ -165,31 +174,60 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
             return paragraphs;
         },
         /**
-         * Enrich paragraphs with named entities.
-         * @param {Array<{id:String,headline:String,content:String}>} paragraphs The paragraphs to enrich.
-         * @param {Array} statistic The statistic used to enrich the paragraphs.
-         * @returns {Array<{id:String,headline:String,content:String,entities:Object}>} The enriched paragraphs.
+         * Create a EEXCESS query profile for a given piece of text. 
+         * 
+         * The profile will be in the format as described at https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format
+         * with the contextKeywords attribute filled with the keywords extracted
+         * from the given text. 
+         * @param {String} paragraphContent The text from which to extract the keywords
+         * @param {paragraphToQuery~callback} callback The callback function
+         * @param {String} [id] An identifier for the paragraph
+         * @param {String} [headline] The headline for the paragraph
+         * @returns {undefined}
          */
-        enrichParagraphs: function(paragraphs, statistic) {
-            if (paragraphs.length !== statistic.length) {
-                console.log('paragraphs do not match statistic');
-                return;
+        paragraphToQuery: function(paragraphContent, callback, id, headline) {
+            if (typeof id === 'undefined') {
+                id = 1;
             }
-            paragraphs.forEach(function(val, idx) {
-                var extended = statistic[idx];
-                // paragraphs and statistic may not be in the same order
-                if (val.id !== extended.id) {
-                    for (var i = 0; i < statistic.length; i++) {
-                        if (val.id === statistic[i].id) {
-                            extended = statistic[i];
-                            break;
+            if (typeof headline === 'undefined') {
+                headline = "";
+            }
+            var paragraphs = [{
+                    id: id,
+                    headline: headline,
+                    content: paragraphContent
+                }];
+            ner.entitiesAndCategories(paragraphs, function(res) {
+                // TODO: there might not be any mainTopic nor entities
+                if (res.status === 'success') {
+                    var profile = {
+                        contextKeywords: []
+                    };
+                    // add main topic
+                    var mainTopic = {
+                        text: res.data.paragraphs[0].topic.text,
+                        uri: res.data.paragraphs[0].topic.entityUri,
+                        type: res.data.paragraphs[0].topic.type,
+                        isMainTopic: true
+                    };
+                    // add other keywords
+                    profile.contextKeywords.push(mainTopic);
+                    $.each(res.data.paragraphs[0].statistic, function() {
+                        if (this.key.text !== mainTopic.text) {
+                            profile.contextKeywords.push({
+                                text: this.key.text,
+                                uri: this.key.entityUri,
+                                type: this.key.type,
+                                isMainTopic: false
+                            });
                         }
-                    }
+                    });
+                    callback({query: profile});
+                } else {
+                    // TODO: add simple fallback
+                    callback({error: res.data});
                 }
-                val.entities = ner.entitiesFromStatistic(extended.statistic);
             });
-            extracted_paragraphs = paragraphs;
-            return paragraphs;
         },
         /**
          * Get the current selection in the document.
@@ -357,6 +395,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         focusedPar = v1;
                     }
                 });
+                // event might be dispatched multiple times, leave the handling to the listener
                 var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
                 document.dispatchEvent(event);
             }
