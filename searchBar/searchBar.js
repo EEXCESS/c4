@@ -1,11 +1,22 @@
 /**
- * A module to add a search bar to the bottom of a page. Currently under development and only pushed to the repository for demo purposes. Therefore not well documented and subject to changes.
+ * A module to add a search bar to the bottom of a page. 
  *
  * @module c4/searchBar
  */
 define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], function($, ui, tagit, api, iframes) {
     var util = {
+        // flag to determine if queries should be surpressed
         preventQuery: false,
+        /**
+         * Helper to adjust the size of an input element to its content.
+         * ATTENTION: the input element must be set as 'this'-context. Hence,
+         * the function need to be executed in the following fashion:
+         * resizeForText.call(<input element>,text,minify)
+         * 
+         * @param {string} text the input's content
+         * @param {boolean} minify wheter the input should also scale down or only scale up
+         * @returns {undefined}
+         */
         resizeForText: function(text, minify) {
             var $this = $(this);
             var $span = $this.parent().find('span');
@@ -15,6 +26,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 $this.css("width", $inputSize);
             }
         },
+        /**
+         * Helper to change the UI and send a query when a user made modifications the query. 
+         * 
+         * Shows the loading animation, hides the indication of results, collects
+         * keywords and main topics and after the timeout specified by settings.queryModificationDelay
+         * sends the query.
+         * @returns {undefined}
+         */
         queryUpdater: function() {
             loader.show();
             result_indicator.hide();
@@ -31,20 +50,27 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 settings.queryFn(lastQuery, resultHandler);
             }, settings.queryModificationDelay);
         },
+        /**
+         * Helper to set the main topic in the search bar.
+         * The topic must at least contain the attribute 'text'. 
+         * 
+         * @param {Object} topic
+         * @returns {undefined}
+         */
         setMainTopic: function(topic) {
             topic.isMainTopic = true;
             mainTopicLabel.val(topic.text).data('properties', topic);
             this.resizeForText.call(mainTopicLabel, topic.text, true);
         }
     };
-    var results = {};
-    var lastQuery = {};
+    var results = {}; // the current results
+    var lastQuery = {}; // cache for the query to execute. On interface level, the query may already have changed
     var settings = {
-        queryFn: api.query,
+        queryFn: api.query, // function to execute a query
         imgPATH: 'img/',
-        queryModificationDelay: 500,
-        queryDelay: 2000,
-        storage: {
+        queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
+        queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
+        storage: {// wrapper for local storage
             set: function(item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
@@ -240,6 +266,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
     };
 
     return {
+        /**
+         * Initialize the searchBar with the set of visualization widgets to display and custom settings (optional). 
+         * 
+         * @param {} tabs
+         * @param {object} config
+         * @returns {undefined}
+         */
         init: function(tabs, config) {
             settings = $.extend(settings, config);
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
@@ -257,7 +290,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             right.append(result_indicator);
 
             // close button
-            var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e){
+            var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e) {
                 contentArea.hide();
             });
             $jQueryTabsHeader.append($close_button);
@@ -265,10 +298,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             //generates jquery-ui tabs TODO: icons? and move into external json
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
-                tab.renderedHead = $("<li><a href='#tabs-" + tab.id + "'>" + tab.name + " </a></li>");
+                tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
                 $("#eexcess-tabBar-jQueryTabsHeader ul").append(tab.renderedHead);
                 // add tab content corresponding to tab titles
-                tab.renderedContent = $("<div id='tabs-" + tab.id + "'><iframe src='" + tab.url + "'</div>");
+                tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");
                 $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
                 // following 3 functions derived from jQuery-UI Tabs
                 $jQueryTabsHeader.tabs().addClass("ui-tabs-vertical ui-helper-clearfix eexcess");
