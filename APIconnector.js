@@ -3,21 +3,12 @@
  * @module c4/APIconnector
  */
 
-requirejs.config({
-    paths: {
-    	jquery: "./bower_components/jquery/dist/jquery", 
-    	peas: "./bower_components/peas"
-    }, 
-});
-
 /**
  * Callback used by query
  * @callback APIconnector~onResponse
  * @param {String} status Indicates the status of the request, either "success" or "error". 
  * @param {Object} data Contains the response data. In the case of an error, it is the error message and in the case of success, it is the response returned from the federated recommender in the format described at {@link https://github.com/EEXCESS/eexcess/wiki/json-exchange-format#response-format}. The profile that lead to this response is included in an additional attribute "profile".
  */
-
-
 define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
         //base_url: 'http://eexcess-dev.joanneum.at/eexcess-privacy-proxy-1.0-SNAPSHOT/api/v1/',
