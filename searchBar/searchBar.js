@@ -1,13 +1,26 @@
 /**
- * A module to add a search bar to the bottom of a page. Currently under development and only pushed to the repository for demo purposes. Therefore not well documented and subject to changes.
+ * A module to add a search bar to the bottom of a page. 
  *
  * @module c4/searchBar
  */
 define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], function($, ui, tagit, api, iframes) {
     var util = {
+        // flag to determine if queries should be surpressed
         preventQuery: false,
+        // flag to determine if changing the query in the searchBar should be supressed
         preventQuerySetting: false,
+        // a temporarily stored set of contextKeywords
         cachedQuery: null,
+        /**
+         * Helper to adjust the size of an input element to its content.
+         * ATTENTION: the input element must be set as 'this'-context. Hence,
+         * the function need to be executed in the following fashion:
+         * resizeForText.call(<input element>,text,minify)
+         * 
+         * @param {string} text the input's content
+         * @param {boolean} minify wheter the input should also scale down or only scale up
+         * @returns {undefined}
+         */
         resizeForText: function(text, minify) {
             var $this = $(this);
             var $span = $this.parent().find('span');
@@ -17,6 +30,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 $this.css("width", $inputSize);
             }
         },
+        /**
+         * Helper to change the UI and send a query when a user made modifications the query. 
+         * 
+         * Shows the loading animation, hides the indication of results, collects
+         * keywords and main topics and after the timeout specified by settings.queryModificationDelay
+         * sends the query.
+         * @returns {undefined}
+         */
         queryUpdater: function() {
             loader.show();
             result_indicator.hide();
@@ -33,11 +54,31 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 settings.queryFn(lastQuery, resultHandler);
             }, settings.queryModificationDelay);
         },
+        /**
+         * Helper to set the main topic in the search bar.
+         * The topic must at least contain the attribute 'text'. 
+         * 
+         * @param {Object} topic
+         * @returns {undefined}
+         */
         setMainTopic: function(topic) {
             topic.isMainTopic = true;
             mainTopicLabel.val(topic.text).data('properties', topic);
             this.resizeForText.call(mainTopicLabel, topic.text, true);
         },
+        /**
+         * Helper to display the provided contextKeywords in the searchBar and automatically
+         * trigger a query with them after the delay specified by settings.queryDelay.
+         * 
+         * @param {array<keyword>} contextKeywords A keyword must look like:
+         * {
+         *  text:"<textual label>" // the keyword (type:String)
+         *  type:"<entity type>" // either person, location, organization, misc (type:String, optional)
+         *  uri:"<entity uri" // uri of the entity (type:String, optional)
+         *  isMainTopic:"<true,false>" // indicator whether this keyword is the main topic
+         * }
+         * @returns {undefined}
+         */
         setQuery: function(contextKeywords) {
             util.preventQuery = true;
             taglist.tagit('removeAll');
@@ -59,14 +100,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             }, settings.queryDelay);
         }
     };
-    var results = {};
-    var lastQuery = {};
+    var results = {}; // the current results
+    var lastQuery = {}; // cache for the query to execute. On interface level, the query may already have changed
     var settings = {
-        queryFn: api.query,
+        queryFn: api.query, // function to execute a query
         imgPATH: 'img/',
-        queryModificationDelay: 500,
-        queryDelay: 2000,
-        storage: {
+        queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
+        queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
+        storage: { // wrapper for local storage
             set: function(item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
@@ -272,6 +313,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
     };
 
     return {
+        /**
+         * Initialize the searchBar with the set of visualization widgets to display and custom settings (optional). 
+         * 
+         * @param {array<Tab Object>} tabs the widgets to include. Should look like:
+         * {
+         *  name:"<name>" // the name of the widget, will be displayed as tab entry
+         *  url:"<url>" // the url of the widgets main page, will be included as iframe
+         *  icon:"<icon path>" // optional, will be displayed instead of the name
+         * }
+         * @param {object} config Custom settings
+         * @returns {undefined}
+         */
         init: function(tabs, config) {
             settings = $.extend(settings, config);
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
@@ -294,7 +347,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             });
             $jQueryTabsHeader.append($close_button);
 
-            //generates jquery-ui tabs TODO: icons? and move into external json
+            //generates jquery-ui tabs TODO: icons?
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
                 tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
@@ -372,8 +425,21 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 });
             });
         },
+        /**
+         * Displays the provided contextKeywords in the searchBar and automatically
+         * triggers a query with them after the delay specified by settings.queryDelay.
+         * 
+         * @param {array<keyword>} contextKeywords A keyword must look like:
+         * {
+         *  text:"<textual label>" // the keyword (type:String)
+         *  type:"<entity type>" // either person, location, organization, misc (type:String, optional)
+         *  uri:"<entity uri" // uri of the entity (type:String, optional)
+         *  isMainTopic:"<true,false>" // indicator whether this keyword is the main topic
+         * }
+         * @returns {undefined}
+         */
         setQuery: function(contextKeywords) {
-            if(util.preventQuerySetting) {
+            if (util.preventQuerySetting) {
                 util.cachedQuery = contextKeywords;
             } else {
                 util.setQuery(contextKeywords);
