@@ -127,6 +127,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
          * @returns {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} The paragraphs
          */
         getParagraphs: function(root) {
+            if (typeof root === 'undefined') {
+                root = document;
+            }
             var candidates = getCandidates(root);
             var paragraphs = [];
             var counter = 0;
