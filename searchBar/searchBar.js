@@ -1,22 +1,13 @@
 /**
- * A module to add a search bar to the bottom of a page. 
+ * A module to add a search bar to the bottom of a page. Currently under development and only pushed to the repository for demo purposes. Therefore not well documented and subject to changes.
  *
  * @module c4/searchBar
  */
 define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], function($, ui, tagit, api, iframes) {
     var util = {
-        // flag to determine if queries should be surpressed
         preventQuery: false,
-        /**
-         * Helper to adjust the size of an input element to its content.
-         * ATTENTION: the input element must be set as 'this'-context. Hence,
-         * the function need to be executed in the following fashion:
-         * resizeForText.call(<input element>,text,minify)
-         * 
-         * @param {string} text the input's content
-         * @param {boolean} minify wheter the input should also scale down or only scale up
-         * @returns {undefined}
-         */
+        preventQuerySetting: false,
+        cachedQuery: null,
         resizeForText: function(text, minify) {
             var $this = $(this);
             var $span = $this.parent().find('span');
@@ -26,14 +17,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 $this.css("width", $inputSize);
             }
         },
-        /**
-         * Helper to change the UI and send a query when a user made modifications the query. 
-         * 
-         * Shows the loading animation, hides the indication of results, collects
-         * keywords and main topics and after the timeout specified by settings.queryModificationDelay
-         * sends the query.
-         * @returns {undefined}
-         */
         queryUpdater: function() {
             loader.show();
             result_indicator.hide();
@@ -50,27 +33,40 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 settings.queryFn(lastQuery, resultHandler);
             }, settings.queryModificationDelay);
         },
-        /**
-         * Helper to set the main topic in the search bar.
-         * The topic must at least contain the attribute 'text'. 
-         * 
-         * @param {Object} topic
-         * @returns {undefined}
-         */
         setMainTopic: function(topic) {
             topic.isMainTopic = true;
             mainTopicLabel.val(topic.text).data('properties', topic);
             this.resizeForText.call(mainTopicLabel, topic.text, true);
+        },
+        setQuery: function(contextKeywords) {
+            util.preventQuery = true;
+            taglist.tagit('removeAll');
+            $.each(contextKeywords, function() {
+                if (this.isMainTopic) {
+                    // TODO: support multiple topics?
+                    util.setMainTopic(this);
+                } else {
+                    taglist.tagit('createTag', this.text, this);
+                }
+            });
+            util.preventQuery = false;
+            clearTimeout(timeout);
+            setTimeout(function() {
+                loader.show();
+                result_indicator.hide();
+                lastQuery = {contextKeywords: contextKeywords};
+                settings.queryFn({contextKeywords: contextKeywords}, resultHandler);
+            }, settings.queryDelay);
         }
     };
-    var results = {}; // the current results
-    var lastQuery = {}; // cache for the query to execute. On interface level, the query may already have changed
+    var results = {};
+    var lastQuery = {};
     var settings = {
-        queryFn: api.query, // function to execute a query
+        queryFn: api.query,
         imgPATH: 'img/',
-        queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
-        queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
-        storage: {// wrapper for local storage
+        queryModificationDelay: 500,
+        queryDelay: 2000,
+        storage: {
             set: function(item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
@@ -221,6 +217,16 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
     var contentArea = $("<div id = 'eexcess-tabBar-contentArea'><div id='eexcess-tabBar-iframeCover'></div><div id='eexcess-tabBar-jQueryTabsHeader'><ul></ul><div id = 'eexcess-tabBar-jQueryTabsContent' class='flex-container intrinsic-container intrinsic-container-ratio' ></div></div></div>").hide();
     $('body').append(contentArea);
     var $jQueryTabsHeader = $("#eexcess-tabBar-jQueryTabsHeader");
+    // prevent changes of query while the mouse is over the widget area
+    $jQueryTabsHeader.mouseenter(function() {
+        util.preventQuerySetting = true;
+    }).mouseleave(function() {
+        util.preventQuerySetting = false;
+        if (util.cachedQuery) {
+            util.setQuery(util.cachedQuery);
+            util.cachedQuery = null;
+        }
+    });
     var $iframeCover = $("#eexcess-tabBar-iframeCover");
     var $contentArea = $("#eexcess-tabBar-contentArea");
 
@@ -266,18 +272,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
     };
 
     return {
-        /**
-         * Initialize the searchBar with the set of visualization widgets to display and custom settings (optional). 
-         * 
-         * @param {array<Tab Object>} tabs the widgets to include. Should look like:
-         * {
-         *  name:"<name>" // the name of the widget, will be displayed as tab entry
-         *  url:"<url>" // the url of the widgets main page, will be included as iframe
-         *  icon:"<icon path>" // optional, will be displayed instead of the name
-         * }
-         * @param {object} config Custom settings
-         * @returns {undefined}
-         */
         init: function(tabs, config) {
             settings = $.extend(settings, config);
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
@@ -300,7 +294,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             });
             $jQueryTabsHeader.append($close_button);
 
-            //generates jquery-ui tabs TODO: icons
+            //generates jquery-ui tabs TODO: icons? and move into external json
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
                 tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
@@ -378,38 +372,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 });
             });
         },
-        /**
-         * Displays the provided contextKeywords in the searchBar and automatically
-         * triggers a query with them after the delay specified by settings.queryDelay.
-         * 
-         * @param {array<keyword>} contextKeywords A keyword must look like:
-         * {
-         *  text:"<textual label>" // the keyword (type:String)
-         *  type:"<entity type>" // either person, location, organization, misc (type:String, optional)
-         *  uri:"<entity uri" // uri of the entity (type:String, optional)
-         *  isMainTopic:"<true,false>" // indicator whether this keyword is the main topic
-         * }
-         * @returns {undefined}
-         */
         setQuery: function(contextKeywords) {
-            util.preventQuery = true;
-            taglist.tagit('removeAll');
-            $.each(contextKeywords, function() {
-                if (this.isMainTopic) {
-                    // TODO: support multiple topics?
-                    util.setMainTopic(this);
-                } else {
-                    taglist.tagit('createTag', this.text, this);
-                }
-            });
-            util.preventQuery = false;
-            clearTimeout(timeout);
-            setTimeout(function() {
-                loader.show();
-                result_indicator.hide();
-                lastQuery = {contextKeywords: contextKeywords};
-                settings.queryFn({contextKeywords: contextKeywords}, resultHandler);
-            }, settings.queryDelay);
+            if(util.preventQuerySetting) {
+                util.cachedQuery = contextKeywords;
+            } else {
+                util.setQuery(contextKeywords);
+            }
         }
     };
 });
