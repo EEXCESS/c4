@@ -42,15 +42,15 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
     }
   ```
 * ```queryPeas```: allows to query the Federated Recommender (through the Privacy Proxy) in a privacy-preserving way. It returns the exact same result as ```query```. It uses the [PEAS indistinguishability protocol](https://github.com/EEXCESS/peas#indistinguishability-protocol). This example shows how to use it: 
-```javascript
-require(["APIconnector"], function(apiConnector){
-	var nbFakeQueries = 2; // The greater the better from a privacy point of view, but the worse from a performance point of view (2 or 3 are acceptable values). 
-	var query = JSON.parse('{"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"}, "numResults": 3, "contextKeywords": [{"text": "graz","weight": 0.1}, {"text": "vienna","weight": 0.3}]');
-	apiConnector.queryPeas(query, nbFakeQueries, function(results){
-		var resultsObj = results.data; 
-	});
-}
-```
+  ```javascript
+    require(["APIconnector"], function(apiConnector){
+	    var nbFakeQueries = 2; // The greater the better from a privacy point of view, but the worse from a performance point of view (2 or 3 are acceptable values). 
+	    var query = JSON.parse('{"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"}, "numResults": 3, "contextKeywords": [{"text": "graz","weight": 0.1}, {"text": "vienna","weight": 0.3}]');
+	    apiConnector.queryPeas(query, nbFakeQueries, function(results){
+		    var resultsObj = results.data; 
+	    });
+    }
+  ```
 * ```getDetails(documentBadges,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameters are a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#details-query-format) of the items for which to retrieve details  and a callback function.
   ```javascript
     require(['c4/APIconnector'], function(api) {
@@ -109,7 +109,7 @@ Returns an array of the detected paragraphs with the entries in the following fo
       headlin:"Sit Amet" // textual content of the corresponding headline of the paragraph
     }
   ```
-Usage:
+  Usage:
   ```javascript
     require(['c4/paragraphDetection'], function(paragraphDetection) {
       var paragraphs = paragraphDetection.getParagraphs();
@@ -125,7 +125,7 @@ Usage:
     * [headline] - optional headline corresponding to the paragraph
   ```javascript
     require(['c4/paragraphDetection'], function(paragraphDetection) {
-      var text = 'Lorem ipsum dolor sit amet...";
+      var text = 'Lorem ipsum dolor sit amet...';
       paragraphDetection.paragraphToQuery(text, function(response){
         if(typeof response.query !== 'undefined') {
           // query has sucessfully been constructed
