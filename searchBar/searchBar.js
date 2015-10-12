@@ -107,7 +107,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
         imgPATH: 'img/',
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
-        storage: { // wrapper for local storage
+        storage: {// wrapper for local storage
             set: function(item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
@@ -322,11 +322,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
          *  url:"<url>" // the url of the widgets main page, will be included as iframe
          *  icon:"<icon path>" // optional, will be displayed instead of the name
          * }
-         * @param {object} config Custom settings
+         * @param {object} [config] Custom settings
          * @returns {undefined}
          */
         init: function(tabs, config) {
-            settings = $.extend(settings, config);
+            if (typeof config !== 'undefined') {
+                settings = $.extend(settings, config);
+            }
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
             right.append(logo);
             loader = $('<img id="eexcess_loader" src="' + settings.imgPATH + 'eexcess_loader.gif" />').hide();
