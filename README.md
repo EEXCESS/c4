@@ -88,12 +88,83 @@ require(["APIconnector"], function(apiConnector){
   ```
   
 # paragraphDetection
-A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create search query from a paragraph.
-* ```init(settings)```
-* ```getParagraphs([root])```
-* ```paragraphToQuery(text,callback,[id],[headline])```
-* ```findFocusedParagraphSimple([paragraphs])```
-* ```findFocusedParagraph([paragraphs])```
+A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create a search query from a paragraph.
+* ```init(settings)```:allows to initialize the paragraph detection with custom parameters. You only need to provide the parameters you want to change. Parameters that can be changed are a prefix that is used for the identifiers of newly created HTML elements and the classname that will added to those elements (atm a wrapper div with the mentioned parameters is created around the detected paragraph). The example uses the default values, if you are fine with these, you do not need to call the ``init`` method.
+  ```javascript
+    require(['c4/paragraphDetection'], function(paragraphDetection) {
+      paragraphDetection.init({
+        prefix:"eexcess", // default value
+        classname:"eexcess_detected_par" // default value
+      });
+    }
+  ```
+* ```getParagraphs([root])```: allows to detect text paragraphs in arbitrary HTML markup. The detection heuristic tries to extract 'real' paragraphs, opposed to navigation menus, advertisements, etc. The ``root`` parameter (optional) specifies the root HTML-element from where to start the extraction. If it is not given, the detection will use ``document`` as root.  
+Returns an array of the detected paragraphs with the entries in the following format:
+  ```javascript
+    {
+      id: "<prefix>_par_0", // identifier, the prefix can be customized via the init method
+      elements:[], // the HTML-elements spanning the paragrah
+      multi:false, // indicator, whether the paragraph consists of e.g. a singe <p> element or several <p> siblings
+      content:"Lorem ipsum dolor", // the textual content of the paragraph
+      headlin:"Sit Amet" // textual content of the corresponding headline of the paragraph
+    }
+  ```
+Usage:
+  ```javascript
+    require(['c4/paragraphDetection'], function(paragraphDetection) {
+      var paragraphs = paragraphDetection.getParagraphs();
+      paragrahps.forEach(function(entry){
+        console.log(entry); // do something with each paragraph
+      });
+    }
+  ```
+* ```paragraphToQuery(text,callback,[id],[headline])```: creates a query from the given text in the [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format) format. Only the attribute `contextKeywords` will be set. The parameters to be set are:
+    * text - The text of the paragraph for which to create a query
+    * callback(response) - The callback function to execute after the query generation. The generated query profile is contained in response.query or if an error occurs, error details are provided in response.error
+    * [id] - optional identifier of the paragraph
+    * [headline] - optional headline corresponding to the paragraph
+  ```javascript
+    require(['c4/paragraphDetection'], function(paragraphDetection) {
+      var text = 'Lorem ipsum dolor sit amet...";
+      paragraphDetection.paragraphToQuery(text, function(response){
+        if(typeof response.query !== 'undefined') {
+          // query has sucessfully been constructed
+          console.log(response.query);
+        } else {
+          // something went wrong
+          console.log(response.error);
+        }
+      });
+    }
+  ```
+* ```findFocusedParagraphSimple([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
+In this simple version, the topmost left paragraph is accounted as being read, except for the user explicitly clicking on a paragraph. When a change of the focused paragraph occurs, a `paragraphFocused` event is dispatched with the focused paragraph attached. The set of paragraphs to observe can be specified via the optional `paragraphs` parameter. If this parameter is not set, the method will observe paragraphs already detected by the module (if any - e.g. from a previous `getParagraphs` call). The `paragraphFocused` event may be dispatched several times for the same paragraph.
+  ```javascript
+    require(['jquery','c4/paragraphDetection'], function($,paragraphDetection) {
+      // detect paragraphs in the document
+      paragraphDetection.getParagraphs();
+      // listen for paragraphFoucsed events
+      $(document).on('paragraphFocused', function(e){
+        console.log(evt.originalEvent.detail); // the focused paragraph
+      });
+      // set up tracking of focused paragraph
+      paragraphDetection.findFocusedParagraphSimple();
+    }
+  ```
+* ```findFocusedParagraph([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
+This method is in principle identical to `findFocusedParagraph`, but accounts for more implicit user interaction. The probability of a focused paragraph is calculated by a weighted combination of its size, position and distance to the mouse position. When mouse movements occur, the distance to the mouse position has a higher weight, while scrolling events render the paragraph position more important.
+  ```javascript
+    require(['jquery','c4/paragraphDetection'], function($,paragraphDetection) {
+      // detect paragraphs in the document
+      paragraphDetection.getParagraphs();
+      // listen for paragraphFoucsed events
+      $(document).on('paragraphFocused', function(e){
+        console.log(evt.originalEvent.detail); // the focused paragraph
+      });
+      // set up tracking of focused paragraph
+      paragraphDetection.findFocusedParagraphSimple();
+    }
+  ```
   
 # iframes
 A utility module for communicating between iframes
