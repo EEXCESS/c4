@@ -21,7 +21,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails',
         suffix_favicon: 'getPartnerFavIcon?partnerId='
-      })
+      });
     }
   ```
 * ```query(profile,callback)```: allows to query the Federated Recommender (through the Privacy Proxy). The expected parameters are a [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format) and a callback function.
