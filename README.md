@@ -41,6 +41,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
       });
     }
   ```
+  
 * ```queryPeas```: allows to query the Federated Recommender (through the Privacy Proxy) in a privacy-preserving way. It returns the exact same result as ```query```. It uses the [PEAS indistinguishability protocol](https://github.com/EEXCESS/peas#indistinguishability-protocol). This example shows how to use it:
   ```javascript
     require(["APIconnector"], function(apiConnector){
@@ -51,6 +52,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
 	    });
     }
   ```
+  
 * ```getDetails(documentBadges,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameters are a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#details-query-format) of the items for which to retrieve details  and a callback function.
   ```javascript
     require(['c4/APIconnector'], function(api) {
@@ -68,6 +70,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
       });
     }
   ```
+  
 * ```getCache()```: allows to retrieve the cached queries/result sets.
   ```javascript
     require(['c4/APIconnector'], function(api) {
@@ -98,6 +101,7 @@ A module to extract textual paragraphs from arbitrary webpage markup, find the p
       });
     }
   ```
+  
 * ```getParagraphs([root])```: allows to detect text paragraphs in arbitrary HTML markup. The detection heuristic tries to extract 'real' paragraphs, opposed to navigation menus, advertisements, etc. The ``root`` parameter (optional) specifies the root HTML-element from where to start the extraction. If it is not given, the detection will use ``document`` as root.  
 Returns an array of the detected paragraphs with the entries in the following format:
   ```javascript
@@ -118,6 +122,7 @@ Returns an array of the detected paragraphs with the entries in the following fo
       });
     }
   ```
+  
 * ```paragraphToQuery(text,callback,[id],[headline])```: creates a query from the given text in the [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format) format. Only the attribute `contextKeywords` will be set. The parameters to be set are:
     * text - The text of the paragraph for which to create a query
     * callback(response) - The callback function to execute after the query generation. The generated query profile is contained in response.query or if an error occurs, error details are provided in response.error
@@ -137,6 +142,7 @@ Returns an array of the detected paragraphs with the entries in the following fo
       });
     }
   ```
+  
 * ```findFocusedParagraphSimple([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
 In this simple version, the topmost left paragraph is accounted as being read, except for the user explicitly clicking on a paragraph. When a change of the focused paragraph occurs, a `paragraphFocused` event is dispatched with the focused paragraph attached. The set of paragraphs to observe can be specified via the optional `paragraphs` parameter. If this parameter is not set, the method will observe paragraphs already detected by the module (if any - e.g. from a previous `getParagraphs` call). The `paragraphFocused` event may be dispatched several times for the same paragraph.
   ```javascript
@@ -151,6 +157,7 @@ In this simple version, the topmost left paragraph is accounted as being read, e
       paragraphDetection.findFocusedParagraphSimple();
     }
   ```
+  
 * ```findFocusedParagraph([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
 This method is in principle identical to `findFocusedParagraph`, but accounts for more implicit user interaction. The probability of a focused paragraph is calculated by a weighted combination of its size, position and distance to the mouse position. When mouse movements occur, the distance to the mouse position has a higher weight, while scrolling events render the paragraph position more important.
   ```javascript
