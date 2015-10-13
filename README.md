@@ -13,25 +13,28 @@ C4 - Cultural and sCientific Content in Context
 # APIconnector
 The APIconnector module provides means to communicate with the (EEXCESS) Federated Recommender via the Privacy Proxy
 
-* ```init(settings)```: allows to initialize the APIconnector with custom parameters. You only need to specify the parameters you would like to customize. The example below shows the initialization with the default values. If you are ok with these, you do not need to call the ```init``` method. The following parameters can be customized:
+* ```init(settings)```: allows to initialize the APIconnector with custom parameters. You must call this method and specify the ```origin``` attribute (see below), before you can send queries. The minimum configuration is shown in the example below. The following parameters can be customized:
   * ```base_url``` The basic url of the server to call
-  * ```timeout``` The timeout in ms, after which a request to the server is cancelled
-  * ```cacheSize``` The size of the query/result cache. Determines how many queries and corresponding result sets should be cached.
-  * ```suffix_recommend``` The endpoint for the recommender service
-  * ```suffix_details``` The endpoint to get details for result items
-  * ```suffix_favicon``` The endpoint from which to retrieve the provider favicons
-    ```javascript
+  * ```timeout``` The timeout in ms, after which a request to the server is canceled. Default is 10000.
+  * ```logTimeout``` The timeout in ms, after which a logging request to the server is canceled. Default is 5000.
+  * ```loggingLevel``` Flag whether queries/results should be logged on the privacy proxy. Defaults to 0 (logging enabled). If you want to disable the logging on the server you need to set the flag to 1.  
+  * ```cacheSize``` The size of the query/result cache. Determines how many queries and corresponding result sets should be cached. Default is 10.
+  * ```suffix_recommend``` The endpoint for the recommender service. Default: "recommend".
+  * ```suffix_details``` The endpoint to get details for result items. Default: "getDetails".
+  * ```suffix_favicon``` The endpoint from which to retrieve the provider favicons. Default: "getPartnerFavIcon?partnerId=".
+  * ```suffix_log``` The endpoint for logging requests. Default: "log/".
+  * ```origin``` The identifier for the requesting client/user. This object must contain the attributes ```clientType```, ```clientVersion``` and ```userID```, see the example below.
+  ```javascript
     require(['c4/APIconnector'], function(api) {
       api.init({
-        base_url: "https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
-        timeout: 10000,
-        cacheSize: 10,
-        suffix_recommend: 'recommend',
-        suffix_details: 'getDetails',
-        suffix_favicon: 'getPartnerFavIcon?partnerId='
+        origin:{
+          clientType:"some client", // the name of the client application
+          clientVersion:"42.23", // the version nr of the client application
+          userID:"E993A29B-A063-426D-896E-131F85193EB7" // UUID of the current user
+        }
       });
     }
-    ```
+  ```
     
 * ```query(profile,callback)```: allows to query the Federated Recommender (through the Privacy Proxy). The expected parameters are a [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format) and a callback function.
   ```javascript
@@ -96,6 +99,26 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
     var current = api.getCurrent();
     console.log(current.profile); // the query
     console.log(current.result); // the result set
+  }
+  ```
+  
+* ```logInteractionType```: Enum for logging interaction types. See ```sendLog``` for usage.
+* ```sendLog(interactionType, logEntry)```: allows to send logging requests to the server. The parameter ```interactionType``` specifies the type of the interaction to log and the parameter ```logEntry``` the entry to be logged.
+  ```javascript
+  require(['c4/APIconnector'], function(api) {
+    // the log entry normally will be created within a widget, here we define one explicitly.
+    // The entry we create logs the citation of a result item as an image.
+    var logEntry = {
+      origin:{
+        moduleName:"example widget",
+        moduleVersion:"0.23"
+      },
+      content:{
+        documentBadge:{<documentBadge of the item>}
+      },
+      queryID:<identifier of the query that provided this result item>
+    }
+    api.sendLog(api.logInteractionType.itemCitedAsImage,logEntry);
   }
   ```
   

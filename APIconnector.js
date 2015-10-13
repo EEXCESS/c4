@@ -13,10 +13,13 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
         base_url: "https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
         timeout: 10000,
+        logTimeout: 5000,
+        logggingLevel: 0,
         cacheSize: 10,
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails',
-        suffix_favicon: 'getPartnerFavIcon?partnerId='
+        suffix_favicon: 'getPartnerFavIcon?partnerId=',
+        suffix_log: 'log/'
     };
     peas_indist.initUrl(settings.base_url);
     var xhr;
@@ -27,7 +30,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         }
         sessionCache.push(element);
     };
-    
+
     /**
      * Complement the origin object with the name of the client and a user identifier;
      * 
@@ -35,13 +38,13 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
      * @returns {Object}
      */
     var complementOrigin = function(origin) {
-        if(typeof origin === 'undefined') {
+        if (typeof origin === 'undefined') {
             throw new "origin undefined";
         } else if (typeof origin.moduleName === 'undefined') {
             throw new "origin.moduleName undfined";
-        } else if(typeof settings.origin === 'undefined') {
+        } else if (typeof settings.origin === 'undefined') {
             throw new 'origin undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>", clientVersion:"version nr",userID:"<UUID>"}})';
-        } else if(typeof settings.origin.clientType === 'undefined') {
+        } else if (typeof settings.origin.clientType === 'undefined') {
             throw new 'origin.clientType undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>"}})';
         } else if (typeof settings.origin.clientVersion === 'undefined') {
             throw new 'origin.clientVersion undefined (need to initialize via APIconnector.init({origin:{clientVersion:"<version nr>"}})';
@@ -113,15 +116,15 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         queryPeas: function(profile, k, callback) {
-        	var obfuscatedProfile = peas_indist.obfuscateQuery(profile, k);
-	        this.query(obfuscatedProfile, function(results){
-	        	if (results.status === "success"){
-	        		var filteredResults = peas_indist.filterResults(results.data, profile);
-	               	callback({status: results.status, data: filteredResults});
-	        	} else {
-	        		callback({status: results.status, data: results.data});
-	        	}
-	        });
+            var obfuscatedProfile = peas_indist.obfuscateQuery(profile, k);
+            this.query(obfuscatedProfile, function(results) {
+                if (results.status === "success") {
+                    var filteredResults = peas_indist.filterResults(results.data, profile);
+                    callback({status: results.status, data: filteredResults});
+                } else {
+                    callback({status: results.status, data: results.data});
+                }
+            });
         },
         /**
          * Function to retrieve details for a set of returned results.
@@ -131,14 +134,14 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         getDetails: function(documentBadges, callback) {
             var xhr = $.ajax({
                 url: settings.base_url + settings.suffix_details,
-                data: JSON.stringify({documentBadge:documentBadges}),
+                data: JSON.stringify({documentBadge: documentBadges}),
                 type: 'POST',
                 contentType: 'application/json; charset=UTF-8',
                 dataType: 'json',
                 timeout: settings.timeout
             });
             xhr.done(function(response) {
-                callback({status:'success', data:response});
+                callback({status: 'success', data: response});
             });
             xhr.fail(function(jqXHR, textStatus, errorThrown) {
                 if (textStatus !== 'abort') {
@@ -168,6 +171,36 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
             } else {
                 return null;
             }
+        },
+        /**
+         * Enum for logging interaction types
+         */
+        logInteractionType: {
+            moduleOpened: "moduleOpened",
+            moduleClosed: "moduleClosed",
+            moduleStatisticsCollected: "moduleStatisticsCollected",
+            itemOpened: "itemOpened",
+            itemClosed: "itemClosed",
+            itemCitedAsImage: "itemCitedAsImage",
+            itemCitedAsText: "itemCitedAsText",
+            itemCitedAsHyperlink: "itemCitedAsHyperlink",
+            itemRated: "itemRated"
+        },
+        /**
+         * Function to send a log event to the logging endpoint
+         * @param {String} interactionType The type of interaction to be logged. See `APIconnector.logInteractionType` for a list of possible interactions
+         * @param {Object} logEntry The entry to be logged. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging}
+         */
+        sendLog: function(interactionType, logEntry) {
+            logEntry.origin = complementOrigin(logEntry.origin);
+            var xhr;
+            xhr = $.ajax({
+                url: settings.base_url + settings.suffix_log + interactionType,
+                data: JSON.stringify(logEntry),
+                type: 'POST',
+                contentType: 'application/json; charset=UTF-8',
+                timeout: settings.logTimeout
+            });
         }
     };
 });
