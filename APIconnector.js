@@ -27,6 +27,33 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         }
         sessionCache.push(element);
     };
+    
+    /**
+     * Complement the origin object with the name of the client and a user identifier;
+     * 
+     * @param {Object} origin
+     * @returns {Object}
+     */
+    var complementOrigin = function(origin) {
+        if(typeof origin === 'undefined') {
+            throw new "origin undefined";
+        } else if (typeof origin.moduleName === 'undefined') {
+            throw new "origin.moduleName undfined";
+        } else if(typeof settings.origin === 'undefined') {
+            throw new 'origin undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>", clientVersion:"version nr",userID:"<UUID>"}})';
+        } else if(typeof settings.origin.clientType === 'undefined') {
+            throw new 'origin.clientType undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>"}})';
+        } else if (typeof settings.origin.clientVersion === 'undefined') {
+            throw new 'origin.clientVersion undefined (need to initialize via APIconnector.init({origin:{clientVersion:"<version nr>"}})';
+        } else if (typeof settings.origin.userID === 'undefined') {
+            throw new 'origin.userID undefined (need to initialize via APIconnector.init({origin:{userID:"<UUID>"}})';
+        } else {
+            origin.clientType = settings.origin.clientType;
+            origin.clientVersion = settings.origin.clientVersion;
+            origin.userID = settings.origin.userID;
+        }
+        return origin;
+    };
 
     return {
         /**
@@ -48,6 +75,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         query: function(profile, callback) {
+            profile.origin = complementOrigin(profile.origin);
             if (xhr && xhr.readyState !== 4) {
                 xhr.abort();
             }
