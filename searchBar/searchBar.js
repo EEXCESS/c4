@@ -50,6 +50,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 if (mainTopic && mainTopic.text && mainTopic.text !== '') {
                     lastQuery.contextKeywords.push(mainTopic);
                 }
+                // add origin
+                lastQuery.origin = {
+                    module: "c4/searchBar"
+                };
                 // query
                 settings.queryFn(lastQuery, resultHandler);
             }, settings.queryModificationDelay);
@@ -80,7 +84,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
          * @returns {undefined}
          */
         setQuery: function(contextKeywords, delay) {
-            if(typeof delay === 'undefined') {
+            if (typeof delay === 'undefined') {
                 delay = settings.queryDelay;
             }
             util.preventQuery = true;
@@ -99,7 +103,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 loader.show();
                 result_indicator.hide();
                 lastQuery = {contextKeywords: contextKeywords};
-                settings.queryFn({contextKeywords: contextKeywords}, resultHandler);
+                // add origin
+                lastQuery.origin = {
+                    module: "c4/searchBar"
+                };
+                settings.queryFn(lastQuery, resultHandler);
             }, delay);
         }
     };
@@ -282,6 +290,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
         // visualization has triggered a query -> widgets must be visible
         if (msg.data.event && msg.data.event === 'eexcess.queryTriggered') {
             lastQuery = msg.data.data;
+            // add origin
+            lastQuery.origin = {
+                module: "c4/searchBar"
+            };
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
             result_indicator.hide();
             loader.show();
@@ -447,7 +459,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             if (util.preventQuerySetting) {
                 util.cachedQuery = contextKeywords;
             } else {
-                util.setQuery(contextKeywords,0);
+                util.setQuery(contextKeywords, 0);
             }
         }
     };
