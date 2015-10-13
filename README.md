@@ -8,10 +8,9 @@ requirejs.config({
   baseUrl: 'bower_components/',
   paths: {
     jquery: 'jquery/dist/jquery',
-    peas:'peas',
-    jquery-ui:'jquery-ui/jquery-ui',
+    "jquery-ui":'jquery-ui/jquery-ui',
     graph:'graph/lib/graph',
-    tag-it:'tag-it/js/tag-it'
+    "tag-it":'tag-it/js/tag-it'
   }
 });
 ```
