@@ -33,7 +33,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
           userID:"E993A29B-A063-426D-896E-131F85193EB7" // UUID of the current user
         }
       });
-    }
+    });
   ```
     
 * ```query(profile,callback)```: allows to query the Federated Recommender (through the Privacy Proxy). The expected parameters are a [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format) and a callback function.
@@ -51,7 +51,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
         // an error occured, details may be in response.data
       }
     });
-  }
+  });
   ```
   
 * ```queryPeas```: allows to query the Federated Recommender (through the Privacy Proxy) in a privacy-preserving way. It returns the exact same result as ```query```. It uses the [PEAS indistinguishability protocol](https://github.com/EEXCESS/peas#indistinguishability-protocol). This example shows how to use it:
@@ -62,7 +62,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
     apiConnector.queryPeas(query, nbFakeQueries, function(results){
       var resultsObj = results.data; 
     });
-  }
+  });
   ```
   
 * ```getDetails(documentBadges,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameters are a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) of the items for which to retrieve details  and a callback function.
@@ -80,7 +80,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
         // an error occured, details may be in response.data
       }
     });
-  }
+  });
   ```
   
 * ```getCache()```: allows to retrieve the cached queries/result sets.
@@ -90,7 +90,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
       console.log(this.profile); // the query
       console.log(this.result); // the result set
     });
-  }
+  });
   ```
   
 * ```getCurrent()```: allows to retrieve the last successfully executed query and corresponding result set. Returns ```null``` if no successful query has been executed up to that point.
@@ -99,7 +99,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
     var current = api.getCurrent();
     console.log(current.profile); // the query
     console.log(current.result); // the result set
-  }
+  });
   ```
   
 * ```logInteractionType```: Enum for logging interaction types. See ```sendLog``` for usage.
@@ -118,7 +118,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
       queryID:<identifier of the query that provided this result item>
     }
     api.sendLog(api.logInteractionType.itemCitedAsImage,logEntry);
-  }
+  });
   ```
   
 # paragraphDetection
@@ -130,7 +130,7 @@ A module to extract textual paragraphs from arbitrary webpage markup, find the p
       prefix:"eexcess", // default value
       classname:"eexcess_detected_par" // default value
     });
-  }
+  });
   ```
   
 * ```getParagraphs([root])```: allows to detect text paragraphs in arbitrary HTML markup. The detection heuristic tries to extract 'real' paragraphs, opposed to navigation menus, advertisements, etc. The ``root`` parameter (optional) specifies the root HTML-element from where to start the extraction. If it is not given, the detection will use ``document`` as root.  
@@ -151,7 +151,7 @@ Returns an array of the detected paragraphs with the entries in the following fo
     paragrahps.forEach(function(entry){
       console.log(entry); // do something with each paragraph
     });
-  }
+  });
   ```
   
 * ```paragraphToQuery(text,callback,[id],[headline])```: creates a query from the given text in the [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format) format. Only the attribute `contextKeywords` will be set. The parameters to be set are:
@@ -171,7 +171,7 @@ Returns an array of the detected paragraphs with the entries in the following fo
         console.log(response.error);
       }
     });
-  }
+  });
   ```
   
 * ```findFocusedParagraphSimple([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
@@ -186,7 +186,7 @@ In this simple version, the topmost left paragraph is accounted as being read, e
     });
     // set up tracking of focused paragraph
     paragraphDetection.findFocusedParagraphSimple();
-  }
+  });
   ```
   
 * ```findFocusedParagraph([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
@@ -201,7 +201,7 @@ This method is in principle identical to `findFocusedParagraph`, but accounts fo
     });
     // set up tracking of focused paragraph
     paragraphDetection.findFocusedParagraphSimple();
-  }
+  });
   ```
 
 # CitationBuilder
@@ -270,7 +270,7 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
       text:"ipsum"
     }];
     searchBar.setQuery(contextKeywords, 0); // query is set and will be immediately executed (delay: 0ms)
-  }
+  });
   ```  
   
 # iframes
@@ -287,7 +287,7 @@ require(['c4/iframes'], function(iframes) {
     event:'eexces.newQueryTriggered',
     data:profile
   });
-}
+});
 ```
   
 # namedEntityRecognition
@@ -318,5 +318,5 @@ require(['c4/namedEntityRecognition'], function(ner) {
       // an error occured, details may be in response.data
     }
   });
-}
+});
 ```
