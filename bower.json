@@ -1,10 +1,11 @@
 {
     "name": "c4",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "homepage": "https://github.com/EEXCESS/c4",
     "authors": [
         "Jörg Schlötterer <joerg.schloetterer@uni-passau.de>",
-        "Nils Witt"
+        "Nils Witt",
+        "Johannes Jurgovsky"
     ],
     "description": "tools for context detection, query generation and result usage in web pages",
     "moduleType": [
@@ -14,9 +15,6 @@
         "context",
         "query",
         "citation",
-        "named",
-        "entity",
-        "recognition",
         "paragraph"
     ],
     "license": "MIT",
