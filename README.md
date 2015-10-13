@@ -193,7 +193,7 @@ In this simple version, the topmost left paragraph is accounted as being read, e
   ```
   
 * ```findFocusedParagraph([paragraphs])```: tries to determine the paragraph, the user is currently looking at.  
-This method is in principle identical to `findFocusedParagraph`, but accounts for more implicit user interaction. The probability of a focused paragraph is calculated by a weighted combination of its size, position and distance to the mouse position. When mouse movements occur, the distance to the mouse position has a higher weight, while scrolling events render the paragraph position more important.
+This method is in principle identical to `findFocusedParagraphSimple`, but accounts for more implicit user interaction. The probability of a focused paragraph is calculated by a weighted combination of its size, position and distance to the mouse position. When mouse movements occur, the distance to the mouse position has a higher weight, while scrolling events render the paragraph position more important.
   ```javascript
   require(['jquery','c4/paragraphDetection'], function($,paragraphDetection) {
     // detect paragraphs in the document
@@ -256,6 +256,7 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
       The ```callback``` parameter is a callback function without parameters to be executed after storing the item. 
     * ```get(key, callback)``` The ```key``` parameter is either a single String (to get a single value) or an Array of Strings (to get several values).  
       The ```callback``` function should be called with an object, containing the provided key(s) and their corresponding values like so:
+      
       ```javascript
         var response = {
           key1: value1,
@@ -282,47 +283,47 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
 # iframes
 A utility module for communicating between iframes
 * ```sendMsgAll(message)```: send a message to all iframes embedded in the current window. The expected parameter is the message to send. The example below shows how to inform all included [widgets](https://github.com/EEXCESS/visualization-widgets) that a new query has been issued.
-```javascript
-require(['c4/iframes'], function(iframes) {
-  var profile = {
-    contextKeywords:[{
-      text:'someKeyword'
-    }];
-  };
-  iframes.sendMsgAll({
-    event:'eexces.newQueryTriggered',
-    data:profile
+  ```javascript
+  require(['c4/iframes'], function(iframes) {
+    var profile = {
+      contextKeywords:[{
+        text:'someKeyword'
+      }];
+    };
+    iframes.sendMsgAll({
+      event:'eexces.newQueryTriggered',
+      data:profile
+    });
   });
-});
-```
+  ```
   
 # namedEntityRecognition
 A utility module to query the EEXCESS recognition and disambiguation service
 * ```entitiesAndCategories(paragraphs,callback)```: allows to extract Wikipedia entities and associated categories from a given piece of text. In addition, the main topic of the text and time mentions are extracted. The expected parameters are a set of paragraphs and a callback function.
-```javascript
-require(['c4/namedEntityRecognition'], function(ner) {
-  var paragraph = {
-    id:42,
-    headline:"I am a headline",
-    content:"Lorem ipsum dolor..."
-  };
-  ner.entitiesAndCategories({paragraphs:[paragraph]}, function(response){
-    if(response.status === 'success') {
-      // the results are contained in response.data.paragraphs
-      response.data.paragraphs.forEach(function(){
-        console.log(this.time); // contains time mentions and associated entities/categories
-        console.log(this.topic); // contains the main topic entity
-        console.log(this.statistic); // contains the extracted entities/categories
-        this.statistic.forEach(function(){
-          console.log(this.key.text); // label of the entity
-          console.log(this.key.categories); // associated categories
-          console.log(this.key.type); // type of the entity (person, location, organization, misc)
-          console.log(this.value); // number of occurences of the entity in the paragraph
+  ```javascript
+  require(['c4/namedEntityRecognition'], function(ner) {
+    var paragraph = {
+      id:42,
+      headline:"I am a headline",
+      content:"Lorem ipsum dolor..."
+    };
+    ner.entitiesAndCategories({paragraphs:[paragraph]}, function(response){
+      if(response.status === 'success') {
+        // the results are contained in response.data.paragraphs
+        response.data.paragraphs.forEach(function(){
+          console.log(this.time); // contains time mentions and associated entities/categories
+          console.log(this.topic); // contains the main topic entity
+          console.log(this.statistic); // contains the extracted entities/categories
+          this.statistic.forEach(function(){
+            console.log(this.key.text); // label of the entity
+            console.log(this.key.categories); // associated categories
+            console.log(this.key.type); // type of the entity (person, location, organization, misc)
+            console.log(this.value); // number of occurences of the entity in the paragraph
+          });
         });
-      });
-    } else {
-      // an error occured, details may be in response.data
-    }
+      } else {
+        // an error occured, details may be in response.data
+      }
+    });
   });
-});
-```
+  ```
