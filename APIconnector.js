@@ -40,8 +40,8 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var complementOrigin = function(origin) {
         if (typeof origin === 'undefined') {
             throw new "origin undefined";
-        } else if (typeof origin.moduleName === 'undefined') {
-            throw new "origin.moduleName undfined";
+        } else if (typeof origin.module === 'undefined') {
+            throw new "origin.module undfined";
         } else if (typeof settings.origin === 'undefined') {
             throw new 'origin undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>", clientVersion:"version nr",userID:"<UUID>"}})';
         } else if (typeof settings.origin.clientType === 'undefined') {

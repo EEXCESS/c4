@@ -110,8 +110,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
     // The entry we create logs the citation of a result item as an image.
     var logEntry = {
       origin:{
-        moduleName:"example widget",
-        moduleVersion:"0.23"
+        module:"example widget"
       },
       content:{
         documentBadge:{<documentBadge of the item>}
