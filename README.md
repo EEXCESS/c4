@@ -105,6 +105,7 @@ A working example using the APIconnector can be found in [examples/searchBar_Par
   
 * ```logInteractionType```: Enum for logging interaction types. See ```sendLog``` for usage.
 * ```sendLog(interactionType, logEntry)```: allows to send logging requests to the server. The parameter ```interactionType``` specifies the type of the interaction to log and the parameter ```logEntry``` the entry to be logged.
+
   ```javascript
   require(['c4/APIconnector'], function(api) {
     // the log entry normally will be created within a widget, here we define one explicitly.
@@ -229,6 +230,7 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
   ```
   The ```config``` object allows to customize the following parameters (you only need to specify the ones you would like to change):
   * ```queryFn``` - a custom function to query a server for results. The function must look like
+  
     ```javascript
       function(profile,function(response){
         console.log(response.status); // should inform about the status, either 'success' or 'error'
