@@ -1,0 +1,3 @@
+[submodule "examples/widgets"]
+	path = examples/widgets
+	url = https://github.com/EEXCESS/visualization-widgets.git
