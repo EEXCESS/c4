@@ -259,7 +259,8 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
           key2: value2
         }
         callback(response);
-      ```         
+      ```
+
 * ```setQuery(contextKeywords [,delay])```: sets the query in the search bar.
   The ```contextKeywors``` must be in the format as the contextKeywords in the [EEXCESS query profile format](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format).  
   The query will automatically be executed after the delay given by the settings (default: 2000ms, can be customized via ```searchBar.init(<tabs>,{queryDelay:<custom value>})```. Alternatively, this setting can be overwritten by providing the optional ```delay``` parameter, which specifies the delay in ms.
@@ -273,8 +274,8 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
     }];
     searchBar.setQuery(contextKeywords, 0); // query is set and will be immediately executed (delay: 0ms)
   });
-  ```  
-  
+  ```
+
 # iframes
 A utility module for communicating between iframes
 * ```sendMsgAll(message)```: send a message to all iframes embedded in the current window. The expected parameter is the message to send. The example below shows how to inform all included [widgets](https://github.com/EEXCESS/visualization-widgets) that a new query has been issued.
