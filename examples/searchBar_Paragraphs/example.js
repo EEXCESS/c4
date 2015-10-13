@@ -18,7 +18,8 @@ require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/sea
     // add searchResultListVis widget to display results
     var tabs = [{
             name:"search results",
-            url:"../widgets/searchResultListVis/index.html"
+            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
+            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/index.html"
     }];
     // initialize the searchBar with the specified tabs and the path to the image folder
     searchBar.init(tabs, {imgPATH: '../../searchBar/img/'});
