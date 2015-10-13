@@ -1,6 +1,26 @@
 C4 - Cultural and sCientific Content in Context
 
 # Installation
+The simplest way is to use [bower](http://bower.io/). C4 is available in the package repository, so `bower install c4` will install everything you need.  
+After c4 is installed, you might need to configure the paths for requirejs. This can be comfortably automated with [grunt-bower-requirejs](https://github.com/yeoman/grunt-bower-requirejs). If you choose to configure the paths manually, your configuration might look similar to this (first part of the script, in which you want to use c4 modules):
+```javascript
+requirejs.config({
+  baseUrl: 'bower_components/',
+  paths: {
+    jquery: 'jquery/dist/jquery',
+    peas:'peas',
+    jquery-ui:'jquery-ui/jquery-ui',
+    graph:'graph/lib/graph',
+    tag-it:'tag-it/js/tag-it'
+  }
+});
+```
+
+Once the paths are configuration, you need to include your script via requirejs as usual, for example like so:
+```html
+<script data-main="myScript" src="bower_components/requirejs/require.js"></script>
+```
+where `myScript` is the script you want to execute and in which you use c4 modules.
 
 # Module Overview
 * ```APIconnector``` A module that simplifies requests to the EEXCESS privacy proxy. It allows to send (privacy preserved) queries, obtain details for a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) and provides a cache of the last queries/result sets.  
