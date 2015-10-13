@@ -121,7 +121,6 @@ A working example using the APIconnector can be found in [examples/searchBar_Par
     api.sendLog(api.logInteractionType.itemCitedAsImage,logEntry);
   });
   ```
-  
 # paragraphDetection
 A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create a search query from a paragraph.  
 A working example using the paragraphDetection can be found in [examples/searchBar_Paragraphs](examples/searchBar_Paragraphs)
@@ -250,6 +249,7 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
         }
       }
       ```
+      
       The ```callback``` parameter is a callback function without parameters to be executed after storing the item. 
     * ```get(key, callback)``` The ```key``` parameter is either a single String (to get a single value) or an Array of Strings (to get several values).  
       The ```callback``` function should be called with an object, containing the provided key(s) and their corresponding values like so:
@@ -260,7 +260,6 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
         }
         callback(response);
       ```         
-
 * ```setQuery(contextKeywords [,delay])```: sets the query in the search bar.
   The ```contextKeywors``` must be in the format as the contextKeywords in the [EEXCESS query profile format](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format).  
   The query will automatically be executed after the delay given by the settings (default: 2000ms, can be customized via ```searchBar.init(<tabs>,{queryDelay:<custom value>})```. Alternatively, this setting can be overwritten by providing the optional ```delay``` parameter, which specifies the delay in ms.
