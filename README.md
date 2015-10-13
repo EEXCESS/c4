@@ -121,6 +121,7 @@ A working example using the APIconnector can be found in [examples/searchBar_Par
     api.sendLog(api.logInteractionType.itemCitedAsImage,logEntry);
   });
   ```
+
 # paragraphDetection
 A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create a search query from a paragraph.  
 A working example using the paragraphDetection can be found in [examples/searchBar_Paragraphs](examples/searchBar_Paragraphs)
