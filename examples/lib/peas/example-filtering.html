@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+		requirejs.config({
+		    paths: {
+		    	jquery: "./bower_components/jquery/dist/jquery",
+		    	graph: "./bower_components/graph/lib/graph", 
+		    	peas: "./"
+		    }
+		});		
+		</script>
+		<script>
+			require(["peas/peas_indist"], function(peas_indist){
+				document.getElementById("go").addEventListener("click", function(){ 
+					var originalQuery = JSON.parse(document.getElementById("originalQuery").value);
+					var obfuscatedQuery = JSON.parse(document.getElementById("obfuscatedQuery").value);
+					var results = JSON.parse(document.getElementById("results").value);
+					var filteredResults = peas_indist.filterResults(results, originalQuery);
+					document.getElementById("filteredResults").innerHTML = JSON.stringify(filteredResults);
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>
+				Original query: <br/>
+				<textarea id="originalQuery" rows="10" cols="150">{
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+		"clientVersion": "2beta", 
+		"module": "testing"
+	},
+	"numResults":3,
+	"contextKeywords":[
+		{"text":"graz",	"weight":0.1},
+		{"text":"vienna", "weight":0.3}
+	]
+}</textarea>
+			</p>
+			<p>
+				Obfuscated query: <br/>
+				<textarea id="obfuscatedQuery" rows="10" cols="150">{
+	"origin": {
+		"userID": "E993A29B-A063-426D-896E-131F85193EB7", 
+		"clientType": "EEXCESS - Google Chrome Extension", 
+		"clientVersion": "2beta", 
+		"module": "testing"
+	},
+	"numResults":3,
+	"contextKeywords":[
+		[{"text":"graz",	"weight":0.1},{"text":"vienna", "weight":0.1}],
+   		[{"text":"music",	"weight":0.1},{"text":"bass", "weight":0.1}],
+   		[{"text":"money",	"weight":0.1},{"text":"euro", "weight":0.1}]
+	]
+}</textarea>
+			</p>
+			<p>
+				Results before filtering: <br/>
+				<textarea id="results" rows="10" cols="150">{
+	"results": [{
+		"partnerResponseState": [{
+			"systemID": "Deutsche Digitale Bibliothek",
+			"success": true
+		}, {
+			"systemID": "Europeana",
+			"success": true
+		}, {
+			"systemID": "KIMPortal",
+			"success": true
+		}, {
+			"systemID": "Mendeley",
+			"success": true
+		}, {
+			"systemID": "ZBW",
+			"success": true
+		}, {
+			"systemID": "Wissenmedia",
+			"success": true
+		}],
+		"result": [{
+			"licence": "restricted",
+			"title": "Slovenia and Austria : bilateral economic effects of Slovenian EU accession ; papers from the Conference \\\"The Slovenian EU Accession and Its Bilateral Economic Effects on Austria and Slovenia\\\" (November 5th 2003, Graz) ; organised by the Ludwig-Boltzmann-Institute for Monetary Economics, Vienna in co-operation with the Government of Styria and Joanneum Research, Graz",
+			"generatingQuery": "graz OR vienna",
+			"documentBadge": {
+				"id": "10002094844",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10002094844"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2004",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "restricted",
+			"title": "Arbeitsmarktanalyse der Stadt Graz im Vergleich mit Linz: Zentrale Ergebnisse einer aktuellen Studie im Auftrag von AMS Steiermark, Wirtschaftskammer Steiermark und Stadt Graz",
+			"generatingQuery": "graz OR vienna",
+			"documentBadge": {
+				"id": "10011282301",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10011282301"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2014",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "restricted",
+			"title": "Graz",
+			"generatingQuery": "graz OR vienna",
+			"documentBadge": {
+				"id": "sl23309976",
+				"provider": "Wissenmedia",
+				"uri": "http://service.wissens-server.com/wissensserver/view.html?a=t&r=CURRENT&i=sl23309976&s=BEP&v=eexcess&w=EEXCESS"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2014-11-01T06:15:53Z",
+			"mediaType": "IMAGE"
+		}],
+		"totalResults": 3,
+		"provider": "federated"
+	}, {
+		"partnerResponseState": [{
+			"systemID": "Deutsche Digitale Bibliothek",
+			"success": true
+		}, {
+			"systemID": "Europeana",
+			"success": true
+		}, {
+			"systemID": "KIMPortal",
+			"success": true
+		}, {
+			"systemID": "Mendeley",
+			"success": true
+		}, {
+			"systemID": "ZBW",
+			"success": true
+		}, {
+			"systemID": "Wissenmedia",
+			"success": true
+		}],
+		"result": [{
+			"licence": "https://creativecommons.org/licenses/by/3.0/legalcode",
+			"title": "Evaluation Of Sealing Ability Of Different Endodontic Sealers",
+			"generatingQuery": "music OR bass",
+			"documentBadge": {
+				"id": "48c1d433-84e5-39e5-88f0-4f80924f651d",
+				"provider": "Mendeley",
+				"uri": "http://www.mendeley.com/research/evaluation-sealing-ability-different-endodontic-sealers"
+			},
+			"language": "unknown",
+			"resultGroup": [],
+			"date": "2006",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "restricted",
+			"title": "Music in Mission: Exploring Outcomes of a Community Music-Service Learning Project",
+			"generatingQuery": "music OR bass",
+			"documentBadge": {
+				"id": "10011210196",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10011210196"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2014-10",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "http://www.europeana.eu/rights/rr-f/",
+			"title": "Musical \\\"\\\"No No Nanette\\\"\\\" in Carre, v.l.n.r. Joop Doderer, Johan Kaart en Sylvain PoonsContext information: Rijksfotoarchief: Collectie Algemeen Nederlands Fotopersbureau (ANEFO), 1945-1989 - positieven [geordend op onderwerp] >> Rijksfotoarchief: Collectie Algemeen Nederlands Fotopersbureau (ANEFO), positieven [geordend op onderwerp]",
+			"generatingQuery": "music OR bass",
+			"documentBadge": {
+				"id": "/09003/0F22235E9958A13EF232B297CD71C260148FCB53",
+				"provider": "Europeana",
+				"uri": "http://europeana.eu/resolve/record/09003/0F22235E9958A13EF232B297CD71C260148FCB53"
+			},
+			"language": "nl",
+			"resultGroup": [],
+			"date": "1965",
+			"mediaType": "IMAGE"
+		}],
+		"totalResults": 3,
+		"provider": "federated"
+	}, {
+		"partnerResponseState": [{
+			"systemID": "Deutsche Digitale Bibliothek",
+			"success": true
+		}, {
+			"errorMessage": "Waited too long for partner system 'Europeana' to respond 5007 ms ",
+			"systemID": "Europeana",
+			"success": false
+		}, {
+			"systemID": "KIMPortal",
+			"success": true
+		}, {
+			"errorMessage": "Waited too long for partner system 'Mendeley' to respond 5007 ms ",
+			"systemID": "Mendeley",
+			"success": false
+		}, {
+			"systemID": "ZBW",
+			"success": true
+		}, {
+			"errorMessage": "Waited too long for partner system 'Wissenmedia' to respond 5007 ms ",
+			"systemID": "Wissenmedia",
+			"success": false
+		}],
+		"result": [{
+			"licence": "restricted",
+			"title": "Household Money Demand: The Euro Area Case",
+			"generatingQuery": "money OR euro",
+			"documentBadge": {
+				"id": "10010693087",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10010693087"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2012",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "restricted",
+			"title": "Euro money market spreads during the 2007-? financial crisis",
+			"generatingQuery": "money OR euro",
+			"documentBadge": {
+				"id": "10010686834",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10010686834"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2012-05",
+			"mediaType": "TEXT"
+		}, {
+			"licence": "restricted",
+			"title": "Euro money market study",
+			"generatingQuery": "money OR euro",
+			"documentBadge": {
+				"id": "10002610649",
+				"provider": "ZBW",
+				"uri": "http://www.econbiz.de/Record/10002610649"
+			},
+			"language": "de",
+			"resultGroup": [],
+			"date": "2001; 3.2001(2002); 4.2002(2003); 5.2004(2005); 6.2006(2007); 7.2008(2009); 2012[?]",
+			"mediaType": "TEXT"
+		}],
+		"totalResults": 3,
+		"provider": "federated"
+	}],
+	"queryID": "264991418"
+}</textarea>
+			</p>
+			<p>
+				<button id="go" type="button">Go!</button>
+			</p>
+			<p>Results after filtering: <span id="filteredResults"></span>
+		</form>
+	</body>
+</html>
