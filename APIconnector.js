@@ -34,8 +34,8 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     /**
      * Complement the origin object with the name of the client and a user identifier;
      * 
-     * @param {Object} origin
-     * @returns {Object}
+     * @param {Object} origin The origin to complement
+     * @returns {Object} The complemented origin
      */
     var complementOrigin = function(origin) {
         if (typeof origin === 'undefined') {
@@ -62,12 +62,16 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         /**
          * Initializes the module with parameters other than the defaults.
          * @param {Object} config The configuration to be set. Only the parameters to change need to be specified.
-         * @param {String} config.url The url of the endpoint.
-         * @param {Integer} config.timeout The timeout of the request in ms.
+         * @param {String} config.base_url The url of the endpoint.
+         * @param {Integer} config.timeout The timeout of the query request in ms.
+         * @param {Integer} config.logTimeout The timeout for logging requests in ms.
+         * @param {Integer} config.loggingLevel Flag indicating whether request should be logged on the privacy proxy or not (0 := enabled, 1 := disabled)
          * @param {Integer} config.cacheSize The number of queries/responses to cache.
          * @param {String} config.suffix_recommend The query endpoint.
-         * @param {String} config.suffix_detals The endpoint for gathering details about response items.
+         * @param {String} config.suffix_details The endpoint for gathering details about response items.
          * @param {String} config.suffix_favicon The endpoint for gathering the favicon of a provider.
+         * @param {String} cnfig.suffix_log The endpoint for logging.
+         * @param {Object} config.origin The origin object for logging.
          */
         init: function(config) {
             settings = $.extend(settings, config);
