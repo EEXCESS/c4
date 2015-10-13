@@ -32,6 +32,7 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
       });
     }
     ```
+    
 * ```query(profile,callback)```: allows to query the Federated Recommender (through the Privacy Proxy). The expected parameters are a [EEXCESS profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format) and a callback function.
   ```javascript
   require(['c4/APIconnector'], function(api) {
@@ -53,11 +54,11 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
 * ```queryPeas```: allows to query the Federated Recommender (through the Privacy Proxy) in a privacy-preserving way. It returns the exact same result as ```query```. It uses the [PEAS indistinguishability protocol](https://github.com/EEXCESS/peas#indistinguishability-protocol). This example shows how to use it:
   ```javascript
   require(["APIconnector"], function(apiConnector){
-   var nbFakeQueries = 2; // The greater the better from a privacy point of view, but the worse from a performance point of view (2 or 3 are acceptable values). 
-   var query = JSON.parse('{"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"}, "numResults": 3, "contextKeywords": [{"text": "graz","weight": 0.1}, {"text": "vienna","weight": 0.3}]');
-   apiConnector.queryPeas(query, nbFakeQueries, function(results){
-    var resultsObj = results.data; 
-   });
+    var nbFakeQueries = 2; // The greater the better from a privacy point of view, but the worse from a performance point of view (2 or 3 are acceptable values). 
+    var query = JSON.parse('{"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"}, "numResults": 3, "contextKeywords": [{"text": "graz","weight": 0.1}, {"text": "vienna","weight": 0.3}]');
+    apiConnector.queryPeas(query, nbFakeQueries, function(results){
+      var resultsObj = results.data; 
+    });
   }
   ```
   
@@ -212,12 +213,43 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
     where the ```profile``` parameter represents an [EEXCESS query profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format). By default, the ```query``` method of the ```APIconnector``` module is used. 
   * ```imgPATH``` - path where images are stored. Defaults to 'img/'
   * ```queryModificationDelay``` - the delay before a query is executed (in ms) after the user interacted with it (added/removed keywords, changed main topic, etc). Defaults to 500.
-  * ```queryDelay``` - the delay (in ms) before a query is executed due to changes from the parent container. This delay is used after the query has been changed through the ```setQuery``` method of this module. Defaults to 2000.
-  * ```storage``` - an object providing storage options. It must exhibit two functions:
-    * ```set(item, callback)```
-    * ```get(key, callback)```
+  * ```queryDelay``` - the delay (in ms) before a query is executed due to changes from the parent container. This delay is used after the query has been changed through the ```setQuery``` method of this module. Defaults to 2000.  
+    In addition, the delay can also be provided as parameter to the ```setQuery``` function, in order to enable different delays for specific interactions.
+  * ```storage``` - an object providing storage capabilities. By default, the search bar will use the browser's local storage to store values. The storage function must exhibit two functions:
+    * ```set(item, callback)``` The ```item``` passed to this function is an object containing key value pairs to store. It looks like this:
+      ```javascript
+      {
+        key1:"value1", // value can be a simple type like String
+        key2:{
+          // value can also be an JSON-serialiazable objects
+        }
+      }
+      ```
+      The ```callback``` parameter is a callback function without parameters to be executed after storing the item. 
+    * ```get(key, callback)``` The ```key``` parameter is either a single String (to get a single value) or an Array of Strings (to get several values).  
+      The ```callback``` function should be called with an object, containing the provided key(s) and their corresponding values like so:
+      ```javascript
+        var response = {
+          key1: value1,
+          key2: value2
+        }
+        callback(response);
+      ```         
 
-* ```setQuery```
+* ```setQuery(contextKeywords [,delay])```: sets the query in the search bar.
+  The ```contextKeywors``` must be in the format as the contextKeywords in the [EEXCESS query profile format](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format).  
+  The query will automatically be executed after the delay given by the settings (default: 2000ms, can be customized via ```searchBar.init(<tabs>,{queryDelay:<custom value>})```. Alternatively, this setting can be overwritten by providing the optional ```delay``` parameter, which specifies the delay in ms.
+  ```javascript
+  require(['jquery','c4/searchBar'], function($,searchBar) {
+    // searchBar needs to be initialized first, omitted here
+    var contextKeywords = [{
+      text:"Lorem"
+    },{
+      text:"ipsum"
+    }];
+    searchBar.setQuery(contextKeywords, 0); // query is set and will be immediately executed (delay: 0ms)
+  }
+  ```  
   
 # iframes
 A utility module for communicating between iframes
