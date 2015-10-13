@@ -79,7 +79,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
          * }
          * @returns {undefined}
          */
-        setQuery: function(contextKeywords) {
+        setQuery: function(contextKeywords, delay) {
+            if(typeof delay === 'undefined') {
+                delay = settings.queryDelay;
+            }
             util.preventQuery = true;
             taglist.tagit('removeAll');
             $.each(contextKeywords, function() {
@@ -97,7 +100,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 result_indicator.hide();
                 lastQuery = {contextKeywords: contextKeywords};
                 settings.queryFn({contextKeywords: contextKeywords}, resultHandler);
-            }, settings.queryDelay);
+            }, delay);
         }
     };
     var results = {}; // the current results
@@ -444,7 +447,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             if (util.preventQuerySetting) {
                 util.cachedQuery = contextKeywords;
             } else {
-                util.setQuery(contextKeywords);
+                util.setQuery(contextKeywords,0);
             }
         }
     };
