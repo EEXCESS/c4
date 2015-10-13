@@ -15,7 +15,7 @@ requirejs.config({
 });
 ```
 
-Once the paths are configuration, you need to include your script via requirejs as usual, for example like so:
+Once the paths are configured, you need to include your script via requirejs as usual, for example like so:
 ```html
 <script data-main="myScript" src="bower_components/requirejs/require.js"></script>
 ```
