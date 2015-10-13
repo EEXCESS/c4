@@ -3,7 +3,7 @@ C4 - Cultural and sCientific Content in Context
 # Installation
 
 # Module Overview
-* ```APIconnector``` A module that simplifies requests to the EEXCESS privacy proxy. It allows to send (privacy preserved) queries, obtain details for a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) and provides a cache of the last queries/result sets.
+* ```APIconnector``` A module that simplifies requests to the EEXCESS privacy proxy. It allows to send (privacy preserved) queries, obtain details for a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) and provides a cache of the last queries/result sets.  
 * ```paragraphDetection``` A module that allows to extract textual paragraphs from HTML documents (opposed to navigational menus, advertisements, etc.), construct queries in the [EEXCESS query profile](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format) format and determine the currently focused paragraph.
 * ```CitationBuilder``` A module to assemble ready-to-use citations from metadata provided as JSON. See the [CitationBuilder README.md](CitationBuilder/README.md) for details.
 * ```searchBar``` A module to add a bar to the bottom of the page, which allows query interaction and displaying results.
@@ -11,7 +11,8 @@ C4 - Cultural and sCientific Content in Context
 * ```namedEntityRecognition``` A utility module for communication with the [DoSer](https://github.com/quhfus/DoSeR) named entity recognition service.
 
 # APIconnector
-The APIconnector module provides means to communicate with the (EEXCESS) Federated Recommender via the Privacy Proxy
+The APIconnector module provides means to communicate with the (EEXCESS) Federated Recommender via the Privacy Proxy.  
+A working example using the APIconnector can be found in [examples/searchBar_Paragraphs](examples/searchBar_Paragraphs)
 
 * ```init(settings)```: allows to initialize the APIconnector with custom parameters. You must call this method and specify the ```origin``` attribute (see below), before you can send queries. The minimum configuration is shown in the example below. The following parameters can be customized:
   * ```base_url``` The basic url of the server to call
@@ -122,7 +123,8 @@ The APIconnector module provides means to communicate with the (EEXCESS) Federat
   ```
   
 # paragraphDetection
-A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create a search query from a paragraph.
+A module to extract textual paragraphs from arbitrary webpage markup, find the paragraph currently in focus of the user and create a search query from a paragraph.  
+A working example using the paragraphDetection can be found in [examples/searchBar_Paragraphs](examples/searchBar_Paragraphs)
 * ```init(settings)```:allows to initialize the paragraph detection with custom parameters. You only need to provide the parameters you want to change. Parameters that can be changed are a ```prefix``` that is used for the identifiers of newly created HTML elements and the ```classname``` that will added to those elements (atm a wrapper div with the mentioned parameters is created around the detected paragraph). The example uses the default values, if you are fine with these, you do not need to call the ``init`` method.
   ```javascript
   require(['c4/paragraphDetection'], function(paragraphDetection) {
@@ -208,7 +210,8 @@ This method is in principle identical to `findFocusedParagraph`, but accounts fo
 Please see the [README.md](CitationBuilder/README.md) of the CitationBuilder module for details.
 
 # searchBar
-A module that adds a search bar to the bottom of the page, which enables to show and modify the query and display the results.
+A module that adds a search bar to the bottom of the page, which enables to show and modify the query and display the results.  
+A working example using the searchBar can be found in [examples/searchBar_Paragraphs](examples/searchBar_Paragraphs)
 * ```init(tabs[,config])```: initializes the search bar with a set of visualization widgets (parameter tabs) and custom configuration options (optional parameter config).  
 The ```tabs``` parameter specifies the [visualization widgets](https://github.com/EEXCESS/visualization-widgets) to use for displaying the result in the following format:
   ```
