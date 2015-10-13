@@ -47,7 +47,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 lastQuery.contextKeywords = taglist.tagit('getActiveTagsProperties');
                 // get main topic
                 var mainTopic = mainTopicLabel.data('properties');
-                if (mainTopic.text && mainTopic.text !== '') {
+                if (mainTopic && mainTopic.text && mainTopic.text !== '') {
                     lastQuery.contextKeywords.push(mainTopic);
                 }
                 // query
