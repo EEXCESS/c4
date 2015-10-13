@@ -283,6 +283,7 @@ The ```tabs``` parameter specifies the [visualization widgets](https://github.co
 # iframes
 A utility module for communicating between iframes
 * ```sendMsgAll(message)```: send a message to all iframes embedded in the current window. The expected parameter is the message to send. The example below shows how to inform all included [widgets](https://github.com/EEXCESS/visualization-widgets) that a new query has been issued.
+
   ```javascript
   require(['c4/iframes'], function(iframes) {
     var profile = {
@@ -300,6 +301,7 @@ A utility module for communicating between iframes
 # namedEntityRecognition
 A utility module to query the EEXCESS recognition and disambiguation service
 * ```entitiesAndCategories(paragraphs,callback)```: allows to extract Wikipedia entities and associated categories from a given piece of text. In addition, the main topic of the text and time mentions are extracted. The expected parameters are a set of paragraphs and a callback function.
+
   ```javascript
   require(['c4/namedEntityRecognition'], function(ner) {
     var paragraph = {
