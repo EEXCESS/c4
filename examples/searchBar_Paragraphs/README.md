@@ -9,12 +9,14 @@ The relevant parts in this file is the inclusion of the `example.js` script via 
   ```html
   <script data-main="example" src="../lib/require.js"></script>
   ```
+  
 * inclusion of css-files
   ```html
   <link rel="stylesheet" href="../../searchBar/searchBar.css" />
   <link rel="stylesheet" href="../lib/css/jquery-ui.css" />
   <link rel="stylesheet" href="../lib/css/jquery.tagit.css" />
   ```
+  
 # example.js
 In principle, this file is where all work is done, it is heavily commented, so have a look at the source code to get the details.
 
