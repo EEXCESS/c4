@@ -31,6 +31,11 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         sessionCache.push(element);
     };
 
+    var originException = function(errorMsg) {
+        this.toString = function() {
+            return errorMsg;
+        };
+    }
     /**
      * Complement the origin object with the name of the client and a user identifier;
      * 
@@ -39,17 +44,17 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
      */
     var complementOrigin = function(origin) {
         if (typeof origin === 'undefined') {
-            throw new "origin undefined";
+            throw new originException("origin undefined");
         } else if (typeof origin.module === 'undefined') {
-            throw new "origin.module undfined";
+            throw new originException("origin.module undfined");
         } else if (typeof settings.origin === 'undefined') {
-            throw new 'origin undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>", clientVersion:"version nr",userID:"<UUID>"}})';
+            throw new originException('origin undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>", clientVersion:"version nr",userID:"<UUID>"}})');
         } else if (typeof settings.origin.clientType === 'undefined') {
-            throw new 'origin.clientType undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>"}})';
+            throw new originException('origin.clientType undefined (need to initialize via APIconnector.init({origin:{clientType:"<name of client>"}})');
         } else if (typeof settings.origin.clientVersion === 'undefined') {
-            throw new 'origin.clientVersion undefined (need to initialize via APIconnector.init({origin:{clientVersion:"<version nr>"}})';
+            throw new originException('origin.clientVersion undefined (need to initialize via APIconnector.init({origin:{clientVersion:"<version nr>"}})');
         } else if (typeof settings.origin.userID === 'undefined') {
-            throw new 'origin.userID undefined (need to initialize via APIconnector.init({origin:{userID:"<UUID>"}})';
+            throw new originException('origin.userID undefined (need to initialize via APIconnector.init({origin:{userID:"<UUID>"}})');
         } else {
             origin.clientType = settings.origin.clientType;
             origin.clientVersion = settings.origin.clientVersion;
