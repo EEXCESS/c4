@@ -207,14 +207,16 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         contextKeywords: []
                     };
                     // add main topic
-                    var mainTopic = {
-                        text: res.data.paragraphs[0].topic.text,
-                        uri: res.data.paragraphs[0].topic.entityUri,
-                        type: res.data.paragraphs[0].topic.type,
-                        isMainTopic: true
-                    };
+                    if (typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
+                        var mainTopic = {
+                            text: res.data.paragraphs[0].topic.text,
+                            uri: res.data.paragraphs[0].topic.entityUri,
+                            type: res.data.paragraphs[0].topic.type,
+                            isMainTopic: true
+                        };
+                        profile.contextKeywords.push(mainTopic);
+                    }
                     // add other keywords
-                    profile.contextKeywords.push(mainTopic);
                     $.each(res.data.paragraphs[0].statistic, function() {
                         if (this.key.text !== mainTopic.text) {
                             profile.contextKeywords.push({
@@ -479,7 +481,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     updateProbabilities();
                 }, 100);
             });
-        },        /**
+        }, /**
          * Find the paragraph the user is currently looking at. 
          * 
          * In this simplified version, the topmost left paragraph is regarded as focused, except for the user explicitly clicking on a paragraph.
