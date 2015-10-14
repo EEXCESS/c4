@@ -28,6 +28,7 @@ where `myScript` is the script you want to execute and in which you use c4 modul
 * ```searchBar``` A module to add a bar to the bottom of the page, which allows query interaction and displaying results.
 * ```iframes``` A utility module for communication with iframes, which enables broadcasting messages.
 * ```namedEntityRecognition``` A utility module for communication with the [DoSer](https://github.com/quhfus/DoSeR) named entity recognition service.
+* ```logging``` A module that simplifies the handling of different types of logging events. 
 
 # APIconnector
 The APIconnector module provides means to communicate with the (EEXCESS) Federated Recommender via the Privacy Proxy.  
@@ -354,3 +355,113 @@ A utility module to query the EEXCESS recognition and disambiguation service
     });
   });
   ```
+
+# logging-API
+A module that provides an API for generating logging events in the format specified by [Logging Format](https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging). Logging-Events are passed over to the ```APIconnector``` which sends it to the logging endpoints of the Privacy Proxy. A working example on how the ```logging``` is to be used, can be found in [examples/loggingExample](examples/loggingExample). 
+
+The logging-API provides methods to create logging events in the correct format and it broadcasts these events as messages via the browser's Messaging-API. Thus, the client application needs to listen to the following messages and forward them to the Privacy Proxy:
+
+  ```javascript
+  require(['c4/APIconnector'], function(api) {
+    api.init({origin: {
+      clientType: "EEXCESS Chrome extension",
+      clientVersion: "2.0.1"
+      userID: "93939A-8494BE-99ADF2"
+      }});
+    
+    window.onmessage = function(msg) {
+      if (msg.data.event) {
+        switch (msg.data.event) {
+          case 'eexcess.log.moduleOpened':
+              api.sendLog(api.logInteractionType.moduleOpened, msg.data.data);
+              break;
+          case 'eexcess.log.moduleClosed':
+              api.sendLog(api.logInteractionType.moduleClosed, msg.data.data);
+              break;
+          case 'eexcess.log.moduleStatisticsCollected':
+              api.sendLog(api.logInteractionType.moduleStatisticsCollected, msg.data.data);
+              break;
+          case 'eexcess.log.itemOpened':
+              api.sendLog(api.logInteractionType.itemOpened, msg.data.data);
+              break;
+          case 'eexcess.log.itemClosed':
+              api.sendLog(api.logInteractionType.itemClosed, msg.data.data);
+              break;
+          case 'eexcess.log.itemCitedAsImage':
+              api.sendLog(api.logInteractionType.itemCitedAsImage, msg.data.data);
+              break;
+          case 'eexcess.log.itemCitedAsText':
+              api.sendLog(api.logInteractionType.itemCitedAsText, msg.data.data);
+              break;
+          case 'eexcess.log.itemCitedAsHyperlink':
+              api.sendLog(api.logInteractionType.itemCitedAsHyperlink, msg.data.data);
+              break;
+          case 'eexcess.log.itemRated':
+              api.sendLog(api.logInteractionType.itemRated, msg.data.data);
+              break;
+          default:
+              break;
+        }
+      }
+    }
+  });
+  ```
+  
+The methods of the logging-API are as follows:
+
+* ```init(config)```: allows to initialize the logging-API with custom parameters. You must call this method and specify the ```origin``` attribute (see below), before you can call methods of the logging-API. The following parameters can be customized:
+  * ```origin``` The identifier for the requesting component. This object must contain a ```module``` attribute, that specifies the name of the issuing component, see the example below.
+  
+  ```javascript
+    require(['c4/logging'], function(logging) {
+      logging.init({
+        origin:{
+          module: "Dashboard Visualization"
+        }
+      });
+    });
+  ```
+
+The logging-API provides the following methods to create corresponding logging events: 
+* ```moduleOpened(moduleName)```: Create the logging event ```moduleOpened```. The expected parameter is the name of the component that has been opened.
+* ```moduleClosed(moduleName)```: Create the logging event ```moduleClosed```. The expected parameter is the name of the component that has been closed.
+* ```moduleStatisticsCollected(statistics)```: Create the logging event ```moduleStatisticsCollected```. The expected parameter can be of any type. ```statistics``` is logged as-is.
+* ```itemOpened(documentBadge, queryID)```: Create the logging event ```itemOpened```. The expected parameters are a ```documentBadge```, which refers to the resource that was opened in detailed view, and a ```queryID```, which refers to the query that returned the resource.
+* ```itemClosed(documentBadge, queryID, duration)```: Create the logging event ```itemClosed```. The expected parameters are a ```documentBadge```, which refers to the resource that was closed in detailed view, a ```queryID```, which refers to the query that returned the resource, and a ```duration```. The latter specifies the time in milliseconds, during which the item was opened in detailed view.
+* ```itemCitedAsImage(documentBadge, queryID)```: Create the logging event ```itemCitedAsImage```. The expected parameters are a ```documentBadge```, which refers to the resource that was cited as an image, and a ```queryID```, which refers to the query that returned the resource.
+* ```itemCitedAsText(documentBadge, queryID)```: Create the logging event ```itemCitedAsText```. The expected parameters are a ```documentBadge```, which refers to the resource that was cited as text, and a ```queryID```, which refers to the query that returned the resource.
+* ```itemCitedAsHyperlink(documentBadge, queryID)```: Create the logging event ```itemCitedAsHyperlink```. The expected parameters are a ```documentBadge```, which refers to the resource that was cited as a hyperlink, and a ```queryID```, which refers to the query that returned the resource.
+* ```itemRated(documentBadge, queryID, minRating, maxRating, rating)```: Create the logging event ```itemRated```. The expected parameters are a ```documentBadge```, which refers to the resource that was rated and a ```queryID```, which referst to the query that returned the rated resource. ```minRating``` and ```maxRating``` allow to specifiy the range a rating can have. ```rating``` is the actual value that has been assigned to the resource.
+  
+The following examples demonstrate the usage of these methods:
+
+  ```javascript
+  require(['c4/logging'], function(logging) {
+      logging.init({
+        origin:{
+          module: "Dashboard Visualization"
+        }
+      });
+      
+      var queryID = "483904939"
+      var documentBadge = {
+        id: "995eb36f-151d-356c-b00c-4ef419bc2124",
+        uri: "http://www.mendeley.com/research/hellenism-homoeroticism-shelley-circle",
+        provider: "Mendeley"
+      };
+      
+      logging.moduleOpened("anotherVisualizationName");
+      logging.moduleClosed("anotherVisualizationName", 5000);
+      logging.moduleStatisticsCollected({usageStatistics: 42});
+      
+      logging.itemOpened(documentBadge, queryID); 
+      logging.itemClosed(documentBadge, queryID, 1500);
+      
+      logging.itemCitedAsImage(documentBadge, queryID);
+      logging.itemCitedAsText(documentBadge, queryID);
+      logging.itemCitedAsHyperlink(documentBadge, queryID);
+      
+      logging.itemRated(documentBadge, queryID, 0, 4, 3);
+    });
+  ```
+    
