@@ -207,7 +207,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         contextKeywords: []
                     };
                     // add main topic
-                    if (typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
+                    if (res.data.paragraphs[0].topic && typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
                         var mainTopic = {
                             text: res.data.paragraphs[0].topic.text,
                             uri: res.data.paragraphs[0].topic.entityUri,
