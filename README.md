@@ -85,15 +85,10 @@ A working example using the APIconnector can be found in [examples/searchBar_Par
   });
   ```
   
-* ```getDetails(documentBadges,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameters are a set of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) of the items for which to retrieve details  and a callback function.
+* ```getDetails(detailsRequestObj,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameter is a [detailsRequestObj](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#pp-details-query-format) object, that has an ```origin```, ```queryID``` and a list of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) of the items for which to retrieve details. A callback function can be used to return the results to.
   ```javascript
-  require(['c4/APIconnector'], function(api) {
-    var documentBadges = [{
-          "id":"sl23394330",
-          "uri":"http://service.wissens-server.com/wissensserver/view.html?a=t&r=CURRENT&i=sl23394330&s=BEP&v=eexcess&w=EEXCESS",
-          "provider":"Wissenmedia"
-    }];
-    api.getDetails(documentBadges, function(response) {
+  require(['c4/APIconnector'], function(api) {    
+    api.getDetails(detailsRequestObj, function(response) {
       if(response.status === 'success') {
         // do something with the result contained in response.data
       } else {
