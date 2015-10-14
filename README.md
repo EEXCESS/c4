@@ -88,6 +88,17 @@ A working example using the APIconnector can be found in [examples/searchBar_Par
 * ```getDetails(detailsRequestObj,callback)```: allows to retrieve details for result items from the Federated Recommender (through the Privacy Proxy). The expected parameter is a [detailsRequestObj](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#pp-details-query-format) object, that has an ```origin```, ```queryID``` and a list of [document badges](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#response-format) of the items for which to retrieve details. A callback function can be used to return the results to.
   ```javascript
   require(['c4/APIconnector'], function(api) {    
+    var detailsRequestObj = {
+            origin : {"origin": {"userID": "E993A29B-A063-426D-896E-131F85193EB7", "clientType": "EEXCESS - Google Chrome Extension", "clientVersion": "2beta", "module": "testing"},
+            documentBadge: [
+                {
+                    id: "/09003/4A65C4999F4077781A1F9CF2510EE512CD6571B9",
+                    uri: "http://europeana.eu/resolve/record/09003/4A65C4999F4077781A1F9CF2510EE512CD6571B9",
+                    provider: "Europeana"
+                }
+            ],
+            queryID: "70342716"
+        };
     api.getDetails(detailsRequestObj, function(response) {
       if(response.status === 'success') {
         // do something with the result contained in response.data
