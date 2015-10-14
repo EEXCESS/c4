@@ -1,11 +1,31 @@
 /**
  * Logging module
- * You can include the module either with require.js or in the normal hmtl-way
+ * You can include the module either with require.js or in the normal html-way
  * Once included, the logging functionality is available in a global 'LOGGING' variable.
  */
 
 (function() {
     var loggingFunc = function () {
+
+        var settings = {
+            origin: {
+                module: "undefined"
+            }
+        };
+
+        function checkOriginSettings() {
+
+            if (typeof settings.origin !== 'object') {
+                throw new LoggingFormatException("'settings.origin'", 'object');
+            } else if(typeof settings.origin.module !== 'string') {
+                throw new LoggingFormatException("'settings.origin.module'", 'string');
+            } else if(settings.origin.module === 'undefined') {
+                throw new LoggingFormatException("'settings.origin.module'", "'string'");
+            } else {
+                return true;
+            }
+        }
+
         function LoggingFormatException(value, hint) {
             this.value = value;
             this.hint = hint;
@@ -14,17 +34,26 @@
                 return "LoggingFormatException: " + this.value + this.message + this.hint;
             };
         }
+
         return {
+            /*
+            @param {Object} config An 'origin' object must be specified within the 'config' object.
+            'origin' is a general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
+            The only mandatory attribute is 'config.origin.module', which specifies the name of the module that implements logging.
+            */
+            init: function(config) {
+                settings.origin = config.origin
+            },
+
             /**
              *
-             * @param {Object} origin A general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {String} moduleName The name of the module that was opened
              */
-            moduleOpened: function (origin, moduleName) {
-                if (typeof origin !== 'object') {throw new LoggingFormatException(origin, 'object')}
+            moduleOpened: function (moduleName) {
+                checkOriginSettings();
                 if (typeof moduleName != 'string') {throw new LoggingFormatException(moduleName, 'string')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         name: moduleName
                     }
@@ -33,16 +62,15 @@
             },
             /**
              *
-             * @param {Object} origin A general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {String} moduleName The name of the module that was closed
              * @param {Number} duration (optional) The number of milliseconds the module has been open
              */
-            moduleClosed: function (origin, moduleName, duration) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            moduleClosed: function (moduleName, duration) {
+                checkOriginSettings();
                 if (typeof moduleName != 'string') {throw new LoggingFormatException(moduleName, 'string')}
                 if (typeof duration != 'number') {throw new LoggingFormatException(duration, 'number')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         name: moduleName,
                         duration: duration
@@ -52,29 +80,27 @@
             },
             /**
              *
-             * @param {Object} origin A general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {Object} statistics Any object that should be logged as it is
              */
-            moduleStatisticsCollected: function (origin, statistics) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            moduleStatisticsCollected: function (statistics) {
+                checkOriginSettings();
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: statistics
                 };
                 window.top.postMessage({event: 'eexcess.log.moduleStatisticsCollected', data: eventData}, '*');
             },
             /**
              *
-             * @param {Object} origin A general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {Object} documentBadge The `documentBadge` of this item. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#input-formats} for details on the format.
              * @param {String} queryID The identifier of the query that returned this item. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              */
-            itemOpened: function (origin, documentBadge, queryID) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemOpened: function (documentBadge, queryID) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge
                     },
@@ -82,13 +108,13 @@
                 };
                 window.top.postMessage({event: 'eexcess.log.itemOpened', data: eventData}, '*');
             },
-            itemClosed: function (origin, documentBadge, queryID, duration) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemClosed: function (documentBadge, queryID, duration) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 if (typeof duration != 'number') {throw new LoggingFormatException(duration, 'number')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge,
                         duration: duration
@@ -97,12 +123,12 @@
                 };
                 window.top.postMessage({event: 'eexcess.log.itemClosed', data: eventData}, '*');
             },
-            itemCitedAsImage: function (origin, documentBadge, queryID) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemCitedAsImage: function (documentBadge, queryID) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge
                     },
@@ -110,12 +136,12 @@
                 };
                 window.top.postMessage({event: 'eexcess.log.itemCitedAsImage', data: eventData}, '*');
             },
-            itemCitedAsText: function (origin, documentBadge, queryID) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemCitedAsText: function (documentBadge, queryID) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge
                     },
@@ -123,12 +149,12 @@
                 };
                 window.top.postMessage({event: 'eexcess.log.itemCitedAsText', data: eventData}, '*');
             },
-            itemCitedAsHyperlink: function (origin, documentBadge, queryID) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemCitedAsHyperlink: function (documentBadge, queryID) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge
                     },
@@ -138,22 +164,21 @@
             },
             /**
              *
-             * @param {Object} origin A general identifier, that identifies client, module and user. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {Object} documentBadge The `documentBadge` of this item. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#input-formats} for details on the format.
              * @param {String} queryID The identifier of the query that returned this item. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#important-attributes} for details.
              * @param {Number} minRating The lowest rating a user can assign to an item (most negative)
              * @param {Number} maxRating The highest rating a user can assign to an item (most positive)
              * @param {Number} rating The actual rating a user assigned to the rated item. See {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging#input-formats} for details.
              */
-            itemRated: function (origin, documentBadge, queryID, minRating, maxRating, rating) {
-                if (typeof origin != 'object') {throw new LoggingFormatException(origin, 'object')}
+            itemRated: function (documentBadge, queryID, minRating, maxRating, rating) {
+                checkOriginSettings();
                 if (typeof documentBadge != 'object') {throw new LoggingFormatException(documentBadge, 'object')}
                 if (typeof queryID != 'string') {throw new LoggingFormatException(queryID, 'string')}
                 if (typeof minRating != 'number') {throw new LoggingFormatException(minRating, 'number')}
                 if (typeof maxRating != 'number') {throw new LoggingFormatException(maxRating, 'number')}
                 if (typeof rating != 'number') {throw new LoggingFormatException(rating, 'number')}
                 var eventData = {
-                    origin: origin,
+                    origin: settings.origin,
                     content: {
                         documentBadge: documentBadge,
                         rating: {

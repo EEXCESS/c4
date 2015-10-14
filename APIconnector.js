@@ -141,10 +141,12 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. There exists a documentbagde for each result entry in the original result set.
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
-        getDetails: function(documentBadges, callback) {
+        getDetails: function(detailReqObj, callback) {
+            detailReqObj.loggingLevel = settings.logggingLevel;
+            detailReqObj.origin = complementOrigin(detailReqObj.origin);
             var xhr = $.ajax({
                 url: settings.base_url + settings.suffix_details,
-                data: JSON.stringify({documentBadge: documentBadges}),
+                data: JSON.stringify(detailReqObj),
                 type: 'POST',
                 contentType: 'application/json; charset=UTF-8',
                 dataType: 'json',
