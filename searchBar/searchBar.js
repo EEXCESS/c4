@@ -300,7 +300,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             taglist = $('<ul id="eexcess_taglist" class="eexcess"></ul>');
             taglist.tagit({
                 allowSpaces: true,
-                placeholderText: 'add keyword',
+                placeholderText: '',
                 beforeTagAdded: function (event, ui) {
                     $(ui.tag).addClass('eexcess');
                     $(ui.tag).draggable({
@@ -393,6 +393,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
                 // following 3 functions derived from jQuery-UI Tabs
                 $jQueryTabsHeader.tabs().addClass("ui-tabs-vertical ui-helper-clearfix eexcess");
+                $('#eexcess-tabBar-jQueryTabsHeader ul').addClass('eexcess');
                 $("#jQueryTabsHeader li").removeClass("ui-corner-top").addClass("ui-corner-left");
                 $jQueryTabsHeader.tabs("refresh");
                 $jQueryTabsHeader.tabs({active: 0});
