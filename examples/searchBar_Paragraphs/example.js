@@ -20,6 +20,10 @@ require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/sea
             name:"search results",
             // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
             url:"http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/index.html"
+    },{
+            name:"dashboard",
+            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
+            url:"https://eexcess.github.io/visualization-widgets/Dashboard/index.html?a"
     }];
     // initialize the searchBar with the specified tabs and the path to the image folder
     searchBar.init(tabs, {imgPATH: '../../searchBar/img/'});
