@@ -19,7 +19,8 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails',
         suffix_favicon: 'getPartnerFavIcon?partnerId=',
-        suffix_log: 'log/'
+        suffix_log: 'log/',
+        numResults: 30
     };
     peas_indist.init(settings.base_url);
     var xhr;
@@ -89,6 +90,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         query: function(profile, callback) {
             profile.loggingLevel = settings.logggingLevel;
             profile.origin = complementOrigin(profile.origin);
+            if (!profile.numResults) {
+                profile.numResults = settings.numResults;
+            }
             if (xhr && xhr.readyState !== 4) {
                 xhr.abort();
             }
