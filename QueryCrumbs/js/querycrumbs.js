@@ -1,5 +1,9 @@
-
-function QueryCrumbs() {
+/**
+ * A module to add a search bar to the bottom of a page.
+ *
+ * @module c4/queryCrumbs
+ */
+define(['jquery', 'd3', 'QueryCrumbsSettings'], function ($, d3, QueryCrumbsConfiguration) {
 
     var self = {
 
@@ -84,7 +88,7 @@ function QueryCrumbs() {
                         self.simResults.push(queryNode);
                     }
                 }
-                d3.select(this).select(docNodeTag+".queryCircleBorder").transition().delay(0).duration(500).ease("elastic").attr("opacity",1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r).attr("stroke", "#1d904e");
+                d3.select(this).select(".queryCircleBorder").transition().delay(0).duration(500).ease("elastic").attr("opacity",1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r).attr("stroke", "#1d904e");
 
                 self.svgContainer.selectAll("g.crumb").filter(function(d,i) {
                     return d.queryID != self.currentNode.queryID;
@@ -98,7 +102,7 @@ function QueryCrumbs() {
             },
             onMouseOutNode: function (d, i) {
                 var docNodeTag = (QueryCrumbsConfiguration.nodeForm === "CIRCLE") ? "path" : "rect";
-                d3.select(this).select(docNodeTag+".queryCircleBorder").transition().duration(200).attr("stroke", "#cccccc");
+                d3.select(this).select(".queryCircleBorder").transition().duration(200).attr("stroke", "#cccccc");
                 d3.select(this.parentNode).selectAll(".docNode").transition().delay(0).duration(300).style("opacity", QueryCrumbsConfiguration.colorSettings.newDocOpacity);
                 self.svgContainer.selectAll("g.crumb").filter(function(d,i) {
                     return d.queryID != self.currentNode.queryID;
@@ -224,12 +228,12 @@ function QueryCrumbs() {
                     var similarities = self.CORE.getGroupSimilarities(newNode, nodeGroups);
                     newNode.sim = similarities.maxMutualResults/newNode.results.length;
                     if(newNode.rID == 0) {
-                        newNode.base_color = BaseColorManager.getInitialColor();
+                        newNode.base_color = QueryCrumbsConfiguration.BaseColorManager.getInitialColor();
                     } else {
                         if(newNode.sim > QueryCrumbsConfiguration.colorSettings.colorThreshold) {
                             newNode.base_color = similarities.maxMutualResultsBaseColor;
                         } else {
-                            newNode.base_color = BaseColorManager.getNextColor(visualData[newNode.rID-1].base_color);
+                            newNode.base_color = QueryCrumbsConfiguration.BaseColorManager.getNextColor(visualData[newNode.rID-1].base_color);
                         }
                     }
                     if(nodeGroups.hasOwnProperty(newNode.base_color)) {
@@ -562,4 +566,4 @@ function QueryCrumbs() {
             });
         }
     }
-}
+});
