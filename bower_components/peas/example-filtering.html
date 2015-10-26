@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+		requirejs.config({
+		    paths: {
+		    	jquery: "./bower_components/jquery/dist/jquery",
+		    	graph: "./bower_components/graph/lib/graph", 
+		    	peas: "./"
+		    }
+		});		
+		</script>
+		<script>
+			require(["peas/peas_indist"], function(peas_indist){
+				document.getElementById("go").addEventListener("click", function(){ 
+					var originalQuery = JSON.parse(document.getElementById("originalQuery").value);
+					var obfuscatedQuery = JSON.parse(document.getElementById("obfuscatedQuery").value);
+					var results = JSON.parse(document.getElementById("results").value);
+					var filteredResults = peas_indist.filterResults(results, originalQuery);
+					document.getElementById("filteredResults").innerHTML = JSON.stringify(filteredResults);
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>
+				Original query: <br/>
+				<textarea id="originalQuery" rows="10" cols="150">{
+    "origin": {
+        "userID": "E993A29B-A063-426D-896E-131F85193EB7",
+        "clientType": "EEXCESS - Google Chrome Extension",
+        "clientVersion": "2beta",
+        "module": "testing"
+    },
+    "numResults": 3,
+    "contextKeywords": [{"text": "graz", "weight": 0.1}, {"text": "vienna", "weight": 0.3}]
+}</textarea>
+			</p>
+			<p>
+				Obfuscated query: <br/>
+				<textarea id="obfuscatedQuery" rows="10" cols="150">{
+    "origin": {
+        "userID": "E993A29B-A063-426D-896E-131F85193EB7",
+        "clientType": "EEXCESS - Google Chrome Extension",
+        "clientVersion": "2beta",
+        "module": "testing"
+    },
+    "numResults": 3,
+    "contextKeywords": [
+        [{"text": "monkey", "weight": 0.1}, {"text": "penny", "weight": 0.3}],
+        [{"text": "the", "weight": 0.1}, {"text": "wizard", "weight": 0.3}],
+        [{"text": "graz", "weight": 0.1}, {"text": "vienna", "weight": 0.3}]
+    ]
+}</textarea>
+			</p>
+			<p>
+				Results before filtering: <br/>
+				<textarea id="results" rows="10" cols="150">{"results":[{"result":[{"date":"2014-01-01","licence":"restricted","generatingQuery":"monkey OR penny","documentBadge":{"provider":"ZBW","id":"10010335854","uri":"http://www.econbiz.de/Record/10010335854"},"description":"We test the effect of the amount of information on the strategies played by others in the theoretically strategy-proof Top Trading Cycles (TTC) mechanism. We find that providing limited information on the strategies played by others has a negative and significant effect in truth-telling rates relative to full or no information about others' strategies. Subjects report truthfully more often when either full information or no information on the strategies played by others is available. Our results have potentially important implications for the design of markets based on strategy-proof matching algorithms.","mediaType":"text","language":"de","resultGroup":[{"date":"2014-01-01","licence":"restricted","generatingQuery":"monkey OR penny","documentBadge":{"provider":"ZBW","id":"10010955345","uri":"http://www.econbiz.de/Record/10010955345"},"description":"We test the effect of the amount of information on the strategies played by others in the theoretically strategy-proof Top Trading Cycles (TTC) mechanism. We find that providing limited information on the strategies played by others has a negative and significant effect in truth-telling rates relative to full or no information about others' strategies. Subjects report truthfully more often when either full information or no information on the strategies played by others is available. Our results have potentially important implications for the design of markets based on strategy-proof matching algorithms.","mediaType":"text","language":"de","resultGroup":[],"title":"Monkey see, monkey do: Truth-telling in matching algorithms and the manipulation of others"}],"title":"Monkey see, monkey do: Truth-telling in matching algorithms and the manipulation of others"},{"date":"2013-10-14","licence":"restricted","generatingQuery":"monkey OR penny","documentBadge":{"provider":"Wissenmedia","id":"wke_0048","uri":"http://service.wissens-server.com/wissensserver/view.html?a=t&r=CURRENT&i=wke_0048&s=welterben&v=eexcess&w=EEXCESS"},"description":"Naturpark Shark Bay\n Der nördlich von Perth gelegene, etwa 22 000 km² große Naturpark Shark Bay ist Lebensraum vieler gefährdeter Meeres- und Landtiere...","mediaType":"text","language":"de","resultGroup":[],"title":"Naturpark Shark Bay"},{"date":"2014-01-01","licence":"restricted","generatingQuery":"monkey OR penny","documentBadge":{"provider":"ZBW","id":"10010257320","uri":"http://www.econbiz.de/Record/10010257320"},"mediaType":"text","language":"de","resultGroup":[],"title":"Monkey see, monkey do : truth-telling in matching algorithms and the manipulation of others"}],"totalResults":3,"provider":"federated","partnerResponseState":[{"systemID":"Deutsche Digitale Bibliothek","success":true},{"systemID":"Europeana","success":true},{"systemID":"Kierling","success":true},{"systemID":"Mendeley","success":true},{"systemID":"KIMPortal","success":true},{"systemID":"ZBW","success":true},{"systemID":"Wissenmedia","success":true}]},{"result":[{"date":"unknown","licence":"http://www.europeana.eu/rights/rr-f/","generatingQuery":"the OR wizard","documentBadge":{"provider":"Europeana","id":"/03915/753CF7A28A7E19289CB14DD9C846F4BB284B4A96","uri":"http://europeana.eu/resolve/record/03915/753CF7A28A7E19289CB14DD9C846F4BB284B4A96"},"mediaType":"IMAGE","language":"fr","resultGroup":[],"title":"Edmund Lowe dans le rôle de Stanley Gordon auprès d'une femme qui porte un boa autour du cou dans \\\"The wizard\\\" de Richard Rosson (William Fox)","previewImage":"http://europeanastatic.eu/api/image?uri=http%3A%2F%2Fwww.culture.gouv.fr%2FWave%2Fimage%2Fmemoire%2F1209%2Fsap59_0602t00665_v.jpg&size=LARGE&type=IMAGE"},{"date":"unknown","licence":"https://creativecommons.org/publicdomain/zero/1.0/","generatingQuery":"the OR wizard","documentBadge":{"provider":"Deutsche Digitale Bibliothek","id":"ZFKM5CSRQ3BGAP3FYDQFY6QY6ECRW2MS","uri":"https://www.deutsche-digitale-bibliothek.de/item/ZFKM5CSRQ3BGAP3FYDQFY6QY6ECRW2MS"},"mediaType":"unknown","language":"unknown","resultGroup":[],"title":"Emil Nolde : [the great colour wizard]"},{"date":"unknown","licence":"https://creativecommons.org/publicdomain/zero/1.0/","generatingQuery":"the OR wizard","documentBadge":{"provider":"Deutsche Digitale Bibliothek","id":"O3KOXTLCFT2N4P3XENTIB65P57YFDB7B","uri":"https://www.deutsche-digitale-bibliothek.de/item/O3KOXTLCFT2N4P3XENTIB65P57YFDB7B"},"mediaType":"text","language":"unknown","resultGroup":[],"title":"The Wizard of Oz Conventions"}],"totalResults":3,"provider":"federated","partnerResponseState":[{"systemID":"Deutsche Digitale Bibliothek","success":true},{"systemID":"Europeana","success":true},{"systemID":"Kierling","success":true},{"systemID":"Mendeley","success":true},{"systemID":"KIMPortal","success":true},{"systemID":"ZBW","success":true},{"systemID":"Wissenmedia","success":true}]},{"result":[{"date":"2004-01-01","licence":"restricted","generatingQuery":"graz OR vienna","documentBadge":{"provider":"ZBW","id":"10002094844","uri":"http://www.econbiz.de/Record/10002094844"},"mediaType":"text","language":"de","resultGroup":[],"title":"Slovenia and Austria : bilateral economic effects of Slovenian EU accession ; papers from the Conference \\\"The Slovenian EU Accession and Its Bilateral Economic Effects on Austria and Slovenia\\\" (November 5th 2003, Graz) ; organised by the Ludwig-Boltzmann-Institute for Monetary Economics, Vienna in co-operation with the Government of Styria and Joanneum Research, Graz"},{"date":"1999-01-01","licence":"https://creativecommons.org/licenses/by/3.0/legalcode","generatingQuery":"graz OR vienna","documentBadge":{"provider":"Mendeley","id":"b0a0ab47-4ca7-30e8-b412-d8d7fd1e06a1","uri":"http://www.mendeley.com/research/qualitative-approach-assessing-body-compartments-using-bioelectrical-variables"},"mediaType":"text","language":"unknown","resultGroup":[],"title":"A qualitative approach to assessing body compartments using bioelectrical variables."},{"date":"2014-01-01","licence":"restricted","generatingQuery":"graz OR vienna","documentBadge":{"provider":"ZBW","id":"10011282301","uri":"http://www.econbiz.de/Record/10011282301"},"description":"Die regionale Arbeitslosenquote ist in der urbanen Agglomeration Graz-Stadt traditionell höher als im oberösterreichischen Zentralraum beziehungsweise als in Linz-Stadt und den umliegenden Bezirken. Die Ursachen dieser erheblichen strukturellen Unterschiede wurden im Rahmen dieser Studie im Auftrag des AMS Steiermark, der Wirtschaftskammer Steiermark und der Stadt Graz vom Zentrum für Wirtschafts- und Innovationsforschung des Joanneum Research eingehend untersucht. Ein zentrales Ergebnis dieser Arbeit ist, dass neben den klassischen Problemlagen am österreichischen Arbeitsmarkt (z.B. niedrigqualifizierte Personen, nicht-österreichische Staatsbürgerschaft) spezifische urbane Herausforderungen identifiziert wurden. Die zentralörtlichen Funktionen der urbanen Zentralräume, die interregionalenVerflechtungen am Arbeitsmarkt, aber auch deutliche Unterschiede in der demographischen Entwicklung wirken direkt auf den regionalen Arbeitsmarkt. Insgesamt wurden im Rahmen dieser Studie sechs Themenfelder diskutiert. Diese werden im folgenden AMS info zusammenfassend dargestellt, ebenso werden wichtige Handlungsfelder skizziert.","mediaType":"text","language":"de","resultGroup":[],"title":"Arbeitsmarktanalyse der Stadt Graz im Vergleich mit Linz: Zentrale Ergebnisse einer aktuellen Studie im Auftrag von AMS Steiermark, Wirtschaftskammer Steiermark und Stadt Graz"}],"totalResults":3,"provider":"federated","partnerResponseState":[{"systemID":"Deutsche Digitale Bibliothek","success":true},{"systemID":"Europeana","success":true},{"systemID":"Kierling","success":true},{"systemID":"Mendeley","success":true},{"systemID":"KIMPortal","success":true},{"systemID":"ZBW","success":true},{"systemID":"Wissenmedia","success":true}]}],"queryID":"151990152","profile":{"origin":{"userID":"E993A29B-A063-426D-896E-131F85193EB7","clientType":"EEXCESS - Google Chrome Extension","clientVersion":"2beta","module":"testing"},"numResults":3,"contextKeywords":[[{"text":"monkey","weight":0.1},{"text":"penny","weight":0.3}],[{"text":"the","weight":0.1},{"text":"wizard","weight":0.3}],[{"text":"graz","weight":0.1},{"text":"vienna","weight":0.3}]]},"faviconURL":"https://eexcess-dev.joanneum.at/eexcess-federated-recommender-web-service-1.0-SNAPSHOT/recommender/getPartnerFavIcon?partnerId="}</textarea>
+			</p>
+			<p>
+				<button id="go" type="button">Go!</button>
+			</p>
+			<p>Results after filtering: <span id="filteredResults"></span>
+		</form>
+	</body>
+</html>

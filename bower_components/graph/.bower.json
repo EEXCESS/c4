@@ -1,0 +1,13 @@
+{
+  "name": "graph",
+  "homepage": "https://github.com/tantalor/graphjs",
+  "_release": "4425d8e136",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "4425d8e1360721184fd0f0a57cd78539c1376fed"
+  },
+  "_source": "https://github.com/tantalor/graphjs.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/tantalor/graphjs.git"
+}
