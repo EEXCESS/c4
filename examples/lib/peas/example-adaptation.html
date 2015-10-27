@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+			require(["peas_adapt"], function(peas_adapt){				
+				document.getElementById("go").addEventListener("click", function(){ 
+					var originalQuery = JSON.parse(document.getElementById("originalQuery").value);
+					if (originalQuery != ""){
+						var adaptedQuery = peas_adapt.adaptQuery(originalQuery);
+						var adaptedQueryStr = JSON.stringify(adaptedQuery);
+						document.getElementById("adaptedQuery").innerHTML = adaptedQueryStr; 
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>
+				Original query: <br/>
+				<textarea id="originalQuery" rows="30" cols="150">{
+   "numResults":3,
+   "contextKeywords":[
+   		{"text":"graz",	"weight":0.1},
+		{"text":"vienna", "weight":0.3}
+   ], 
+   "firstName": "Thomas", 
+   "lastName": "Cerqueus", 
+   "gender": "male",
+   "birthDate": 0,
+   "address": {
+   		"country": "France", 
+   		"city": "Lyon", 
+   		"zipCode": 69100,
+   		"line1": "aaa",
+   		"line2": "bbb"
+   },   
+   "languages":[
+   		{
+   			"iso2": "fr", 
+   			"languageCompetenceLevel": 1
+   		}, {
+   			"iso2": "en", 
+   			"languageCompetenceLevel": 0.75
+   		}
+   ], 
+   "interests":[
+   		{"text": "history"},
+   		{"text": "art"}, 
+   		{"text": "sport"}
+   ]
+}</textarea>
+			</p>
+			<p>
+				<button id="go" type="button">Go!</button>
+			</p>
+			<p>Adapted query: <span id="adaptedQuery"></span>
+		</form>
+	</body>
+</html>

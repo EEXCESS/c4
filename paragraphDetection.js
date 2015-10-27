@@ -127,6 +127,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
          * @returns {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} The paragraphs
          */
         getParagraphs: function(root) {
+            if (typeof root === 'undefined') {
+                root = document;
+            }
             var candidates = getCandidates(root);
             var paragraphs = [];
             var counter = 0;
@@ -204,14 +207,16 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         contextKeywords: []
                     };
                     // add main topic
-                    var mainTopic = {
-                        text: res.data.paragraphs[0].topic.text,
-                        uri: res.data.paragraphs[0].topic.entityUri,
-                        type: res.data.paragraphs[0].topic.type,
-                        isMainTopic: true
-                    };
+                    if (res.data.paragraphs[0].topic && typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
+                        var mainTopic = {
+                            text: res.data.paragraphs[0].topic.text,
+                            uri: res.data.paragraphs[0].topic.entityUri,
+                            type: res.data.paragraphs[0].topic.type,
+                            isMainTopic: true
+                        };
+                        profile.contextKeywords.push(mainTopic);
+                    }
                     // add other keywords
-                    profile.contextKeywords.push(mainTopic);
                     $.each(res.data.paragraphs[0].statistic, function() {
                         if (this.key.text !== mainTopic.text) {
                             profile.contextKeywords.push({
@@ -321,6 +326,14 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 }
             });
         },
+        /**
+         * Find the paragraph the user is currently looking at.
+         * 
+         * If the focused paragraph changes, a 'paragraphFocused' event will be dispatched with he focused paragraph attached.
+         * 
+         * @param {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} paragraphs
+         * @returns {undefined}
+         */
         findFocusedParagraph: function(paragraphs) {
             var w1 = 0.1; // weight for size relation
             var w2 = 1; // weight for distance to top left corner
@@ -468,6 +481,78 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     updateProbabilities();
                 }, 100);
             });
+        }, /**
+         * Find the paragraph the user is currently looking at. 
+         * 
+         * In this simplified version, the topmost left paragraph is regarded as focused, except for the user explicitly clicking on a paragraph.
+         * 
+         * If the focused paragraph changes, a 'paragraphFocused' event will be dispatched with he focused paragraph attached.
+         * 
+         * @param {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} paragraphs
+         * @returns {undefined}
+         */
+        findFocusedParagraphSimple: function(paragraphs) {
+            var scrollTimer;
+            if (typeof paragraphs !== 'undefined') {
+                extracted_paragraphs = paragraphs;
+            }
+            $.each(extracted_paragraphs, function() {
+                var that = this;
+                $(this.elements[0]).parent().click(function(e) {
+                    var event = new CustomEvent('paragraphFocused', {detail: that});
+                    document.dispatchEvent(event);
+                });
+            });
+            var visiblePars = getVisible(extracted_paragraphs);
+            updateDistance();
+            updateProbabilities();
+
+            function updateProbabilities() {
+                var highestProb;
+                var focusedPar;
+                visiblePars.forEach(function(v1) {
+                    v1.pGotRead = v1.distance;
+                    if (!highestProb || v1.pGotRead < highestProb) {
+                        highestProb = v1.pGotRead;
+                        focusedPar = v1;
+                    }
+                });
+                // event might be dispatched multiple times, leave the handling to the listener
+                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                document.dispatchEvent(event);
+            }
+
+            $(document).scroll(function(evt) {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function() {
+                    visiblePars = getVisible(extracted_paragraphs);
+                    updateDistance();
+                    updateProbabilities();
+                }, 100);
+            });
+
+            function getVisible(paragraphs) {
+                var visibleElements = new Set();
+                var offset = $(window).scrollTop() + $(window).height();
+                $(paragraphs).each(function() {
+                    var top = $(this.elements[0]).offset().top;
+                    if (offset > top && top > $(window).scrollTop()) {
+                        visibleElements.add(this);
+                    }
+                });
+                return visibleElements;
+            }
+            function updateDistance() {
+                visiblePars.forEach(function(v1) {
+                    var offset = $(v1.elements[0]).offset();
+                    var left = offset.left - $(window).scrollLeft();
+                    var top = offset.top - $(window).scrollTop();
+//                    if (top < 0) {
+//                        top = $(window).height();
+//                    }
+                    v1.distance = Math.sqrt(left * left + top * top);
+                });
+            }
         }
     };
 });

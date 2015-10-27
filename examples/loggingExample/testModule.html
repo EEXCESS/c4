@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>I am visualization-module, embedded as iframe!</h1>
+<h3> Just like SearchResultList, Dashboard, etc...</h3>
+<p>Each button calls the corresponding method of the client-logging API (logging.js) with some dummy parameters to log.</p>
+<p>The client-logging API wraps the parameters inside the logging-format and issues a message to the parent window.</p>
+<p>The parent window listens to these messages and sends them via 'APIconnector.js' to the Privacy Proxy.</p>
+
+<form id="query">
+    <input type="submit" value="sendQuery 'Women'">
+</form>
+<form id="detailsQuery">
+    <input type="submit" value="sendDetailsQuery">
+</form>
+<form id="moOp">
+    <input type="submit" value="moduleOpened">
+</form>
+<form id="moCl">
+    <input type="submit" value="moduleClosed" />
+</form>
+<form id="moSt">
+    <input type="submit" value="moduleStatisticsCollected" />
+</form>
+<form id="itOp">
+    <input type="submit" value="itemOpened" />
+</form>
+<form id="itCl">
+    <input type="submit" value="itemClosed" />
+</form>
+<form id="itCiAsIm">
+    <input type="submit" value="itemCitedAsImage" />
+</form>
+<form id="itCiAsTe">
+    <input type="submit" value="itemCitedAsText" />
+</form>
+<form id="itCiAsHy">
+    <input type="submit" value="itemCitedAsHyperlink" />
+</form>
+<form id="itRa">
+    <input type="submit" value="itemRated" />
+</form>
+
+<!-- include example.js via requirejs -->
+<script data-main="testModule" src="../lib/require.js"></script>
+
+</body>
+</html>
