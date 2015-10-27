@@ -46,6 +46,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         query: function(profile, callback) {
+        	console.log(profile);
             if (xhr && xhr.readyState !== 4) {
                 xhr.abort();
             }
