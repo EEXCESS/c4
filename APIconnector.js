@@ -83,6 +83,13 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
             settings = $.extend(settings, config);
         },
         /**
+         * Set the number of results to retrieve from the federated recommender
+         * @param {Number} numResults The number of results
+         */        
+        setNumResults:function(numResults) {
+            settings.numResults = numResults;
+        },         
+        /**
          * Function to query the privacy proxy.
          * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format}
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
