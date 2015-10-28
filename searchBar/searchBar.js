@@ -407,7 +407,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
                     }
-                },settings.queryCrumbs.getHistoryCallback);
+                },settings.queryCrumbs.storage);
             }
 
             // close button
