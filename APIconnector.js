@@ -142,6 +142,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
             this.query(obfuscatedProfile, function(results) {
                 if (results.status === "success") {
                     var filteredResults = peas_indist.filterResults(results.data, profile);
+                    filteredResults.profile = profile;
                     callback({status: results.status, data: filteredResults});
                 } else {
                     callback({status: results.status, data: results.data});
