@@ -12,6 +12,10 @@ require(['../config'], function(config) {
                 name: "search results",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/index.html"
+            },{
+                name: "facet scape",
+                // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
+                url: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/index.html"
             }, {
                 name: "dashboard",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
