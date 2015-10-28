@@ -20,6 +20,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         suffix_details: 'getDetails',
         suffix_favicon: 'getPartnerFavIcon?partnerId=',
         suffix_log: 'log/',
+        suffix_getRegisteredPartners: 'getRegisteredPartners',
         numResults: 30
     };
     peas_indist.init(settings.base_url);
@@ -85,10 +86,10 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         /**
          * Set the number of results to retrieve from the federated recommender
          * @param {Number} numResults The number of results
-         */        
-        setNumResults:function(numResults) {
+         */
+        setNumResults: function(numResults) {
             settings.numResults = numResults;
-        },         
+        },
         /**
          * Function to query the privacy proxy.
          * @param {Object} profile The profile used to query. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#query-format}
@@ -223,6 +224,31 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
                 type: 'POST',
                 contentType: 'application/json; charset=UTF-8',
                 timeout: settings.logTimeout
+            });
+        },
+        /**
+         * Function to retrieve the partner sources registered at the recommender. See {@link https://github.com/EEXCESS/eexcess/wiki/Federated-Recommender-Service#get-registered-partners}.
+         * @param {function} callback Callback function on success or error. The parameter of this function is an object with the attribute 'status', indicating either success or error and an attribute 'data', containing the response on success and error details on error. 
+         */
+        getRegisteredPartners: function(callback) {
+            xhr = $.ajax({
+                url: settings.base_url + settings.suffix_getRegisteredPartners,
+                type: 'GET'
+            });
+            xhr.done(function(response) {
+                if (typeof callback !== 'undefined') {
+                    callback({status: 'success', data: response});
+                }
+            });
+            xhr.fail(function(jqXHR, textStatus, errorThrown) {
+                if (textStatus !== 'abort') {
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                    if (typeof callback !== 'undefined') {
+                        callback({status: 'error', data: textStatus});
+                    }
+                }
             });
         }
     };
