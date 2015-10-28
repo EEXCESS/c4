@@ -3,7 +3,7 @@
  *
  * @module c4/searchBar
  */
-define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], function($, ui, tagit, api, iframes) {
+define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/QueryCrumbs/querycrumbs'], function($, ui, tagit, api, iframes, qc) {
     var util = {
         // flag to determine if queries should be surpressed
         preventQuery: false,
@@ -124,6 +124,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
         imgPATH: 'img/',
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
+        queryCrumbs: {
+            active: false
+        },
         storage: {// wrapper for local storage
             set: function(item, callback) {
                 for (var key in item) {
@@ -215,6 +218,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             result_indicator.show();
             if (contentArea.is(':visible')) {
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+                if (settings.queryCrumbs.active) {
+                    qc.addNewQuery(results);
+                }
             }
         } else {
             loader.hide();
@@ -237,6 +243,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
          * @returns {undefined}
          */
         init: function(tabs, config) {
+            if (typeof config !== 'undefined') {
+                settings = $.extend(settings, config);
+            }
 
             bar = $('<div id="eexcess_searchBar"></div>');
             left = $('<div id="eexcess_barLeft"></div>');
@@ -369,9 +378,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
 
 
 
-            if (typeof config !== 'undefined') {
-                settings = $.extend(settings, config);
-            }
+
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
             right.append(logo);
             loader = $('<img id="eexcess_loader" src="' + settings.imgPATH + 'eexcess_loader.gif" />').hide();
@@ -382,9 +389,26 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                 if (!contentArea.is(':visible')) {
                     contentArea.show('fast');
+                    if (settings.queryCrumbs.active) {
+                        qc.addNewQuery(results);
+                    }
                 }
             }).hide();
             right.append(result_indicator);
+            if (settings.queryCrumbs.active) {
+                right.css('width','460px');
+                var qc_div = $('<div id="queryCrumbs"></div>');
+                right.append(qc_div);
+                qc.init(qc_div.get(0), function(query) {
+                    iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: query.profile});
+                    settings.queryFn(query.profile, resultHandler);
+                    loader.show();
+                    result_indicator.hide();
+                    if (!contentArea.is(':visible')) {
+                        contentArea.show('fast');
+                    }
+                },settings.queryCrumbs.getHistoryCallback);
+            }
 
             // close button
             var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e) {

@@ -70,6 +70,7 @@
     z-index: 9999;
     border: none;
     background-color: rgba(0,0,0,0.0);
+    background-image:none;
 }
 
 #eexcess-tabBar-jQueryTabsContent {
@@ -123,6 +124,7 @@
 #eexcess_logo {
     position:absolute;
     width:100px;
+    right:10px;
 }
 
 #eexcess_loader {
@@ -179,9 +181,16 @@
     padding-top:3px;
 }
 
+#queryCrumbs {
+    width:300px;
+    overflow: hidden;
+    margin-right: 50px;
+}
+
 #eexcess_barMain {
     flex:1;
     order:2;
+    min-width: 200px;
 }
 
 #eexcess_searchBar {

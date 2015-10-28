@@ -22,7 +22,7 @@ require(['../config'], function(config) {
                 url: "https://eexcess.github.io/visualization-widgets/Dashboard/index.html?a"
             }];
         // initialize the searchBar with the specified tabs and the path to the image folder
-        searchBar.init(tabs, {imgPATH: '../../searchBar/img/'});
+        searchBar.init(tabs, {imgPATH: '../../searchBar/img/',queryCrumbs:{active:true}});
 
         // detect paragraphs
         var paragraphs = paragraphDetection.getParagraphs();
