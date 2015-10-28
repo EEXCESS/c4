@@ -233,7 +233,8 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         getRegisteredPartners: function(callback) {
             xhr = $.ajax({
                 url: settings.base_url + settings.suffix_getRegisteredPartners,
-                type: 'GET'
+                type: 'GET',
+                timeout: 5000
             });
             xhr.done(function(response) {
                 if (typeof callback !== 'undefined') {
