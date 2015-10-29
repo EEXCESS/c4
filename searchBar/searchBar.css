@@ -1,8 +1,7 @@
 /* remove for horizontal tab bar */
 .ui-tabs-vertical.eexcess {
-    width: 45em;
     font-size: 11px !important;
-    color: grey !important;
+    color: white !important;
 
 }
 
@@ -11,17 +10,18 @@
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav {
-    padding: .2em .1em .2em .2em;
+    padding: .2em .2em .2em .2em;
     float: left;
+	background: white;
     width: auto;
+	margin-right: 2px;
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav li {
     clear: left;
     width: 100%;
-    border-bottom-width: 1px !important;
-    border-right-width: 0 !important;
-    margin: 0 -1px .2em 0;
+	border: 0px;
+    margin: 0 0px .5em 0;
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav li a {
@@ -31,7 +31,7 @@
 .ui-tabs-vertical.eexcess .ui-tabs-nav li.ui-tabs-active {
     padding-bottom: 0;
     padding-right: .1em;
-    border-right-width: 1px;
+    border-right-width: 0px;
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-panel {
@@ -39,7 +39,6 @@
     float: right;
     width: 30em;
 }
-
 
 /*####################################################*/
 
@@ -78,7 +77,9 @@
     position: relative;
     height: 100%;
     overflow: hidden;
-    border: 1px solid rgb(170, 170, 170);
+    border: 1px solid rgb(221, 221, 221);
+	border-radius: 5px;
+	box-shadow: -5px -5px 5px rgba(0,0,0,0.05), 5px 5px 5px rgba(0,0,0,0.05);
     background-color: white;
 }
 
@@ -136,9 +137,9 @@
 
 #eexcess_result_indicator {
     text-decoration: none;
-    font-weight: bold;
-    color: #FFA706;    
-    -webkit-text-fill-color: #FFA706;
+    font-weight: regular;
+    color: #018746;    
+    -webkit-text-fill-color: #018746;
     font-size: 12px;
     position: absolute;
     right: 44px;
@@ -148,7 +149,7 @@
     color:rgb(85,85,85) !important;
     font-size: 9pt !important;
     font-weight: normal;
-    font-family: sans-serif;
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -299,13 +300,13 @@
     border-right-color: rgb(0, 0, 0);
     border-right-style: none;
     border-right-width: 0px;
-    border-top-color: rgb(0, 0, 0);
+    border-top-color: rgb(221, 221, 221);
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
-    border-top-style: none;
-    border-top-width: 0px;
+    border-top-style: solid;
+    border-top-width: 1px;
     bottom: 0px;
-    box-shadow: 0 -3px 6px rgba(0,0,0,0.16), 0 -3px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 -5px 10px rgba(0,0,0,0.0), 0 -5px 10px rgba(0,0,0,0.08);
     box-sizing: content-box;
     buffered-rendering: auto;
     caption-side: top;
@@ -335,7 +336,7 @@
     float: none;
     flood-color: rgb(0, 0, 0);
     flood-opacity: 1;
-    font-family: Verdana, Arial, Helvetica, Geneva, sans-serif;
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
     font-kerning: auto;
     font-size: 10px;
     font-stretch: normal;
@@ -536,7 +537,7 @@
     background-repeat: repeat;
     background-size: auto;
     baseline-shift: 0px;
-    border-bottom-color: rgb(102, 102, 102);
+    border-bottom-color: rgb(221, 221, 221);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     border-bottom-style: solid;
@@ -548,13 +549,13 @@
     border-image-slice: 100%;
     border-image-source: none;
     border-image-width: 1;
-    border-left-color: rgb(102, 102, 102);
+    border-left-color: rgb(221, 221, 221);
     border-left-style: solid;
     border-left-width: 1px;
-    border-right-color: rgb(102, 102, 102);
+    border-right-color: rgb(221, 221, 221);
     border-right-style: solid;
     border-right-width: 1px;
-    border-top-color: rgb(102, 102, 102);
+    border-top-color: rgb(221, 221, 221);
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     border-top-style: solid;
@@ -591,7 +592,7 @@
     float: left;
     flood-color: rgb(0, 0, 0);
     flood-opacity: 1;
-    font-family: Verdana, Arial, Helvetica, Geneva, sans-serif;
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
     font-kerning: auto;
     font-size: 13px;
     font-stretch: normal;
@@ -615,7 +616,7 @@
     margin-bottom: 0px;
     margin-left: 5px;
     margin-right: 0px;
-    margin-top: 3px;
+    margin-top: 0 ;
     marker-end: none;
     marker-mid: none;
     marker-start: none;
@@ -709,6 +710,7 @@
 
 
 #eexcess_searchBar input.ui-widget-content {
+
     -webkit-app-region: no-drag;
     -webkit-appearance: none;
     -webkit-background-composite: source-over;
@@ -789,13 +791,12 @@
     background-blend-mode: normal;
     background-clip: border-box;
     background-color: rgba(0, 0, 0, 0.0);
-    background-image: none;
     background-origin: padding-box;
-    background-position: 50% 50%;
-    background-repeat: repeat-x;
-    background-size: auto;
+    background-position: 0% 30%;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
     baseline-shift: 0px;
-    border-bottom-color: rgb(255, 255, 255);
+    border-bottom-color: rgba(221, 221, 221);
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
     border-bottom-style: none;
@@ -803,17 +804,17 @@
     border-collapse: separate;
     -webkit-border-image: none;
     border-image-outset: 0px;
-    border-image-repeat: stretch;
+    border-image-repeat: none;
     border-image-slice: 100%;
     border-image-source: none;
     border-image-width: 1;
-    border-left-color: rgb(255, 255, 255);
+    border-left-color: rgb(221, 221, 221);
     border-left-style: none;
     border-left-width: 0px;
-    border-right-color: rgb(255, 255, 255);
+    border-right-color: rgb(221, 221, 221);
     border-right-style: none;
     border-right-width: 0px;
-    border-top-color: rgb(255, 255, 255);
+    border-top-color: rgb(221, 221, 221);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border-top-style: none;
@@ -850,7 +851,7 @@
     float: none;
     flood-color: rgb(0, 0, 0);
     flood-opacity: 1;
-    font-family: Verdana, Arial, sans-serif;
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
     font-kerning: auto;
     font-size: 13px !important;
     font-stretch: normal;
@@ -976,6 +977,7 @@
     padding-left:8px;
     background-color:rgba(255,255,255,0.7);
     border-radius:5px 5px 0px 0px;
+	border: 1px solid #dddddd;
     height:100%;
     margin-left:10px;
     margin-right:5px;

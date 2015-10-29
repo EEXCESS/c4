@@ -246,7 +246,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (typeof config !== 'undefined') {
                 settings = $.extend(settings, config);
             }
-
             bar = $('<div id="eexcess_searchBar"></div>');
             left = $('<div id="eexcess_barLeft"></div>');
             selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">All</option><option>Persons</option><option>Locations</option></select>');
@@ -318,7 +317,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             taglist = $('<ul id="eexcess_taglist" class="eexcess"></ul>');
             taglist.tagit({
                 allowSpaces: true,
-                placeholderText: 'add keyword',
+                placeholderText: '',
                 beforeTagAdded: function(event, ui) {
                     $(ui.tag).addClass('eexcess');
                     $(ui.tag).draggable({
@@ -372,6 +371,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             right = $('<div id="eexcess_barRight"></div>');
             bar.append(left, main, right);
             $('body').append(bar);
+
+            // set background image for new tag
+            var $tag_input = $('#eexcess_searchBar input.ui-widget-content');
+            $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
+            $tag_input.focus(function(e) {
+                $tag_input.css('background-image', 'none');
+            });
+            $tag_input.blur(function(e) {
+                $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
+            });
+
+
             contentArea = $("<div id = 'eexcess-tabBar-contentArea'><div id='eexcess-tabBar-iframeCover'></div><div id='eexcess-tabBar-jQueryTabsHeader'><ul></ul><div id = 'eexcess-tabBar-jQueryTabsContent' class='flex-container intrinsic-container intrinsic-container-ratio' ></div></div></div>").hide();
             $('body').append(contentArea);
             $jQueryTabsHeader = $("#eexcess-tabBar-jQueryTabsHeader");
@@ -387,9 +398,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             });
             $iframeCover = $("#eexcess-tabBar-iframeCover");
             $contentArea = $("#eexcess-tabBar-contentArea");
-
-
-
 
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
             right.append(logo);
@@ -428,16 +436,21 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             });
             $jQueryTabsHeader.append($close_button);
 
-            //generates jquery-ui tabs TODO: icons?
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
-                tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
+                if (tab.icon) {
+                    var link = $("<a href='#tabs-" + i + "' title='"+tab.name+"'><img src='"+tab.icon+"' /> </a>").css('padding','0.5em 0.4em 0.3em');
+                    tab.renderedHead = $("<li></li>").append(link);
+                } else {
+                    tab.renderedHead = $("<li><a href='#tabs-" + i + "' title='"+tab.name+"'>" + tab.name + " </a></li>");
+                }
                 $("#eexcess-tabBar-jQueryTabsHeader ul").append(tab.renderedHead);
                 // add tab content corresponding to tab titles
                 tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");
                 $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
                 // following 3 functions derived from jQuery-UI Tabs
                 $jQueryTabsHeader.tabs().addClass("ui-tabs-vertical ui-helper-clearfix eexcess");
+                $('#eexcess-tabBar-jQueryTabsHeader ul').addClass('eexcess');
                 $("#jQueryTabsHeader li").removeClass("ui-corner-top").addClass("ui-corner-left");
                 $jQueryTabsHeader.tabs("refresh");
                 $jQueryTabsHeader.tabs({active: 0});
