@@ -206,6 +206,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     var profile = {
                         contextKeywords: []
                     };
+                    var offsets = [];
                     // add main topic
                     if (res.data.paragraphs[0].topic && typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
                         var mainTopic = {
@@ -218,6 +219,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     }
                     // add other keywords
                     $.each(res.data.paragraphs[0].statistic, function() {
+                        offsets[this.key.text] = this.key.offset;
                         if (this.key.text !== mainTopic.text) {
                             profile.contextKeywords.push({
                                 text: this.key.text,
@@ -227,7 +229,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                             });
                         }
                     });
-                    callback({query: profile});
+                    callback({query: profile, offsets:offsets});
                 } else {
                     // TODO: add simple fallback
                     callback({error: res.data});
