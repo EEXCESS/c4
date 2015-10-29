@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+		requirejs.config({
+		    paths: {
+		    	jquery: "./bower_components/jquery/dist/jquery",
+		    	graph: "./bower_components/graph/lib/graph", 
+		    	peas: "./"
+		    }
+		});		
+		</script>
+		<script>
+			require(["peas/peas_indist"], function(peas_indist){	
+				/*var baseUrl = "http://localhost:8080/eexcess-privacy-proxy-issuer/issuer/";
+				var mcsService = baseUrl + "getMaximalCliques";
+				var cogService = baseUrl + "getCoOccurrenceGraph";
+				peas_indist.init(mcsService, cogService);*/
+				document.getElementById("go").addEventListener("click", function(){ 
+					var originalQuery = JSON.parse(document.getElementById("originalQuery").value);
+					var nbFakeQueries = document.getElementById("nbFakeQueries").value;
+					if (originalQuery != ""){
+						var obfuscatedQueryStr;
+						if (nbFakeQueries <= 0){
+							obfuscatedQueryStr = JSON.stringify(originalQuery);
+						} else {
+							var obfuscatedQuery = peas_indist.obfuscateQuery(originalQuery, nbFakeQueries);
+							obfuscatedQueryStr = JSON.stringify(obfuscatedQuery);
+						}
+						document.getElementById("obfuscatedQuery").innerHTML = obfuscatedQueryStr;
+					}
+				});	
+			});
+		</script>
+	</head>
+	<body>
+		<form>
+			<p>
+				Original query: <br/>
+				<textarea id="originalQuery" rows="10" cols="150">{
+    "origin": {
+        "userID": "E993A29B-A063-426D-896E-131F85193EB7",
+        "clientType": "EEXCESS - Google Chrome Extension",
+        "clientVersion": "2beta",
+        "module": "testing"
+    },
+    "numResults": 3,
+    "contextKeywords": [{
+        "text": "graz",
+        "type": "location", 
+        "isMainTopic": true, 
+        "uri": "uri1"
+    }, {
+        "text": "vienna",
+        "type": "misc",
+        "isMainTopic": false, 
+        "uri": "uri2"
+    }]
+}</textarea>
+			</p>
+			<p>
+				Number of fake queries: 
+				<select id="nbFakeQueries">
+					<option value="0">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select>
+			</p>
+			<p>
+				<button id="go" type="button">Go!</button>
+			</p>
+			<p>Obfuscated query: <span id="obfuscatedQuery"></span>
+		</form>
+	</body>
+</html>

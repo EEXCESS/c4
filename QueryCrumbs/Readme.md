@@ -11,14 +11,19 @@ The history is visualized as a sequence of small graphical elements. Each graphi
 
 The implementation of QueryCrumbs consists of methods for drawing the visualization `querycrumbs.js` and attributes for configuring the visualization  `querycrumbs-settings.js`. In order to integrate QueryCrumbs in your application, you only need to provide two functions that establish the communication between your application and QueryCrumbs:
 
-* __getHistoryCallback__: Provides access to the search history of a user. Takes `numberOfElements` as input argument and is expected to return a list of query-objects in the format specified [here](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#pp-response-format). If you don't want to handle the history yourself, set the callback function to `undefined`. Then, QueryCrumbs will use the localStorage of the browser to keep track of the queries.
-* __navigateQueryCallback__: Provides a mechanism to notify your application when a user wants to navigate to a previous query. The function takes a single `query` as input argument and is expected to synchronize your application with this query. The format of `query` is the same as mentioned above.
 
-You can use QueryCrumbs in your application in the following way: Create a QueryCrumbs-object and initialize it with a DOM-element, the `getHistoryCallback` and the `navigateQueryCallback`:
+* __navigateQueryCallback__: Provides a mechanism to notify your application when a user wants to navigate to a previous query. The function takes a single `query` as input argument and is expected to synchronize your application with this query. The format of `query` is the same as mentioned above.
+* __storage__ (optional): Handles access to the search history of a user. `Storage` is an object, that must exhibit two function:
+  * __getHistory(numItems,callback)__ The parameter `numItems` specifies the number of history items to provide and the `callback` parameter is a function, that takes the provided history items as input.
+  * __setHistory(history)__ This function should store the history as provided in the parameter `history`  
+
+  If you don't provide the `storage` parameter, QueryCrumbs will use the localStorage of the browser to keep track of the queries.
+
+You can use QueryCrumbs in your application in the following way: Create a QueryCrumbs-object and initialize it with a DOM-element, the `navigateQueryCallback` and optionally `storage`:
 
 ```javascript
 var QC = QueryCrumbs();
-QC.init($("div.querycrumbs"), getHistoryCallback, navigateQueryCallback);
+QC.init($("div.querycrumbs").get(0), navigateQueryCallback);
 ```
 
 When your application retrieved results for a new query (same [format](https://github.com/EEXCESS/eexcess/wiki/%5B21.09.2015%5D-Request-and-Response-format#pp-response-format) as mentioned above), you inform QueryCrumbs by simply calling

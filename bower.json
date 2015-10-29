@@ -1,36 +1,38 @@
 {
-    "name": "c4",
-    "version": "2.0.1",
-    "homepage": "https://github.com/EEXCESS/c4",
-    "authors": [
-        "Jörg Schlötterer <joerg.schloetterer@uni-passau.de>",
-        "Nils Witt",
-        "Johannes Jurgovsky"
-    ],
-    "description": "tools for context detection, query generation and result usage in web pages",
-    "moduleType": [
-        "amd"
-    ],
-    "keywords": [
-        "context",
-        "query",
-        "citation",
-        "paragraph"
-    ],
-    "license": "MIT",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests",
-        "examples"
-    ],
-    "dependencies": {
-        "jquery": ">=2.1.4",
-        "jquery-ui": "~1.11.4",
-        "peas": "https://github.com/EEXCESS/peas.git",
-        "requirejs": "~2.1.17",
-        "tag-it": "https://github.com/schloett/tag-it.git"
-    }
+  "name": "c4",
+  "version": "2.2.2",
+  "version": "3.2.1",
+  "homepage": "https://github.com/EEXCESS/c4",
+  "authors": [
+    "Jörg Schlötterer <joerg.schloetterer@uni-passau.de>",
+    "Nils Witt",
+    "Johannes Jurgovsky"
+  ],
+  "description": "tools for context detection, query generation and result usage in web pages",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "context",
+    "query",
+    "citation",
+    "paragraph"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "examples"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6",
+    "jquery": ">=2.1.4",
+    "jquery-ui": "~1.11.4",
+    "peas": "https://github.com/EEXCESS/peas.git",
+    "requirejs": "~2.1.17",
+    "tag-it": "https://github.com/schloett/tag-it.git"
+  }
 }

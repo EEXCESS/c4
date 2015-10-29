@@ -1,0 +1,12 @@
+{
+  "name": "tag-it",
+  "version": "1.0.0",
+  "main": [
+    "js/tag-it.js"
+  ],
+  "ignore": [
+  ],
+  "dependencies": {
+    "jquery-ui": ">=1.11"
+  }
+}
