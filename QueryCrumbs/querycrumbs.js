@@ -485,7 +485,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
             self.domElem = d3.select(domElement);
             if (storage) {
                 self.getHistoryCallback = storage.getHistory;
-                self.addToHistory = storage.addToHistory;
+                self.setHistory = storage.setHistory;
             } else {
                 if (typeof(window.localStorage) !== "undefined") {
                     self.setHistory = function(histItem) {
