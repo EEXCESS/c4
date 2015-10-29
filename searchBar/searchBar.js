@@ -338,7 +338,19 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui.tag.find('.ui-icon-close').css('background-image', 'url("' + settings.imgPATH + 'ui-icons_cd0a0a_256x240.png")');
                     if (!util.preventQuery) {
                         util.queryUpdater();
-                    }
+                    };
+                    var data = ui.tag.data('properties');
+                    ui.tag.hover(
+                            function() {
+                                var event = new CustomEvent('c4_keywordMouseEnter', {detail: data});
+                                ui.tag.addClass('eexcess-tag_hover');
+                                document.dispatchEvent(event);
+                            },
+                            function() {
+                                var event = new CustomEvent('c4_keywordMouseLeave', {detail: data});
+                                ui.tag.removeClass('eexcess-tag_hover');
+                                document.dispatchEvent(event);
+                            });
                 },
                 afterTagRemoved: function(e, ui) {
                     if (!util.preventQuery) {
@@ -396,7 +408,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }).hide();
             right.append(result_indicator);
             if (settings.queryCrumbs.active) {
-                right.css('width','460px');
+                right.css('width', '460px');
                 var qc_div = $('<div id="queryCrumbs"></div>');
                 right.append(qc_div);
                 qc.init(qc_div.get(0), function(query) {
@@ -407,7 +419,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
                     }
-                },settings.queryCrumbs.storage);
+                }, settings.queryCrumbs.storage);
             }
 
             // close button

@@ -40,6 +40,11 @@
     width: 30em;
 }
 
+.eexcess-tag_hover {
+    background-image:none !important;
+    background-color:yellow !important;
+}
+
 /*####################################################*/
 
 #eexcess_close {
