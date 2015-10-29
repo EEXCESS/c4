@@ -19,7 +19,7 @@
 					var query = JSON.parse(queryStr);
 					if (nbFakeQueries <= 0){
 						api.query(query, function(results){
-							document.getElementById("results").innerHTML = JSON.stringify(results);
+							document.getElementById("results").innerHTML = JSON.stringify(results.data);
 						});
 					} else {
 						api.queryPeas(query, nbFakeQueries, function(results){
