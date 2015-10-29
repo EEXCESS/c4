@@ -393,10 +393,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes'], funct
             });
             $jQueryTabsHeader.append($close_button);
 
-            //generates jquery-ui tabs TODO: icons?
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
-                tab.renderedHead = $("<li><a href='#tabs-" + i + "'>" + tab.name + " </a></li>");
+                if (tab.icon) {
+                    var link = $("<a href='#tabs-" + i + "' title='"+tab.name+"'><img src='"+tab.icon+"' /> </a>").css('padding','0.5em 0.4em 0.3em');
+                    tab.renderedHead = $("<li></li>").append(link);
+                } else {
+                    tab.renderedHead = $("<li><a href='#tabs-" + i + "' title='"+tab.name+"'>" + tab.name + " </a></li>");
+                }
                 $("#eexcess-tabBar-jQueryTabsHeader ul").append(tab.renderedHead);
                 // add tab content corresponding to tab titles
                 tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");

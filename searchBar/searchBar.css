@@ -1,8 +1,7 @@
 /* remove for horizontal tab bar */
 .ui-tabs-vertical.eexcess {
-    width: 45em;
     font-size: 11px !important;
-    color: grey !important;
+    color: white !important;
 
 }
 
@@ -11,17 +10,18 @@
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav {
-    padding: .2em .1em .2em .2em;
+    padding: .2em .2em .2em .2em;
     float: left;
 	background: white;
     width: auto;
+	margin-right: 2px;
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav li {
     clear: left;
     width: 100%;
-    border: 0px;
-    margin: 0 -1px .2em 0;
+	border: 0px;
+    margin: 0 0px .5em 0;
 }
 
 .ui-tabs-vertical.eexcess .ui-tabs-nav li a {
@@ -41,7 +41,6 @@
 }
 
 .ui-tabs.eexcess .ui-tabs-nav li.ui-tabs-active {
-	margin-bottom: -1px;
 	padding-bottom: 0;
 	border: 0px;
 }
@@ -65,7 +64,6 @@
 	color: #222222;
 	font-weight: bold;
 }
-
 /*####################################################*/
 
 #eexcess_close {
