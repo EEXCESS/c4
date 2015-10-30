@@ -238,6 +238,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                 if (settings.queryCrumbs.active) {
                     qc.addNewQuery(results);
+                    if(typeof settings.queryCrumbs.updateTrigger === 'function') {
+                        settings.queryCrumbs.updateTrigger();
+                    }
                 }
             }
         } else {
