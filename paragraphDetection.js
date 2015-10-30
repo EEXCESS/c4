@@ -571,7 +571,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
             var offsets = [];
             var offset = 0;
             var walker = document.createTreeWalker(
-                    paragraph.elements[0].parent().get(0),
+                    paragraph,
                     NodeFilter.SHOW_TEXT
                     );
             var node;
