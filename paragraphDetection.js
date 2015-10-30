@@ -579,7 +579,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 if (node.nodeValue.length > 0) {
                     offsets.push({
                         offset: offset,
-                        el: node.parentNode
+                        el: node
                     });
                     offset += node.nodeValue.length;
                 }
