@@ -46,7 +46,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 }
                 self.setHistory({history: self.historyData, base_color: self.visualData[0].base_color, currentQueryID: query.queryID});
                 query.origin = {
-                    module:"QueryCrumbs"
+                    module: "QueryCrumbs"
                 };
                 self.navigateQueryCallback(query);
             },
@@ -227,7 +227,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                     var similarities = self.CORE.getGroupSimilarities(newNode, nodeGroups);
                     newNode.sim = similarities.maxMutualResults / newNode.results.length;
                     if (newNode.rID == 0) {
-                        if(self.base_color == undefined) {
+                        if (self.base_color == undefined) {
                             newNode.base_color = QueryCrumbsConfiguration.BaseColorManager.getInitialColor();
                         } else {
                             newNode.base_color = self.base_color;
@@ -346,7 +346,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                         fill: "white",
                         stroke: "#cccccc"
                     });
-                    if(d.fShowEnterTransition) {
+                    if (d.fShowEnterTransition) {
                         crumbBoundary.transition().delay(0).duration(500).ease("elastic").attr("opacity", 1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r);
                     } else {
                         crumbBoundary.attr("opacity", 1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r);
@@ -381,7 +381,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                             .attr("d", arc)
                             //.style("opacity", function(d) { return ((d.preIdx == -1) ? QueryCrumbsConfiguration.colorSettings.newDocOpacity : QueryCrumbsConfiguration.colorSettings.oldDocOpacity);});
                             .style("opacity", QueryCrumbsConfiguration.colorSettings.newDocOpacity);
-                    if(d.fShowEnterTransition) {
+                    if (d.fShowEnterTransition) {
                         contentGroup.transition().delay(100).duration(500).ease("elastic").attr("opacity", 1).attr("transform", "translate(-" + xpos * (scaleBy - 1) + ",-" + ypos * (scaleBy - 1) + ")scale(" + scaleBy + ")");
                     } else {
                         contentGroup.attr("opacity", 1).attr("transform", "translate(-" + xpos * (scaleBy - 1) + ",-" + ypos * (scaleBy - 1) + ")scale(" + scaleBy + ")");
@@ -484,7 +484,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
             setCurrentQuery: function(queryID) {
                 self.svgContainer.selectAll(".crumb").filter(function(d) {
                     return (d.queryID === queryID);
-                }).each(function(d,i) {
+                }).each(function(d, i) {
                     self.currentNode = d;
                     self.currentIdx = d.rID;
                     d3.select(this.parentNode).selectAll(".queryCircleBorder").attr("stroke-width", 1);
@@ -527,13 +527,6 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 }
                 self.getHistoryCallback = function(callback) {
                     if (typeof(window.localStorage) !== "undefined") {
-                        if (window.localStorage.getItem("QueryCrumbs") == null) {
-                            window.localStorage.setItem("QueryCrumbs", JSON.stringify({
-                                history: [],
-                                base_color: QueryCrumbsConfiguration.BaseColorManager.getInitialColor(),
-                                currentQueryID: -1
-                            }));
-                        }
                         var qc = JSON.parse(window.localStorage.getItem("QueryCrumbs"));
                         callback(qc);
                     }
@@ -563,6 +556,13 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
         refresh: function() {
             self.svgContainer.selectAll(".crumb").remove();
             self.getHistoryCallback(function(loadedHistory) {
+                if (typeof loadedHistory === 'undefined' || loadedHistory === null) {
+                    loadedHistory = {
+                        history: [],
+                        base_color: QueryCrumbsConfiguration.BaseColorManager.getInitialColor(),
+                        currentQueryID: -1
+                    };
+                }
                 self.base_color = loadedHistory.base_color;
                 var currentQueryID = loadedHistory.currentQueryID;
                 var hist = loadedHistory.history.slice(Math.max(loadedHistory.history.length - QueryCrumbsConfiguration.dimensions.HISTORY_LENGTH, 0));
