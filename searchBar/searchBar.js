@@ -420,10 +420,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 var qc_div = $('<div id="queryCrumbs"></div>');
                 right.append(qc_div);
                 qc.init(qc_div.get(0), function(query) {
-                    iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: query.profile});
-                    settings.queryFn(query.profile, resultHandler);
-                    loader.show();
-                    result_indicator.hide();
+                    util.setQuery(query.profile.contextKeywords, 0);
+//                    iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: query.profile});
+//                    settings.queryFn(query.profile, resultHandler);
+//                    loader.show();
+//                    result_indicator.hide();
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
                     }

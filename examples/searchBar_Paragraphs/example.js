@@ -30,7 +30,7 @@ require(['../config'], function(config) {
             icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png"
     }];
     // initialize the searchBar with the specified tabs and the path to the image folder
-    searchBar.init(tabs, {imgPATH: '../../searchBar/img/'});
+    searchBar.init(tabs, {imgPATH: '../../searchBar/img/',queryCrumbs:{active:true}});
         // detect paragraphs
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs
