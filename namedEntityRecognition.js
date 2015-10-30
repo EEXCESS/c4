@@ -12,7 +12,7 @@
  */
 
 define(['jquery'], function($) {
-    var endpoint = 'https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/recognizeEntity';
+    var endpoint = 'https://eexcess.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/recognizeEntity';
     var xhr;
 
     return {
@@ -27,10 +27,11 @@ define(['jquery'], function($) {
             }
             xhr = $.ajax({
                 url: endpoint,
-                data: JSON.stringify({paragraphs: paragraphs}),
+                data: JSON.stringify(paragraphs),
                 type: 'POST',
                 contentType: 'application/json',
-                dataType: 'json'
+                dataType: 'json',
+                timeout:5000
             });
             xhr.done(function(response) {
                 if (typeof callback !== 'undefined') {
