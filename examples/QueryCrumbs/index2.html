@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../bower_components/requirejs/require.js"></script>
+</head>
+<body>
+
+<form id="refresh">
+    <input type="submit" value="Refresh">
+</form>
+
+<div id="querycrumbs2"></div>
+
+<script>
+
+    function navigateToQuery(query) {
+        console.log("navigate to:");
+        console.log(query);
+    }
+
+    require(['../config'], function(config) {
+        require(['jquery', 'c4/APIconnector', 'd3', 'c4/QueryCrumbs/querycrumbs'], function ($, api, d3, QueryCrumbs2) {
+
+            QueryCrumbs2.init($('#querycrumbs2').get(0), navigateToQuery);
+
+            api.init({
+                origin: {
+                    clientType: "test",
+                    clientVersion: "0.0",
+                    module: "querycrumbs",
+                    userID: "84884"
+                },
+                loggingLevel: 1
+            });
+
+            $("#refresh").submit(function(event) {
+                event.preventDefault();
+                QueryCrumbs2.refresh();
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -29,9 +29,22 @@ define(['c4/colorbrewer'], function (colorbrewer) {
             getInitialColor: function () {
                 return QueryCrumbsConfiguration.colorSettings.baseColors[0];
             },
+            getColorByIndex: function(idx) {
+                return QueryCrumbsConfiguration.colorSettings.baseColors[idx];
+            },
             getNextColor: function (preNodeColor) {
+                //console.log(existingColors);
+                //for (var c in QueryCrumbsConfiguration.colorSettings.baseColors) {
+                //    QueryCrumbsConfiguration.colorSettings.baseColors[c];
+                //    if (existingColors.indexOf(QueryCrumbsConfiguration.colorSettings.baseColors[c]) < 0) {
+                //        return QueryCrumbsConfiguration.colorSettings.baseColors[c];
+                //    }
+                //}
                 var cIdx = (QueryCrumbsConfiguration.colorSettings.baseColors.indexOf(preNodeColor) + 1) % QueryCrumbsConfiguration.colorSettings.baseColors.length;
                 return QueryCrumbsConfiguration.colorSettings.baseColors[cIdx];
+            },
+            getIndexOfColor: function(color) {
+                return QueryCrumbsConfiguration.colorSettings.baseColors.indexOf(color);
             }
         },
         // Query Crumbs dimensions

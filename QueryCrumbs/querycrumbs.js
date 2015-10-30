@@ -37,12 +37,14 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 d3.select(this.parentNode).selectAll(".queryCircleBorder").attr("stroke-width", 1);
                 d3.select(this).select(".queryCircleBorder").attr("stroke-width", 3);
                 var query;
+
                 for (var n = 0; n < self.historyData.length; n++) {
                     if (self.historyData[n].queryID === d.queryID) {
                         query = self.historyData[n];
                         break;
                     }
                 }
+                self.setHistory({history: self.historyData, base_color: self.visualData[0].base_color, currentQueryID: query.queryID});
                 self.navigateQueryCallback(query);
             },
             onMouseOverNode: function(d, i) {
@@ -167,6 +169,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 vNode.ypos = null;//QueryCrumbsConfiguration.dimensions.circle_cxy;
                 vNode.sim = null;//similarities[nodeIdx].rsSimScore.sim;
                 vNode.base_color = null;//(visualDataNodes[nodeIdx - 1]) ? BaseColorManager.getColor(visualDataNodes[nodeIdx - 1].base_color, vNode.sim) : BaseColorManager.getFirstColor();
+                vNode.fShowEnterTransition = true;
                 vNode.results = [];
                 for (var docIdx = 0; docIdx < query.result.length; docIdx++) {
                     var vDoc = {};
@@ -187,6 +190,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
             updateVisualData: function(visualData) {
                 var newNodes = [];
                 var nodeGroups = {};
+
                 for (var nodeIdx = 0; nodeIdx < visualData.length; nodeIdx++) {
                     var old_rID = visualData[nodeIdx].rID;
                     visualData[nodeIdx].rID = nodeIdx;
@@ -198,6 +202,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                         visualData[nodeIdx].ypos = QueryCrumbsConfiguration.dimensions.circle_cxy - QueryCrumbsConfiguration.dimensions.rectHeight / 2;
                     }
                     // Node already existed: Update index, indicate shifting to rendering-process and remember its group
+
                     if (old_rID !== null) {
                         if (old_rID > nodeIdx) {
                             visualData[nodeIdx].shift = true;
@@ -219,7 +224,11 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                     var similarities = self.CORE.getGroupSimilarities(newNode, nodeGroups);
                     newNode.sim = similarities.maxMutualResults / newNode.results.length;
                     if (newNode.rID == 0) {
-                        newNode.base_color = QueryCrumbsConfiguration.BaseColorManager.getInitialColor();
+                        if(self.base_color == undefined) {
+                            newNode.base_color = QueryCrumbsConfiguration.BaseColorManager.getInitialColor();
+                        } else {
+                            newNode.base_color = self.base_color;
+                        }
                     } else {
                         if (newNode.sim > QueryCrumbsConfiguration.colorSettings.colorThreshold) {
                             newNode.base_color = similarities.maxMutualResultsBaseColor;
@@ -334,7 +343,11 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                         fill: "white",
                         stroke: "#cccccc"
                     });
-                    crumbBoundary.transition().delay(0).duration(500).ease("elastic").attr("opacity", 1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r);
+                    if(d.fShowEnterTransition) {
+                        crumbBoundary.transition().delay(0).duration(500).ease("elastic").attr("opacity", 1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r);
+                    } else {
+                        crumbBoundary.attr("opacity", 1).attr("r", QueryCrumbsConfiguration.dimensions.circle_r);
+                    }
 
                     var contentGroup = d3.select(this).append("g").attr("class", "queryCircleContent").attr("opacity", 0);
                     contentGroup.append("circle").attr({
@@ -365,8 +378,12 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                             .attr("d", arc)
                             //.style("opacity", function(d) { return ((d.preIdx == -1) ? QueryCrumbsConfiguration.colorSettings.newDocOpacity : QueryCrumbsConfiguration.colorSettings.oldDocOpacity);});
                             .style("opacity", QueryCrumbsConfiguration.colorSettings.newDocOpacity);
-
-                    contentGroup.transition().delay(100).duration(500).ease("elastic").attr("opacity", 1).attr("transform", "translate(-" + xpos * (scaleBy - 1) + ",-" + ypos * (scaleBy - 1) + ")scale(" + scaleBy + ")");
+                    if(d.fShowEnterTransition) {
+                        contentGroup.transition().delay(100).duration(500).ease("elastic").attr("opacity", 1).attr("transform", "translate(-" + xpos * (scaleBy - 1) + ",-" + ypos * (scaleBy - 1) + ")scale(" + scaleBy + ")");
+                    } else {
+                        contentGroup.attr("opacity", 1).attr("transform", "translate(-" + xpos * (scaleBy - 1) + ",-" + ypos * (scaleBy - 1) + ")scale(" + scaleBy + ")");
+                    }
+                    d.fShowEnterTransition = true;
                 } else {
                     var xpos = QueryCrumbsConfiguration.dimensions.circle_cxy - QueryCrumbsConfiguration.dimensions.rectWidth / 2 + d.rID * (QueryCrumbsConfiguration.dimensions.rectWidth + QueryCrumbsConfiguration.dimensions.edgeWidth);
                     var ypos = QueryCrumbsConfiguration.dimensions.circle_cxy - QueryCrumbsConfiguration.dimensions.rectHeight / 2;
@@ -447,18 +464,31 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                         } else {
                             newX = currentx - (QueryCrumbsConfiguration.dimensions.rectWidth + QueryCrumbsConfiguration.dimensions.edgeWidth);
                         }
-                        console.log(newX);
                         return "translate(" + newX + ", " + currenty + ")";
                     } else {
                         return "translate(" + currentx + "," + currenty + ")";
                     }
                 });
 
+
+
                 crumbs.enter().append("g").attr("class", "crumb")
                         .on("mouseenter", self.INTERACTION.onMouseOverNode)
                         .on("mouseleave", self.INTERACTION.onMouseOutNode)
                         .on("click", self.INTERACTION.onClick)
                         .each(self.RENDERING.addCrumb);
+            },
+            setCurrentQuery: function(queryID) {
+                self.svgContainer.selectAll(".crumb").filter(function(d) {
+                    return (d.queryID === queryID);
+                }).each(function(d,i) {
+                    self.currentNode = d;
+                    self.currentIdx = d.rID;
+                    d3.select(this.parentNode).selectAll(".queryCircleBorder").attr("stroke-width", 1);
+                    d3.select(this).select(".queryCircleBorder").attr("stroke-width", 3);
+                    self.svgContainer.selectAll("g.infoBoxNode").remove();
+                    self.INTERACTION.addInfoBox(this, d);
+                })
             }
         }
     };
@@ -468,7 +498,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
          * @param domElement    The DOM-node where the visualization should reside in.
          * @param navigateQueryCallback     A callback function, indicating that a user wants to navigate to a previous query.
          * The function has one parameter {@param query} and is called whenever the user selects a query-node.
-         * @param [storage]  An object, providing storage capabilities for the queryCrumbs history. Must exhibit two functions: getHistory(#numElements, callback(history)) and setHistory(history). getHistory provides the history, while the parameter #numElements specifies the number of history elements to provide and callback(history) should be called with the provided history elements. setHistory should store the provided history. If the storage parameter is not provided, QueryCrumbs will use the browser's local Storage to handle the history.
+         * @param [storage]  An object, providing storage capabilities for the queryCrumbs history. Must exhibit two functions: getHistory(callback(history)) and setHistory(history). getHistory provides the history and callback(history) should be called with the provided history elements. setHistory should store the provided history. If the storage parameter is not provided, QueryCrumbs will use the browser's local Storage to handle the history.
          */
         init: function(domElement, navigateQueryCallback, storage) {
 
@@ -490,17 +520,19 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 if (typeof(window.localStorage) !== "undefined") {
                     self.setHistory = function(histItem) {
                         window.localStorage.setItem("QueryCrumbs", JSON.stringify(histItem));
-                    }
-                    if (window.localStorage.getItem("QueryCrumbs") == null) {
-                        window.localStorage.setItem("QueryCrumbs", JSON.stringify([]));
-                    }
+                    };
                 }
-                self.getHistoryCallback = function(numberOfElements, callback) {
+                self.getHistoryCallback = function(callback) {
                     if (typeof(window.localStorage) !== "undefined") {
+                        if (window.localStorage.getItem("QueryCrumbs") == null) {
+                            window.localStorage.setItem("QueryCrumbs", JSON.stringify({
+                                history: [],
+                                base_color: QueryCrumbsConfiguration.BaseColorManager.getInitialColor(),
+                                currentQueryID: -1
+                            }));
+                        }
                         var qc = JSON.parse(window.localStorage.getItem("QueryCrumbs"));
-                        callback(qc.slice(Math.max(qc.length - numberOfElements, 0)));
-                    } else {
-                        callback([]);
+                        callback(qc);
                     }
                 };
             }
@@ -508,24 +540,35 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
             self.svgContainer = self.domElem.append("svg")
                     .attr("width", self.width)
                     .attr("height", self.height)
-                    .attr("id", "queryCrumbs-svg");
+                    .attr("class", "queryCrumbs-svg");
 
-            self.getHistoryCallback(QueryCrumbsConfiguration.dimensions.HISTORY_LENGTH, function(loadedHistory) {
-                self.currentIdx = loadedHistory.length - 1;
+            self.getHistoryCallback(function(loadedHistory) {
+                self.base_color = loadedHistory.base_color;
+                var currentQueryID = loadedHistory.currentQueryID;
+                var hist = loadedHistory.history.slice(Math.max(loadedHistory.history.length - QueryCrumbsConfiguration.dimensions.HISTORY_LENGTH, 0));
                 self.visualData = [];
-                for (var nodeIdx = 0; nodeIdx < loadedHistory.length; nodeIdx++) {
-                    self.CORE.addVisualNode(loadedHistory[nodeIdx]);
+                for (var nodeIdx = 0; nodeIdx < hist.length; nodeIdx++) {
+                    self.CORE.addVisualNode(hist[nodeIdx]);
                 }
-                self.currentNode = self.visualData[self.currentIdx];
                 self.RENDERING.redraw(self.visualData);
-                self.svgContainer.selectAll(".crumb").last().each(function(d, i) {
-                    self.currentNode = d;
-                    self.currentIdx = d.rID;
-                    d3.select(this.parentNode).selectAll(".queryCircleBorder").attr("stroke-width", 1);
-                    d3.select(this).select(".queryCircleBorder").attr("stroke-width", 3);
-                    self.svgContainer.selectAll("g.infoBoxNode").remove();
-                    self.INTERACTION.addInfoBox(this, d);
-                });
+                self.RENDERING.setCurrentQuery(currentQueryID);
+            });
+        },
+        /**
+         * Refresh the visualization from the status stored in storage.
+         */
+        refresh: function() {
+            self.svgContainer.selectAll(".crumb").remove();
+            self.getHistoryCallback(function(loadedHistory) {
+                self.base_color = loadedHistory.base_color;
+                var currentQueryID = loadedHistory.currentQueryID;
+                var hist = loadedHistory.history.slice(Math.max(loadedHistory.history.length - QueryCrumbsConfiguration.dimensions.HISTORY_LENGTH, 0));
+                self.visualData = [];
+                for (var nodeIdx = 0; nodeIdx < hist.length; nodeIdx++) {
+                    self.CORE.addVisualNode(hist[nodeIdx]);
+                }
+                self.RENDERING.redraw(self.visualData);
+                self.RENDERING.setCurrentQuery(currentQueryID);
             });
         },
         /**
@@ -547,7 +590,6 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 self.visualData.splice(0, 1);
                 self.visualData = self.CORE.updateVisualData(self.visualData);
             }
-            self.setHistory(self.historyData);
             self.RENDERING.redraw(self.visualData);
             self.svgContainer.selectAll(".crumb").last().each(function(d, i) {
                 self.currentNode = d;
@@ -557,6 +599,7 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                 self.svgContainer.selectAll("g.infoBoxNode").remove();
                 self.INTERACTION.addInfoBox(this, d);
             });
+            self.setHistory({history: self.historyData, base_color: self.visualData[0].base_color, currentQueryID: self.historyData[self.currentIdx].queryID});
         }
     }
 });
