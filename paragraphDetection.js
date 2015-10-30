@@ -229,7 +229,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                             });
                         }
                     });
-                    callback({query: profile, offsets:offsets});
+                    callback({query: profile, offsets: offsets});
                 } else {
                     // TODO: add simple fallback
                     callback({error: res.data});
@@ -254,7 +254,6 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         retVal.entities = paragraphs[idx].entities;
                     }
                 } else if (parentPars.length > 1) {
-                    console.log('multiple paragraphs');
                     // TODO: entities from multiple paragraphs
                 }
             }
@@ -306,7 +305,6 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 if (el.text().length > 3) {
                     var wrapper = $('<div style="display:inline;"></div>');
                     wrapper.mouseenter(function(evt) {
-                        console.log('mouseenter');
                         var parents = el.parents('.' + classname);
                         delayTimer.clearTimer();
                         img.data('query', el.text());
@@ -386,7 +384,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 var offset = $(window).scrollTop() + $(window).height();
                 $(paragraphs).each(function() {
                     var top = $(this.elements[0]).offset().top;
-                    if (offset > top && top > $(window).scrollTop()) {
+                    var bottom = top + $(this.elements[0]).parent().height();
+                    if ((top <= offset) && (bottom >= $(window).scrollTop())) {
+                        //if (offset > top && top > $(window).scrollTop()) {
                         this.cursorDistance = 0;
                         visibleElements.add(this);
                     }
@@ -538,7 +538,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 var offset = $(window).scrollTop() + $(window).height();
                 $(paragraphs).each(function() {
                     var top = $(this.elements[0]).offset().top;
-                    if (offset > top && top > $(window).scrollTop()) {
+                    var bottom = top + $(this.elements[0]).parent().height();
+                    // if (offset > top && top > $(window).scrollTop()) {
+                    if ((top <= offset) && (bottom >= $(window).scrollTop())) {
                         visibleElements.add(this);
                     }
                 });
@@ -555,6 +557,34 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                     v1.distance = Math.sqrt(left * left + top * top);
                 });
             }
+        },
+        /**
+         * Creates a map of text offsets and corresponding DOM elements of the 
+         * paragraph. For each element, the start position in the paragaph's 
+         * plaintext representation is provided.
+         * @param {Object} paragraph The paragraph.
+         * @returns {Array} Array of DOM nodes and corresponding start positions
+         * in the paragrahp's Text. The contained Objects consist of two 
+         * attributes: 'offset' (the start position) and 'el' (the DOM element).
+         */
+        getOffsetMap: function(paragraph) {
+            var offsets = [];
+            var offset = 0;
+            var walker = document.createTreeWalker(
+                    paragraph,
+                    NodeFilter.SHOW_TEXT
+                    );
+            var node;
+            while (node = walker.nextNode()) {
+                if (node.nodeValue.length > 0) {
+                    offsets.push({
+                        offset: offset,
+                        el: node
+                    });
+                    offset += node.nodeValue.length;
+                }
+            }
+            return offsets;
         }
     };
 });
