@@ -5,7 +5,7 @@
  */
 define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/QueryCrumbs/querycrumbs'], function($, ui, tagit, api, iframes, qc) {
     var util = {
-        // flag to determine if queries should be surpressed
+// flag to determine if queries should be surpressed
         preventQuery: false,
         // flag to determine if changing the query in the searchBar should be supressed
         preventQuerySetting: false,
@@ -43,14 +43,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             result_indicator.hide();
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-                // get keywords
+// get keywords
                 lastQuery.contextKeywords = taglist.tagit('getActiveTagsProperties');
                 // get main topic
                 var mainTopic = mainTopicLabel.data('properties');
                 if (mainTopic && mainTopic.text && mainTopic.text !== '') {
                     lastQuery.contextKeywords.push(mainTopic);
                 }
-                // add origin
+// add origin
                 lastQuery.origin = {
                     module: "c4/searchBar"
                 };
@@ -94,7 +94,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             taglist.tagit('removeAll');
             $.each(contextKeywords, function() {
                 if (this.isMainTopic) {
-                    // TODO: support multiple topics?
+// TODO: support multiple topics?
                     util.setMainTopic(this);
                 } else {
                     taglist.tagit('createTag', this.text, this);
@@ -179,33 +179,24 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
     var loader;
     var result_indicator;
     var timeout;
-
     var selectmenu;
-
     var mainTopicDiv;
     var mainTopicLabel;
     var mainTopicLabelHidden;
     var mainTopicDesc;
-
     var main;
-
     var taglist;
     var taglistDesc;
-
     var right;
-
-
     var contentArea;
     var $jQueryTabsHeader;
     var $iframeCover;
     var $contentArea;
-
     var tabModel = {
         tabs: []
     };
-
     window.onmessage = function(msg) {
-        // visualization has triggered a query -> widgets must be visible
+// visualization has triggered a query -> widgets must be visible
         if (msg.data.event && msg.data.event === 'eexcess.queryTriggered') {
             lastQuery = msg.data.data;
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
@@ -225,9 +216,8 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
             });
         }
-        // TODO: handle other events?
+// TODO: handle other events?
     };
-
     var resultHandler = function(response) {
         if (response.status === 'success') {
             results = response.data;
@@ -238,7 +228,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                 if (settings.queryCrumbs.active) {
                     qc.addNewQuery(results);
-                    if(typeof settings.queryCrumbs.updateTrigger === 'function') {
+                    if (typeof settings.queryCrumbs.updateTrigger === 'function') {
                         settings.queryCrumbs.updateTrigger();
                     }
                 }
@@ -249,7 +239,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             result_indicator.show();
         }
     };
-
     return {
         /**
          * Initialize the searchBar with the set of visualization widgets to display and custom settings (optional). 
@@ -392,7 +381,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             right = $('<div id="eexcess_barRight"></div>');
             bar.append(left, main, right);
             $('body').append(bar);
-
             // set background image for new tag
             var $tag_input = $('#eexcess_searchBar input.ui-widget-content');
             $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
@@ -402,8 +390,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             $tag_input.blur(function(e) {
                 $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
             });
-
-
             contentArea = $("<div id = 'eexcess-tabBar-contentArea'><div id='eexcess-tabBar-iframeCover'></div><div id='eexcess-tabBar-jQueryTabsHeader'><ul></ul><div id = 'eexcess-tabBar-jQueryTabsContent' class='flex-container intrinsic-container intrinsic-container-ratio' ></div></div></div>").hide();
             $('body').append(contentArea);
             $jQueryTabsHeader = $("#eexcess-tabBar-jQueryTabsHeader");
@@ -419,7 +405,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             });
             $iframeCover = $("#eexcess-tabBar-iframeCover");
             $contentArea = $("#eexcess-tabBar-contentArea");
-
             logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
             right.append(logo);
             loader = $('<img id="eexcess_loader" src="' + settings.imgPATH + 'eexcess_loader.gif" />').hide();
@@ -448,12 +433,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }, settings.queryCrumbs.storage);
             }
 
-            // close button
+// close button
             var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e) {
                 contentArea.hide();
             });
             $jQueryTabsHeader.append($close_button);
-
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
                 if (tab.icon) {
@@ -474,7 +458,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 $jQueryTabsHeader.tabs({active: 0});
                 $iframeCover.hide();
             });
-
             // adding resize functionality
             $jQueryTabsHeader.resizable({
                 handles: "all",
@@ -482,10 +465,8 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 minWidth: 250,
                 alsoResize: [$iframeCover, $contentArea]
             });
-
             // adding drag functionality to parent div
             $contentArea.draggable({scroll: "true"});
-
             // on resize or drag start, show iframeCover to allow changes when mouse pointer is entering iframe area
             $jQueryTabsHeader.on("resizestart", function(event, ui) {
                 $iframeCover.show();
@@ -493,7 +474,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             $contentArea.on("dragstart", function(event, ui) {
                 $iframeCover.show();
             });
-
             //storing new values and hide iframeCover after size has been changed
             $jQueryTabsHeader.on("resizestop", function(event, ui) {
                 var heightToStore = $jQueryTabsHeader.height();
@@ -508,7 +488,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 settings.storage.set({'dragPositionLeft': positionToStoreLeft});
                 $iframeCover.hide();
             });
-
             //storing new values and hide iframeCover after position has been changed
             $contentArea.on("dragstop", function(event, ui) {
                 var positionToStoreTop = $contentArea.position().top + $jQueryTabsHeader.position().top;
@@ -517,19 +496,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 settings.storage.set({'dragPositionLeft': positionToStoreLeft});
                 $iframeCover.hide();
             });
-
             //sets size and position of the tab area according to previous changes by the user stored in chrome
             // local storage
             $(function setSizeAndPosition() {
                 settings.storage.get(['resizeHeight', 'resizeWidth', 'dragPositionTop', 'dragPositionLeft'], function(result) {
                     var dim = {};
                     if (result.resizeWidth) {
-                        // if width is set, height is also
+// if width is set, height is also
                         dim.width = result.resizeWidth + 'px';
                         dim.height = result.resizeHeight + 'px';
                     }
                     if (result.dragPositionLeft) {
-                        // if left is set, top is also
+// if left is set, top is also
                         dim.left = result.dragPositionLeft + 'px';
                         dim.top = result.dragPositionTop + 'px';
                     }
@@ -558,11 +536,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
         },
         /**
-         * Get the current Settings
-         * @returns {Object} the settings
+         * Refresh QueryCrums if active
          */
-        getSettings: function() {
-            return settings;
+        refreshQC: function() {
+            if (settings.queryCrumbs.active) {
+                qc.refresh();
+            }
         }
     };
 });
