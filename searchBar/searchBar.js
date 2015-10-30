@@ -417,6 +417,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     contentArea.show('fast');
                     if (settings.queryCrumbs.active) {
                         qc.addNewQuery(results);
+                        if (typeof settings.queryCrumbs.updateTrigger === 'function') {
+                            settings.queryCrumbs.updateTrigger();
+                        }
                     }
                 }
             }).hide();
@@ -429,6 +432,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.setQuery(query.profile.contextKeywords, 0, query.origin);
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
+                    }
+                    if (typeof settings.queryCrumbs.updateTrigger === 'function') {
+                        settings.queryCrumbs.updateTrigger();
                     }
                 }, settings.queryCrumbs.storage);
             }
