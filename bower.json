@@ -33,6 +33,7 @@
     "jquery-ui": "~1.11.4",
     "peas": "https://github.com/EEXCESS/peas.git",
     "requirejs": "~2.1.17",
-    "tag-it": "https://github.com/schloett/tag-it.git"
+    "tag-it": "https://github.com/schloett/tag-it.git",
+    "guessLang":"https://github.com/schloett/guessLanguage.js.git"
   }
 }

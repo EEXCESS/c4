@@ -64,7 +64,7 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 			 * @return {JSONObject} A query of format QF2. 
 			 */
 			obfuscateQuery:function(query, k){
-				var obfuscatedQuery = query;
+				var obfuscatedQuery = JSON.parse(JSON.stringify(query));
 				var arrayCK = []; // CK = Context Keywords
 				var profile = []; // XXX Should be initialized with the user profile 
 				var originalCK = query.contextKeywords;
@@ -155,9 +155,9 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 				for (var i = 0 ; i < originalCK.length ; i++){
 					var fakeTerm = new Object();
 					fakeTerm.text = randomClique._vertices[i];
-					fakeTerm.type = originalCK[i].type;
 					fakeTerm.isMainTopic = originalCK[i].isMainTopic;
-					fakeTerm.uri = originalCK[i].uri;
+					fakeTerm.type = "Misc";
+					//fakeTerm.uri = originalCK[i].uri;
 					fakeQuery[i] = fakeTerm;
 				}
 			} else {
@@ -174,9 +174,9 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 				for (var i = 0 ; i < originalCK.length ; i++){
 					var fakeTerm = new Object();
 					fakeTerm.text = randomClique._vertices[i];
-					fakeTerm.type = originalCK[i].type;
 					fakeTerm.isMainTopic = originalCK[i].isMainTopic;
-					fakeTerm.uri = originalCK[i].uri;
+					fakeTerm.type = "Misc";
+					//fakeTerm.uri = originalCK[i].uri;
 					fakeQuery[i] = fakeTerm;
 				}
 			} else {
@@ -194,9 +194,9 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 					var randomIdx =  Math.floor(Math.random() * vocabulary.length);
 					if (!util.contains(ckToArray(fakeQuery), vocabulary[randomIdx])){ // To prevent a word to be added twice
 						fakeTerm.text = vocabulary[randomIdx];
-						fakeTerm.type = originalCK[i].type;
 						fakeTerm.isMainTopic = originalCK[i].isMainTopic;
-						fakeTerm.uri = originalCK[i].uri;
+						fakeTerm.type = "Misc";
+						//fakeTerm.uri = originalCK[i].uri;
 						fakeQuery[i] = fakeTerm;
 						i++;
 					}
@@ -220,13 +220,15 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 			var entry = resultsEntries[i];
 			var scoreEntry = 0;
 			for (var j = 0 ; j < nbKeywords ; j++){
-				var keyword = keywords[j];
+				var keyword = keywords[j].text;
 				var scoreKeyword = 0;
-				if (entry.title != undefined){
-					scoreKeyword += util.nbInstances(entry.title, keyword.text);
-				}
-				if (entry.description != undefined){
-					scoreKeyword += util.nbInstances(entry.description, keyword.text);
+				if (keyword != undefined){
+					if (entry.title != undefined){
+						scoreKeyword += util.nbInstances(entry.title, keyword);
+					}
+					if (entry.description != undefined){
+						scoreKeyword += util.nbInstances(entry.description, keyword);
+					}
 				}
 				scoreEntry += scoreKeyword;
 			}
@@ -245,8 +247,8 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 		if (lastUpdate != null){
 			freshCogNeeded = (util.before(new Date(lastUpdate), util.yesterday()));
 		}
-		//if (!cogStoredLocally || freshCogNeeded){
-		if (true){
+		if (!cogStoredLocally || freshCogNeeded){
+		//if (true){
 			getAndSaveRemoteCog();
 		} else {
 			var cogJson = JSON.parse(localStorage.getItem(storageCogId));

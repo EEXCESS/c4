@@ -1,11 +1,10 @@
 PEAS stands for Private, Efficient and Accurate (web) Search. 
 
-It is composed of three protocols: 
+It is composed of the following protocols: 
 - an [unlinkability protocol](https://github.com/EEXCESS/peas#indistinguishability-protocol) (peas_unlink): aims at hiding users identity, 
 - an indistinguishability protocol (peas_indist): aims at hiding users intents by obfuscating their queries,
-- an [adaptation protocol](https://github.com/EEXCESS/peas#adaptation-protocol) (peas_adapt): aims at sharing users information without revealing private information. 
 
-The request and response formats handled in these protocols are described [here](https://github.com/EEXCESS/eexcess/wiki/Request-and-Response-format-for-call-to-federated-recommender-and-privacy-proxy#request-and-response-formats-to-interact-with-the-privacy-proxy). 
+The request and response formats handled in these protocols are described [here](http://purl.org/eexcess/documentation/request-and-response-format#request-and-response-formats-to-interact-with-the-privacy-proxy). 
 
 The PEAS protocol considers specific formats to exchange data. These formats are described [here](https://github.com/EEXCESS/peas#json-formats). 
 
@@ -98,35 +97,6 @@ require(["peas_indist"], function(peas_indist){
 });
 ```
 
-# Adaptation Protocol
-
-## Query adaptation
-
-The method is defined as follows: 
-```javascript
-/**
- * Allows to adapt a query according to a set of policies. 
- * @method adaptQuery
- * @param {JSONObject} query A query of format QF1.
- * @param {JSONObject} policies A set of policies (attribute and level).
- * @return {JSONObject} A query of format QF1. 
- */			
-adaptQuery(query, policies){ ... }
-```
-
-Policies are described in this [format](https://github.com/EEXCESS/peas#policies). 
-
-This example shows how to use it: 
-```javascript
-require(["peas_adapt"], function(peas_adapt){
-	// Query of format QF1:
-	var originalQuery = JSON.parse('{"partnerList": [{"systemId": "Europeana"}], "protectedPartnerList": [{"systemId": "Europeana", "partnerKey": "ycz!djklasnbm2ia" }], "ageRange": 2, "numResults": 10, "gender": "female", "address": {"country": "testcountry", "city": "testcity"}, "timeRange": {"start": "1980", "end": "2000"}, "languages": [{"iso2": "de","languageCompetenceLevel": 0.1}, {"iso2": "en","languageCompetenceLevel": 0.1}], "userCredentials": [{"systemId": "Wissenmedia","login": "me@partner.x","securityToken": "sdjalkej21!#"}], "contextKeywords": [{"text": "women","type": "misc","uri": "http://dbpedia.com/resource/woman","isMainTopic": false}], "context": {"reason": "manual","value": "www.wikipedia.at"}, "interests": [{"text": "text","weight": 0.1,"confidence": 0.1,"competenceLevel": 0.1,"source": "source","uri": "http://dsjkdjas.de"}, {"text": "text2","weight": 0.2,"confidence": 0.2,"competenceLevel": 0.2,"source": "source2","uri": "http://google.de"}]}');
-	var policies = '[{"attribute": "ageRangePolicy", "level": 0},{"attribute": "genderPolicy", "level": 0},{"attribute": "locationPolicy", "level": 2},{"attribute": "interestPolicy0", "level": 1},{"attribute": "interestPolicy1", "level": 1},{"attribute": "languagePolicy0", "level": 1},{"attribute": "languagePolicy1", "level": 1}]';
-   	// Query of format QF1:
-   	var adaptedQuery = peas_adapt.adaptQuery(originalQuery, policies);
-});
-```
-
 # JSON formats
 
 ## Co-occurrence graph
@@ -160,20 +130,5 @@ A clique is a subgraph of a co-occurrence graph. Therefore, the JSON format to r
 		"term": "bbb", 
 		"frequencies": [ ... ]
 	}]
-]
-```
-
-## Policies
-
-A set of policies is represented as follows: 
-```javascript
-[
-	{"attribute": "ageRangePolicy",  "level": 0},
-	{"attribute": "genderPolicy", 	 "level": 0},
-	{"attribute": "locationPolicy",  "level": 2},
-	{"attribute": "interestPolicy0", "level": 1},
-	{"attribute": "interestPolicy1", "level": 1},
-	{"attribute": "languagePolicy0", "level": 1},
-	{"attribute": "languagePolicy1", "level": 1}
 ]
 ```

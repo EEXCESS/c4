@@ -291,7 +291,7 @@
             if (this.options.availableTags || this.options.tagSource || this.options.autocomplete.source) {
                 var autocompleteOptions = {
                     select: function(event, ui) {
-                        that.createTag(ui.item.value);
+                        that.createTag(ui.item.value, ui.item.data);
                         // Preventing the tag input to be updated with the chosen value.
                         return false;
                     }

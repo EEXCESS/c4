@@ -1,0 +1,24 @@
+{
+  "name": "guesslanguage",
+  "version": "0.4.0",
+  "description": "Guess the natural language of a run of text",
+  "keywords": [
+    "guesslanguage",
+    "guess_language",
+    "guesslanguage.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richtr/guessLanguage.js"
+  },
+  "bugs": { "url": "https://github.com/richtr/guessLanguage.js/issues" },
+  "author": "Rich Tibbett <rich.tibbett@gmail.com>",
+  "license": "LGPL",
+  "main": "./lib/guessLanguage",
+  "engines": {
+    "node": ">= 0.4"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}

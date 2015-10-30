@@ -8,11 +8,11 @@
     "jquery-ui": ">=1.11"
   },
   "homepage": "https://github.com/schloett/tag-it",
-  "_release": "c866910814",
+  "_release": "b33906755f",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "c866910814b050a6028d1f54445c570afd58738c"
+    "commit": "b33906755f486d5bf0f7259985c3aa6d8bc33f17"
   },
   "_source": "https://github.com/schloett/tag-it.git",
   "_target": "*",
