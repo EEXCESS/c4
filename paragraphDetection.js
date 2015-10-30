@@ -19,7 +19,7 @@
  * if an error message is available, it will be present in the 'error' attribute.
  */
 
-define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
+define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], function($, ner, guessLang) {
     var extracted_paragraphs = [];
     var settings = {
         prefix: 'eexcess',
@@ -189,50 +189,283 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
          * @returns {undefined}
          */
         paragraphToQuery: function(paragraphContent, callback, id, headline) {
-            if (typeof id === 'undefined') {
-                id = 1;
-            }
-            if (typeof headline === 'undefined') {
-                headline = "";
-            }
-            var paragraphs = [{
-                    id: id,
-                    headline: headline,
-                    content: paragraphContent
-                }];
-            ner.entitiesAndCategories(paragraphs, function(res) {
-                // TODO: there might not be any mainTopic nor entities
-                if (res.status === 'success') {
-                    var profile = {
-                        contextKeywords: []
-                    };
-                    var offsets = [];
-                    // add main topic
-                    if (res.data.paragraphs[0].topic && typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
-                        var mainTopic = {
-                            text: res.data.paragraphs[0].topic.text,
-                            uri: res.data.paragraphs[0].topic.entityUri,
-                            type: res.data.paragraphs[0].topic.type,
-                            isMainTopic: true
-                        };
-                        profile.contextKeywords.push(mainTopic);
+            var fallback = function(text) {
+                console.log('fallback');
+                var profile = {
+                    contextKeywords: []
+                };
+                var offsets = [];
+                var test_candidate = function(word, len) {
+                    word = word.trim();
+                    if (word.length < len) {
+                        return false;
                     }
-                    // add other keywords
-                    $.each(res.data.paragraphs[0].statistic, function() {
-                        offsets[this.key.text] = this.key.offset;
-                        if (this.key.text !== mainTopic.text) {
-                            profile.contextKeywords.push({
-                                text: this.key.text,
-                                uri: this.key.entityUri,
-                                type: this.key.type,
-                                isMainTopic: false
+                    var first = word.charAt(0);
+                    if (first === first.toUpperCase() && first !== first.toLowerCase()) {
+                        return word;
+                    } else {
+                        return false;
+                    }
+                };
+                var textRank = function(text, k) {
+                    var maxIter = 100;
+                    var damping = 0.85;
+                    var delta = 0.5;
+                    var distance = 3;
+                    var constructGraph = function(text, dist) {
+                        var g = {
+                            nodes: [],
+                            vocabulary: []
+                        };
+                        var split = text.split(/[^a-zA-ZäöüÄÖÜßÀàÂâÆæÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûŸÿ]/);
+                        var tagged = [];
+                        split.forEach(function(val) {
+                            var first = val.charAt(0);
+                            var tag = 'OTH';
+                            if (first === first.toUpperCase() && first !== first.toLowerCase() && val.length > 3) {
+                                tag = 'NN';
+                            }
+                            var arr = [];
+                            arr.push(val);
+                            arr.push(tag);
+                            tagged.push(arr);
+                        });
+                        for (var i = 0; i < tagged.length; ++i) {
+                            if (tagged[i][1] === 'NN') {
+                                var termA = tagged[i][0];
+                                var vocabularyIdx = g.vocabulary.indexOf(termA);
+                                if (vocabularyIdx === -1) {
+                                    vocabularyIdx = g.vocabulary.length;
+                                    g.vocabulary.push(termA);
+                                    g.nodes[vocabularyIdx] = {
+                                        adjacent: new Set(),
+                                        weightOld: 1.0,
+                                        weightNew: 0
+                                    };
+                                }
+                                for (var j = i + 1; j < i + dist && j < tagged.length; ++j) {
+                                    if (tagged[j][1] === 'NN') {
+                                        var termB = tagged[j][0];
+                                        if (termA === termB) {
+                                            continue;
+                                        }
+                                        var vocIdxCO = g.vocabulary.indexOf(termB);
+                                        if (vocIdxCO === -1) {
+                                            vocIdxCO = g.vocabulary.length;
+                                            g.vocabulary.push(termB);
+                                            g.nodes[vocIdxCO] = {
+                                                adjacent: new Set(),
+                                                weightOld: 1.0,
+                                                weightNew: 0
+                                            };
+                                        }
+                                        g.nodes[vocabularyIdx].adjacent.add(vocIdxCO);
+                                        g.nodes[vocIdxCO].adjacent.add(vocabularyIdx);
+                                    }
+                                }
+                            }
+                        }
+                        return g;
+                    };
+
+                    var textRank = function(graph, d) {
+                        var max_change = 0;
+                        for (var i = 0; i < graph.nodes.length; i++) {
+                            var sum_score = 0;
+                            graph.nodes[i].adjacent.forEach(function(v1, v2, set) {
+                                sum_score += graph.nodes[v1].weightOld / graph.nodes[v1].adjacent.size;
                             });
+                            graph.nodes[i].weightNew = (1 - d) + d * sum_score;
+                        }
+                        for (var i = 0; i < graph.nodes.length; i++) {
+                            var change = Math.abs(graph.nodes[i].weightNew - graph.nodes[i].weightOld);
+                            if (change > max_change) {
+                                max_change = change;
+                            }
+                            graph.nodes[i].weightOld = graph.nodes[i].weightNew;
+                            graph.nodes[i].weightNew = 0;
+                        }
+                        return max_change;
+                    };
+
+                    var topK = function(graph, k) {
+                        var result = [];
+                        for (var i = 0; i < graph.nodes.length; i++) {
+                            var node = graph.nodes[i];
+                            result.push({term: graph.vocabulary[i], weight: node.weightOld});
+                        }
+                        result.sort(function(a, b) {
+                            return b.weight - a.weight;
+                        });
+
+                        var finalSet = new Set();
+                        for (var i = 0; i < k && i < result.length; i++) {
+                            finalSet.add(result[i].term);
+                        }
+                        ;
+                        return finalSet;
+                    };
+
+                    var graph = constructGraph(text, distance);
+
+                    // calculate textRank
+                    for (var i = 0; i < maxIter; i++) {
+                        var change = textRank(graph, damping);
+                        if (change <= (delta / graph.nodes.length)) {
+                            break;
+                        }
+                    }
+                    return topK(graph, k);
+                };
+                text = text.trim();
+                var test_split = text.split(/[^a-zA-ZäöüÄÖÜßÀàÂâÆæÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûŸÿ]/);
+                if (test_split.length < 5) {
+                    profile.contextKeywords.push({text: text});
+                    offsets[text] = [paragraphContent.indexOf(text)];
+                    callback({query: profile, offsets: offsets});
+                    return;
+                }
+                var sents = text.split(/[.!?]/);
+                var keywords = new Set();
+                sents.forEach(function(val) {
+                    var words = val.split(/[^a-zA-ZäöüÄÖÜßÀàÂâÆæÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûŸÿ]/);
+                    for (var i = 0; i < words.length; i++) {
+                        var keyword = test_candidate(words[i], 3);
+                        if (keyword) {
+                            var candidate;
+                            i++;
+                            while (i < words.length && (candidate = test_candidate(words[i], 2))) {
+                                keyword += ' ' + candidate;
+                                i++;
+                            }
+                            if (keyword.length > 4) {
+                                keywords.add(keyword);
+                            }
+                        }
+                    }
+                });
+                var tmpArr = [];
+                keywords.forEach(function(val) {
+                    tmpArr.push(val);
+                });
+                keywords = [];
+                tmpArr.sort(function(a, b) {
+                    if (a.length < b.length) {
+                        return -1;
+                    }
+                    if (a.length > b.length) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                for (var i = 0; i < tmpArr.length; ++i) {
+                    var contained = false;
+                    for (var j = i + 1; j < tmpArr.length; ++j) {
+                        if (tmpArr[j].indexOf(tmpArr[i]) !== -1) {
+                            contained = true;
+                        }
+                    }
+                    if (!contained) {
+                        keywords.push(tmpArr[i]);
+                    }
+                }
+                if (keywords.length > 10) {
+                    var finalSet = new Set();
+                    var textranks = textRank(text, 10);
+                    textranks.forEach(function(val) {
+                        for (var i = 0; i < keywords.length; ++i) {
+                            if (keywords[i].indexOf(val) !== -1) {
+                                finalSet.add(keywords[i]);
+                                break;
+                            }
                         }
                     });
-                    callback({query: profile, offsets: offsets});
+                    if (finalSet.size > 3) {
+                        keywords = finalSet;
+                    } else {
+                        keywords = new Set(keywords);
+                    }
                 } else {
-                    // TODO: add simple fallback
-                    callback({error: res.data});
+                    keywords = new Set(keywords);
+                }
+                if (keywords.size === 0) {
+                    var counter = 0;
+                    for (var i = 0; counter < 10 && i < test_split.length; i++) {
+                        var tmp = test_split[i].trim();
+                        if (tmp.length > 3) {
+                            counter++;
+                            keywords.add(tmp);
+                        }
+                    }
+                }
+                keywords.forEach(function(val) {
+                    profile.contextKeywords.push({text: val});
+                    var offset = paragraphContent.indexOf(val);
+                    offsets[val] = [];
+                    while (offset !== -1) {
+                        offsets[val].push(offset);
+                        offset = paragraphContent.indexOf(val, offset + val.length);
+                    }
+                });
+                callback({query: profile, offsets: offsets});
+            };
+            guessLang.detect(paragraphContent, function(lang) {
+                if (lang === 'en') {
+                    if (typeof id === 'undefined') {
+                        id = 1;
+                    }
+                    if (typeof headline === 'undefined') {
+                        headline = "";
+                    }
+                    var paragraphs = {
+                        paragraphs: [{
+                                id: id,
+                                headline: headline,
+                                content: paragraphContent
+                            }],
+                        language: lang
+                    };
+
+
+                    ner.entitiesAndCategories(paragraphs, function(res) {
+                        if (res.status === 'success') {
+                            var profile = {
+                                contextKeywords: []
+                            };
+                            var offsets = [];
+                            // add main topic
+                            if (res.data.paragraphs[0].topic && typeof res.data.paragraphs[0].topic !== 'undefined' && typeof res.data.paragraphs[0].topic.text !== 'undefined') {
+                                var mainTopic = {
+                                    text: res.data.paragraphs[0].topic.text,
+                                    uri: res.data.paragraphs[0].topic.entityUri,
+                                    type: res.data.paragraphs[0].topic.type,
+                                    isMainTopic: true
+                                };
+                                profile.contextKeywords.push(mainTopic);
+                            }
+                            // add other keywords
+                            $.each(res.data.paragraphs[0].statistic, function() {
+                                offsets[this.key.text] = this.key.offset;
+                                if (this.key.text !== mainTopic.text) {
+                                    profile.contextKeywords.push({
+                                        text: this.key.text,
+                                        uri: this.key.entityUri,
+                                        type: this.key.type,
+                                        isMainTopic: false
+                                    });
+                                }
+                            });
+                            if (profile.contextKeywords.length === 0) {
+                                fallback(paragraphContent);
+                            } else {
+                                callback({query: profile, offsets: offsets});
+                            }
+                        } else {
+                            fallback(paragraphContent);
+                        }
+                    });
+                } else {
+                    fallback(paragraphContent);
                 }
             });
         },
