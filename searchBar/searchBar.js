@@ -535,6 +535,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             } else {
                 util.setQuery(contextKeywords, 0);
             }
+        },
+        /**
+         * Get the current Settings
+         * @returns {Object} the settings
+         */
+        getSettings: function() {
+            return settings;
         }
     };
 });
