@@ -254,7 +254,6 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                         retVal.entities = paragraphs[idx].entities;
                     }
                 } else if (parentPars.length > 1) {
-                    console.log('multiple paragraphs');
                     // TODO: entities from multiple paragraphs
                 }
             }
@@ -306,7 +305,6 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 if (el.text().length > 3) {
                     var wrapper = $('<div style="display:inline;"></div>');
                     wrapper.mouseenter(function(evt) {
-                        console.log('mouseenter');
                         var parents = el.parents('.' + classname);
                         delayTimer.clearTimer();
                         img.data('query', el.text());
@@ -378,7 +376,6 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 // calculate size relation`
                 $(extracted_paragraphs).each(function() {
                     this.sizeRelation = this.area / biggestArea;
-                    console.log(this.sizeRelation);
                 });
             }
 
