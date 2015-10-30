@@ -13,17 +13,20 @@ require(['../config'], function(config) {
             // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
             url:"http://rawgit.com/EEXCESS/visualization-widgets/feature/SearchResVis/SearchResultListVis/index.html",
             icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/icon.png"
-    },{
+    },
+    {
             name:"dashboard",
             // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
             url:"https://eexcess.github.io/visualization-widgets/Dashboard/index.html?a",
             icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png"
-    },{
-            name:"power search",
-            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
-            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/index.html",
-            icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/icon.png"
-    },{
+    },
+//    {
+//            name:"power search",
+//            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
+//            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/index.html",
+//            icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/icon.png"
+//    },
+    {
             name:"facet scape",
             // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
             url:"http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/index.html",

@@ -86,7 +86,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * }
          * @returns {undefined}
          */
-        setQuery: function(contextKeywords, delay) {
+        setQuery: function(contextKeywords, delay, origin) {
             if (typeof delay === 'undefined') {
                 delay = settings.queryDelay;
             }
@@ -107,9 +107,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 result_indicator.hide();
                 lastQuery = {contextKeywords: contextKeywords};
                 // add origin
-                lastQuery.origin = {
-                    module: "c4/searchBar"
-                };
+                if (typeof origin === 'undefined') {
+                    lastQuery.origin = {
+                        module: "c4/searchBar"
+                    };
+                } else {
+                    lastQuery.origin = origin;
+                }
                 if (contentArea.is(':visible')) {
                     iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
                 }
@@ -186,10 +190,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // visualization has triggered a query -> widgets must be visible
         if (msg.data.event && msg.data.event === 'eexcess.queryTriggered') {
             lastQuery = msg.data.data;
-            // add origin
-            lastQuery.origin = {
-                module: "c4/searchBar"
-            };
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
             result_indicator.hide();
             loader.show();
@@ -337,7 +337,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui.tag.find('.ui-icon-close').css('background-image', 'url("' + settings.imgPATH + 'ui-icons_cd0a0a_256x240.png")');
                     if (!util.preventQuery) {
                         util.queryUpdater();
-                    };
+                    }
                     var data = ui.tag.data('properties');
                     ui.tag.hover(
                             function() {
@@ -420,11 +420,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 var qc_div = $('<div id="queryCrumbs"></div>');
                 right.append(qc_div);
                 qc.init(qc_div.get(0), function(query) {
-                    util.setQuery(query.profile.contextKeywords, 0);
-//                    iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: query.profile});
-//                    settings.queryFn(query.profile, resultHandler);
-//                    loader.show();
-//                    result_indicator.hide();
+                    util.setQuery(query.profile.contextKeywords, 0, query.origin);
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
                     }
@@ -440,10 +436,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             tabModel.tabs = tabs;
             $.each(tabModel.tabs, function(i, tab) {
                 if (tab.icon) {
-                    var link = $("<a href='#tabs-" + i + "' title='"+tab.name+"'><img src='"+tab.icon+"' /> </a>").css('padding','0.5em 0.4em 0.3em');
+                    var link = $("<a href='#tabs-" + i + "' title='" + tab.name + "'><img src='" + tab.icon + "' /> </a>").css('padding', '0.5em 0.4em 0.3em');
                     tab.renderedHead = $("<li></li>").append(link);
                 } else {
-                    tab.renderedHead = $("<li><a href='#tabs-" + i + "' title='"+tab.name+"'>" + tab.name + " </a></li>");
+                    tab.renderedHead = $("<li><a href='#tabs-" + i + "' title='" + tab.name + "'>" + tab.name + " </a></li>");
                 }
                 $("#eexcess-tabBar-jQueryTabsHeader ul").append(tab.renderedHead);
                 // add tab content corresponding to tab titles
