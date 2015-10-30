@@ -117,7 +117,25 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 if (contentArea.is(':visible')) {
                     iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
                 }
-                settings.queryFn(lastQuery, resultHandler);
+                if (origin && origin.module === 'QueryCrumbs') {
+                    settings.queryFn(lastQuery, function(response) {
+                        if (response.status === 'success') {
+                            results = response.data;
+                            loader.hide();
+                            result_indicator.text(response.data.totalResults + ' results');
+                            result_indicator.show();
+                            if (contentArea.is(':visible')) {
+                                iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+                            }
+                        } else {
+                            loader.hide();
+                            result_indicator.text('error');
+                            result_indicator.show();
+                        }
+                    });
+                } else {
+                    settings.queryFn(lastQuery, resultHandler);
+                }
             }, delay);
         }
     };
