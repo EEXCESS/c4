@@ -45,6 +45,9 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                     }
                 }
                 self.setHistory({history: self.historyData, base_color: self.visualData[0].base_color, currentQueryID: query.queryID});
+                query.origin = {
+                    module:"QueryCrumbs"
+                };
                 self.navigateQueryCallback(query);
             },
             onMouseOverNode: function(d, i) {
