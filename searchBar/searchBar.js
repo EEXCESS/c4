@@ -211,6 +211,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     result_indicator.text(response.data.totalResults + ' results');
                     result_indicator.show();
                     iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+                    if (settings.queryCrumbs.active) {
+                        qc.addNewQuery(results);
+                        if (typeof settings.queryCrumbs.updateTrigger === 'function') {
+                            settings.queryCrumbs.updateTrigger();
+                        }
+                    }
                 } else {
                     iframes.sendMsgAll({event: 'eexcess.error', data: response.data});
                     result_indicator.text('error');
