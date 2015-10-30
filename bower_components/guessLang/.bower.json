@@ -1,11 +1,11 @@
 {
   "name": "guessLang",
   "homepage": "https://github.com/schloett/guessLanguage.js",
-  "_release": "dfd26b68cf",
+  "_release": "c9ba654d67",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "dfd26b68cfd0f6c79a525e6e1280bdca620b5d46"
+    "commit": "c9ba654d67e2d2c5ac9134dcb45f1915a52d867c"
   },
   "_source": "https://github.com/schloett/guessLanguage.js.git",
   "_target": "*",

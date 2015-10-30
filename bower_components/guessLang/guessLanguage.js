@@ -32,15 +32,10 @@
  *   along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global, undefined) {
+define(['./_languageData'], function(models) {
 
-  var guessLanguage = function() {
+  var guessLanguage = (function() {
 
-      var models = global._languageData || {};
-
-      if (typeof module === "object" && module.exports === global) {
-        models = require('./_languageData') || {};
-      }
 
       var MAX_LENGTH = 4096;
       var MIN_LENGTH = 20;
@@ -680,8 +675,8 @@
         }
       };
 
-  };
+  })();
 
-  global.guessLanguage = (global.module || {}).exports = new guessLanguage();
+    return guessLanguage;
 
-})(this);
+});
