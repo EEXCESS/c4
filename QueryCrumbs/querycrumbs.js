@@ -539,6 +539,13 @@ define(['jquery', 'd3', 'c4/QueryCrumbs/querycrumbs-settings'], function($, d3, 
                     .attr("class", "queryCrumbs-svg");
 
             self.getHistoryCallback(function(loadedHistory) {
+                if (typeof loadedHistory === 'undefined' || loadedHistory === null) {
+                    loadedHistory = {
+                        history: [],
+                        base_color: QueryCrumbsConfiguration.BaseColorManager.getInitialColor(),
+                        currentQueryID: -1
+                    };
+                }
                 self.base_color = loadedHistory.base_color;
                 var currentQueryID = loadedHistory.currentQueryID;
                 var hist = loadedHistory.history.slice(Math.max(loadedHistory.history.length - QueryCrumbsConfiguration.dimensions.HISTORY_LENGTH, 0));
