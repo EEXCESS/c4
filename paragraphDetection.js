@@ -378,6 +378,7 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 // calculate size relation`
                 $(extracted_paragraphs).each(function() {
                     this.sizeRelation = this.area / biggestArea;
+                    console.log(this.sizeRelation);
                 });
             }
 
@@ -386,7 +387,9 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
                 var offset = $(window).scrollTop() + $(window).height();
                 $(paragraphs).each(function() {
                     var top = $(this.elements[0]).offset().top;
-                    if (offset > top && top > $(window).scrollTop()) {
+                    var bottom = top + $(this.elements[0]).parent().height();
+                    if( (top <= offset ) && (bottom >= $(window).scrollTop()) ){ 
+                    //if (offset > top && top > $(window).scrollTop()) {
                         this.cursorDistance = 0;
                         visibleElements.add(this);
                     }
@@ -535,10 +538,12 @@ define(['jquery', 'c4/namedEntityRecognition'], function($, ner) {
 
             function getVisible(paragraphs) {
                 var visibleElements = new Set();
-                var offset = $(window).scrollTop() + $(window).height();
+                var offset = $(window).scrollTop() + $(window).height();                
                 $(paragraphs).each(function() {
-                    var top = $(this.elements[0]).offset().top;
-                    if (offset > top && top > $(window).scrollTop()) {
+                    var top = $(this.elements[0]).offset().top;                    
+                    var bottom = top + $(this.elements[0]).parent().height();
+                    // if (offset > top && top > $(window).scrollTop()) {
+                    if( (top <= offset ) && (bottom >= $(window).scrollTop()) ){ 
                         visibleElements.add(this);
                     }
                 });
