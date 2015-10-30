@@ -11,7 +11,7 @@
  */
 define(["jquery", "peas/peas_indist"], function($, peas_indist) {
     var settings = {
-        base_url: "https://eexcess-dev.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
+        base_url: "https://eexcess.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
         timeout: 10000,
         logTimeout: 5000,
         logggingLevel: 0, 
