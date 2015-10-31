@@ -1,12 +1,10 @@
 {
   "name": "c4",
   "version": "2.2.2",
-  "version": "4.1.2",
+  "version": "4.2.0",
   "homepage": "https://github.com/EEXCESS/c4",
   "authors": [
-    "Jörg Schlötterer <joerg.schloetterer@uni-passau.de>",
-    "Nils Witt",
-    "Johannes Jurgovsky"
+    "EEXCESS consortium <eexcess-dev@joanneum.at" 
   ],
   "description": "tools for context detection, query generation and result usage in web pages",
   "moduleType": [
