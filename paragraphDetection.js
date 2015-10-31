@@ -134,6 +134,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var paragraphs = [];
             var counter = 0;
 
+// ######################### connect neighbours ########################
             /**
              * find neighbouring candidates and group them together in a single paragraph
              */
@@ -173,6 +174,16 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     i = j;
                 }
             }
+// ############################################## DO NOT CONNECT NEIGHBOURS #################################
+//            candidates = new Set(candidates); // TODO: is this really necessary?
+//            candidates.forEach(function(val) {
+//                var text = $(val).text();
+//                if (text.length > 100 && text.indexOf('.') > -1) {
+//                    paragraphs.push(paragraphUtil([val], counter));
+//                    counter++;
+//                }
+//            });
+// ##############################################################################################################
             extracted_paragraphs = paragraphs;
             return paragraphs;
         },
@@ -190,6 +201,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
          */
         paragraphToQuery: function(paragraphContent, callback, id, headline) {
             var fallback = function(text) {
+                console.log(text);
                 console.log('fallback');
                 var profile = {
                     contextKeywords: []
@@ -410,6 +422,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 callback({query: profile, offsets: offsets});
             };
             guessLang.detect(paragraphContent, function(lang) {
+                console.log(lang);
                 if (lang === 'en') {
                     if (typeof id === 'undefined') {
                         id = 1;
@@ -784,6 +797,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     var offset = $(v1.elements[0]).offset();
                     var left = offset.left - $(window).scrollLeft();
                     var top = offset.top - $(window).scrollTop();
+                    if(top < 0) {
+                        top -= $(window).height();
+                    }
 //                    if (top < 0) {
 //                        top = $(window).height();
 //                    }
