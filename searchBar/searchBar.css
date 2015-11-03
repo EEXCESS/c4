@@ -116,12 +116,14 @@
 
 
 .mainTopicDropActive {
-    background-color:orange !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    border:1px solid #1d904e !important;
 }
 
 .mainTopicDropHover {
-    background-color:green !important;
+    background-color:rgba(0,0,0,0.0) !important; 
 }
+
 
 #eexcess_logo {
     position:absolute;
