@@ -162,7 +162,8 @@
     padding-top: 2.2px !important;  
     padding-left: 5.5px !important;  
     padding-right: 18px !important;  
-    line-height: normal !important;    
+    line-height: normal !important;   
+    width:initial;
 }
 
 .eexcess > .tagit-new{
@@ -983,6 +984,7 @@
     height:100%;
     margin-left:10px;
     margin-right:5px;
+    width:initial;
 }
 
 #eexcess_mainTopicLabel{
@@ -1011,6 +1013,7 @@
     opacity:0.8;
     margin-top:6px;
     border-top:1px solid gray;
+    width:initial;
 }
 
 #eexcess_taglistDesc{
