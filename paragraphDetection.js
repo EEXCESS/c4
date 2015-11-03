@@ -201,8 +201,6 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
          */
         paragraphToQuery: function(paragraphContent, callback, id, headline) {
             var fallback = function(text) {
-                console.log(text);
-                console.log('fallback');
                 var profile = {
                     contextKeywords: []
                 };
