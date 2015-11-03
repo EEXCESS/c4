@@ -93,7 +93,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.preventQuery = true;
             taglist.tagit('removeAll');
             mainTopicLabel.val('').data('properties', undefined);
-            this.resizeForText.call(mainTopicLabel,'', true);
+            this.resizeForText.call(mainTopicLabel, '', true);
             $.each(contextKeywords, function() {
                 if (this.isMainTopic) {
 // TODO: support multiple topics?
@@ -295,8 +295,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.preventQuery = true;
                     taglist.tagit('removeTagByLabel', tag.text);
                     util.preventQuery = false;
-                    taglist.tagit('createTag', old_topic.text, old_topic);
                     util.setMainTopic(tag);
+                    if (typeof old_topic !== 'undefined' && old_topic.text.length > 0) {
+                        taglist.tagit('createTag', old_topic.text, old_topic);
+                    }
                     util.queryUpdater();
                 }
             });
