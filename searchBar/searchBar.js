@@ -266,11 +266,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
             bar = $('<div id="eexcess_searchBar"></div>');
             left = $('<div id="eexcess_barLeft"></div>');
-            selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">All</option><option>Persons</option><option>Locations</option></select>');
+            selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">show all</option><option>persons</option><option>locations</option></select>');
             selectmenu.change(function(e) {
                 lastQuery = {contextKeywords: []};
-                var type = $(this).children(':selected').text().toLowerCase();
-                if (type !== 'all') {
+                var type = $(this).children(':selected').text();
+                if (type !== 'show all') {
                     $.each(taglist.tagit('getTags'), function() {
                         if ($(this).data('properties').type && $(this).data('properties').type.toLowerCase() + 's' === type) {
                             $(this).css('opacity', '1.0');
