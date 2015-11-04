@@ -1,5 +1,12 @@
 require(['../config'], function(config) {
     require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar'], function($, api, paragraphDetection, searchBar) {
+        
+        paragraphDetection.activateSelectionAugmentation(function(keywordToADD){
+            searchBar.addKeyword({text:keywordToADD});
+        },function(selection){
+            paragraphDetection.pargraphToQuery(selection);
+        },function(){});
+        
         // set origin in the APIconnector
         api.init({origin: {
                 clientType: "c4 example",

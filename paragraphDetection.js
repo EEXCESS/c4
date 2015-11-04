@@ -794,7 +794,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     var offset = $(v1.elements[0]).offset();
                     var left = offset.left - $(window).scrollLeft();
                     var top = offset.top - $(window).scrollTop();
-                    if(top < 0) {
+                    if (top < 0) {
                         top -= $(window).height();
                     }
 //                    if (top < 0) {
@@ -831,6 +831,21 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 }
             }
             return offsets;
+        },
+        activateSelectionAugmentation: function(addKeyword, queryFromSelection) {
+            var selection = '';
+            var img1 = $('<div id="bla" style="position:fixed;width:30px;height:30px;background-color:red;"></div>');
+            img1.mousedown(function(e) {
+                addKeyword(selection);
+            });
+            $('body').append(img1);
+            $(document).bind('mouseup', function(e) {
+                img1.css('top', e.pageY).css('left', e.pageX);
+                var selected_text = window.getSelection().toString();
+                if (selected_text !== '') {
+                    selection = selected_text;
+                }
+            });
         }
     };
 });
