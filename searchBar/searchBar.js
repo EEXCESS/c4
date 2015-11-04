@@ -133,6 +133,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             loader.hide();
                             result_indicator.text('error');
                             result_indicator.show();
+                            if (contentArea.is(':visible')) {
+                                iframes.sendMsgAll({event: 'eexcess.error', data: response.data});
+                            }
                         }
                     });
                 } else {
@@ -245,6 +248,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             loader.hide();
             result_indicator.text('error');
             result_indicator.show();
+            if (contentArea.is(':visible')) {
+                iframes.sendMsgAll({event: 'eexcess.error', data: response.data});
+            }
         }
     };
     return {
