@@ -744,15 +744,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             $.each(extracted_paragraphs, function() {
                 var that = this;
                 $(this.elements[0]).parent().click(function(e) {
-                    var event = new CustomEvent('paragraphFocused', {detail: that});
+                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph:that,trigger:'click'}});
                     document.dispatchEvent(event);
                 });
             });
             var visiblePars = getVisible(extracted_paragraphs);
             updateDistance();
-            updateProbabilities();
+            updateProbabilities('init');
 
-            function updateProbabilities() {
+            function updateProbabilities(trigger) {
                 var highestProb;
                 var focusedPar;
                 visiblePars.forEach(function(v1) {
@@ -763,7 +763,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                 });
                 // event might be dispatched multiple times, leave the handling to the listener
-                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                var event = new CustomEvent('paragraphFocused', {detail: {paragraph:focusedPar,trigger:trigger}});
                 document.dispatchEvent(event);
             }
 
@@ -772,7 +772,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 scrollTimer = setTimeout(function() {
                     visiblePars = getVisible(extracted_paragraphs);
                     updateDistance();
-                    updateProbabilities();
+                    updateProbabilities('scroll');
                 }, 100);
             });
 
