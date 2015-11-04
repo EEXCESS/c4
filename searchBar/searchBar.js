@@ -558,6 +558,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (settings.queryCrumbs.active) {
                 qc.refresh();
             }
+        },
+        addKeyword: function(keyword) {
+            util.preventQuery = true;
+            taglist.tagit('createTag', keyword.text, keyword);
+            util.preventQuery = false;
+            util.queryUpdater();
         }
     };
 });
