@@ -744,7 +744,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             $.each(extracted_paragraphs, function() {
                 var that = this;
                 $(this.elements[0]).parent().click(function(e) {
-                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph:that,trigger:'click'}});
+                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph: that, trigger: 'click'}});
                     document.dispatchEvent(event);
                 });
             });
@@ -762,9 +762,11 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         focusedPar = v1;
                     }
                 });
-                // event might be dispatched multiple times, leave the handling to the listener
-                var event = new CustomEvent('paragraphFocused', {detail: {paragraph:focusedPar,trigger:trigger}});
-                document.dispatchEvent(event);
+                if (focusedPar) {
+                    // event might be dispatched multiple times, leave the handling to the listener
+                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph: focusedPar, trigger: trigger}});
+                    document.dispatchEvent(event);
+                }
             }
 
             $(document).scroll(function(evt) {
@@ -794,7 +796,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     var offset = $(v1.elements[0]).offset();
                     var left = offset.left - $(window).scrollLeft();
                     var top = offset.top - $(window).scrollTop();
-                    if(top < 0) {
+                    if (top < 0) {
                         top -= $(window).height();
                     }
 //                    if (top < 0) {
