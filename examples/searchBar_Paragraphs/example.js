@@ -1,10 +1,10 @@
 require(['../config'], function(config) {
     require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar', 'c4/iframes'], function($, api, paragraphDetection, searchBar, iframes) {
         window.onmessage = function(msg) {
-            if(msg.data.event && msg.data.event === 'eexcess.currentResults') {
+            if (msg.data.event && msg.data.event === 'eexcess.currentResults') {
                 iframes.sendMsgAll({
-                    event:'eexcess.newResults',
-                    data:api.getCurrent()
+                    event: 'eexcess.newResults',
+                    data: api.getCurrent()
                 });
             }
         };
@@ -15,7 +15,7 @@ require(['../config'], function(config) {
                 clientVersion: "0.0.1",
                 userID: "testUser"
             },
-            queryFn:function(queryProfile,callback) {
+            queryFn: function(queryProfile, callback) {
                 api.query(queryProfile, callback);
             }
         });
@@ -32,7 +32,7 @@ require(['../config'], function(config) {
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "https://eexcess.github.io/visualization-widgets-files/Dashboard/index.html",
                 icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png",
-                deferLoading:true
+                deferLoading: true
             },
 //    {
 //            name:"power search",
@@ -45,7 +45,7 @@ require(['../config'], function(config) {
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/index.html",
                 icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png",
-                deferLoading:true
+                deferLoading: true
             }];
         // initialize the searchBar with the specified tabs and the path to the image folder
         searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}});
@@ -69,7 +69,11 @@ require(['../config'], function(config) {
                 // generate query from focused paragraph and set it in the search bar
                 paragraphDetection.paragraphToQuery(eventDetail.paragraph.content, function(paragraphStatistics) {
                     // set query in search bar
-                    searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                    if (eventDetail.trigger && eventDetail.trigger === 'click') {
+                        searchBar.setQuery(paragraphStatistics.query.contextKeywords, true);
+                    } else {
+                        searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                    }
                 });
             }
         });

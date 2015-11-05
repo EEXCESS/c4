@@ -11,6 +11,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         preventQuerySetting: false,
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
+        focusBlurDelayTimer: null,
         /**
          * Helper to adjust the size of an input element to its content.
          * ATTENTION: the input element must be set as 'this'-context. Hence,
@@ -151,6 +152,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         imgPATH: 'img/',
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
+        focusBlurDelay: 1000,
         queryCrumbs: {
             active: false
         },
@@ -396,6 +398,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             taglist.after(taglistDesc);
             right = $('<div id="eexcess_barRight"></div>');
             bar.append(left, main, right);
+            bar.mouseenter(function() {
+                clearTimeout(util.focusBlurDelayTimer);
+                util.preventQuerySetting = true;
+            }).mouseleave(function() {
+                util.focusBlurDelayTimer = setTimeout(function() {
+                    util.preventQuerySetting = false;
+                    if (util.cachedQuery) {
+                        util.setQuery(util.cachedQuery);
+                        util.cachedQuery = null;
+                    }
+                }, settings.focusBlurDelay);
+            });
             $('body').append(bar);
             // set background image for new tag
             var $tag_input = $('#eexcess_searchBar input.ui-widget-content');
@@ -412,12 +426,15 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             // prevent changes of query while the mouse is over the widget area
             $jQueryTabsHeader.mouseenter(function() {
                 util.preventQuerySetting = true;
+                clearTimeout(util.focusBlurDelayTimer);
             }).mouseleave(function() {
-                util.preventQuerySetting = false;
-                if (util.cachedQuery) {
-                    util.setQuery(util.cachedQuery);
-                    util.cachedQuery = null;
-                }
+                util.focusBlurDelayTimer = setTimeout(function() {
+                    util.preventQuerySetting = false;
+                    if (util.cachedQuery) {
+                        util.setQuery(util.cachedQuery);
+                        util.cachedQuery = null;
+                    }
+                }, settings.focusBlurDelay);
             });
             $iframeCover = $("#eexcess-tabBar-iframeCover");
             $contentArea = $("#eexcess-tabBar-contentArea");
@@ -565,11 +582,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * }
          * @returns {undefined}
          */
-        setQuery: function(contextKeywords) {
-            if (util.preventQuerySetting) {
-                util.cachedQuery = contextKeywords;
-            } else {
+        setQuery: function(contextKeywords, immediately) {
+            if (immediately) {
+                clearTimeout(util.focusBlurDelayTimer);
+                util.preventQuerySetting = false;
                 util.setQuery(contextKeywords, 0);
+                util.cachedQuery = null;
+            } else {
+                if (util.preventQuerySetting) {
+                    util.cachedQuery = contextKeywords;
+                } else {
+                    util.setQuery(contextKeywords);
+                }
             }
         },
         /**
