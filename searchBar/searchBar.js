@@ -461,6 +461,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             });
             $jQueryTabsHeader.append($close_button);
             tabModel.tabs = tabs;
+            var activeTabSet = false;
             $.each(tabModel.tabs, function(i, tab) {
                 if (tab.icon) {
                     var link = $("<a href='#tabs-" + i + "' title='" + tab.name + "'><img src='" + tab.icon + "' /> </a>").css('padding', '0.5em 0.4em 0.3em');
@@ -470,14 +471,28 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
                 $("#eexcess-tabBar-jQueryTabsHeader ul").append(tab.renderedHead);
                 // add tab content corresponding to tab titles
-                tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");
-                $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
+                if (tab.deferLoading) {
+                    tab.renderedContent = $("<div id='tabs-" + i + "'></div>");
+                    $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
+                    tab.renderedHead.click(function() {
+                        if (tab.renderedContent.children('iframe').length === 0) {
+                            tab.renderedContent.append("<iframe src='" + tab.url + "' />");
+                        }
+                    });
+                } else {
+                    tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");
+                    $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
+                }
                 // following 3 functions derived from jQuery-UI Tabs
                 $jQueryTabsHeader.tabs().addClass("ui-tabs-vertical ui-helper-clearfix eexcess");
                 $('#eexcess-tabBar-jQueryTabsHeader ul').addClass('eexcess');
                 $("#jQueryTabsHeader li").removeClass("ui-corner-top").addClass("ui-corner-left");
                 $jQueryTabsHeader.tabs("refresh");
-                $jQueryTabsHeader.tabs({active: 0});
+                // set active tab to the first without deferLoading flag
+                if (!tab.deferLoading && !activeTabSet) {
+                    $jQueryTabsHeader.tabs({active: i});
+                    activeTabSet = true;
+                }
                 $iframeCover.hide();
             });
             // adding resize functionality
