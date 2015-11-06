@@ -103,6 +103,19 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     taglist.tagit('createTag', this.text, this);
                 }
             });
+            // filter keywords according to 'show all', 'persons', 'locations'
+            var type = selectmenu.children(':selected').text();
+            if (type !== 'show all') {
+                $.each(taglist.tagit('getTags'), function() {
+                    if ($(this).data('properties').type && $(this).data('properties').type.toLowerCase() + 's' === type) {
+                        $(this).css('opacity', '1.0');
+                    } else {
+                        $(this).css('opacity', '0.4');
+                    }
+                });
+            } else {
+                $(taglist.tagit('getTags').css('opacity', '1.0'));
+            }
             util.preventQuery = false;
             clearTimeout(timeout);
             setTimeout(function() {
