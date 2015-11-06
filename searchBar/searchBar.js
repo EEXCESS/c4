@@ -665,7 +665,8 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.queryUpdater();
         },
         getCurrentModule: function() {
-            if (contentArea.is(':visible')) {
+    
+            if (contentArea && contentArea.is(':visible')) {
                 return $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
             } else {
                 return null;
