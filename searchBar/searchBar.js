@@ -166,8 +166,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
         focusBlurDelay: 1000,
-        origin: null, // needs to be provided upon initalization,
-        loggingLevel: 0,
+        origin: null, // needs to be provided upon initalization
         queryCrumbs: {
             active: false
         },
@@ -287,7 +286,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (typeof config !== 'undefined') {
                 settings = $.extend(settings, config);
             }
-            api.init({origin: settings.origin, loggingLevel: settings.loggingLevel});
+            api.init({origin: settings.origin});
             bar = $('<div id="eexcess_searchBar"></div>');
             left = $('<div id="eexcess_barLeft"></div>');
             selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">show all</option><option>persons</option><option>locations</option></select>');
@@ -666,16 +665,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.queryUpdater();
         },
         getCurrentModule: function() {
-
+    
             if (contentArea && contentArea.is(':visible')) {
                 return $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
             } else {
                 return null;
             }
-        },
-        setLoggingLevel: function(logLevel) {
-            settings.loggingLevel = logLevel;
-            api.setLoggingLevel(logLevel);
         }
     };
 });
