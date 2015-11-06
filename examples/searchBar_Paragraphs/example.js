@@ -1,5 +1,10 @@
 require(['../config'], function(config) {
     require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar', 'c4/iframes'], function($, api, paragraphDetection, searchBar, iframes) {
+        var origin = {
+                clientType: "c4 example",
+                clientVersion: "0.0.1",
+                userID: "testUser"
+            };
         window.onmessage = function(msg) {
             if (msg.data.event && msg.data.event === 'eexcess.currentResults') {
                 iframes.sendMsgAll({
@@ -10,14 +15,7 @@ require(['../config'], function(config) {
         };
         // set origin in the APIconnector
         api.init({
-            origin: {
-                clientType: "c4 example",
-                clientVersion: "0.0.1",
-                userID: "testUser"
-            },
-            queryFn: function(queryProfile, callback) {
-                api.query(queryProfile, callback);
-            }
+            origin: origin
         });
 
         // add searchResultListVis widget to display results
@@ -48,7 +46,7 @@ require(['../config'], function(config) {
                 deferLoading: true
             }];
         // initialize the searchBar with the specified tabs and the path to the image folder
-        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}});
+        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}, origin:origin});
         // detect paragraphs
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs

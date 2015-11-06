@@ -166,6 +166,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
         focusBlurDelay: 1000,
+        origin: null, // needs to be provided upon initalization
         queryCrumbs: {
             active: false
         },
@@ -285,6 +286,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (typeof config !== 'undefined') {
                 settings = $.extend(settings, config);
             }
+            api.init({origin: settings.origin});
             bar = $('<div id="eexcess_searchBar"></div>');
             left = $('<div id="eexcess_barLeft"></div>');
             selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">show all</option><option>persons</option><option>locations</option></select>');
@@ -467,6 +469,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             settings.queryCrumbs.updateTrigger();
                         }
                     }
+                    api.sendLog(api.logInteractionType.moduleOpened, {
+                        origin: {module: 'searchBar'},
+                        content: {
+                            name: $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
+                        }
+                    });
                 }
             }).hide();
             right.append(result_indicator);
@@ -478,6 +486,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.setQuery(query.profile.contextKeywords, 0, query.origin);
                     if (!contentArea.is(':visible')) {
                         contentArea.show('fast');
+                        api.sendLog(api.logInteractionType.moduleOpened, {
+                            origin: {module: 'queryCrumbs'},
+                            content: {
+                                name: $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
+                            }
+                        });
                     }
                     if (typeof settings.queryCrumbs.updateTrigger === 'function') {
                         settings.queryCrumbs.updateTrigger();
@@ -488,10 +502,17 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
 // close button
             var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e) {
                 contentArea.hide();
+                api.sendLog(api.logInteractionType.moduleClosed, {
+                    origin: {module: 'searchBar'},
+                    content: {
+                        name: $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
+                    }
+                });
             });
             $jQueryTabsHeader.append($close_button);
             tabModel.tabs = tabs;
             var activeTabSet = false;
+            var activeModule;
             $.each(tabModel.tabs, function(i, tab) {
                 if (tab.icon) {
                     var link = $("<a href='#tabs-" + i + "' title='" + tab.name + "'><img src='" + tab.icon + "' /> </a>").css('padding', '0.5em 0.4em 0.3em');
@@ -513,6 +534,25 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     tab.renderedContent = $("<div id='tabs-" + i + "'><iframe src='" + tab.url + "'</div>");
                     $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
                 }
+                // log opening/closing module
+                tab.renderedHead.click(function() {
+                    var newModule = $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
+                    if (newModule !== activeModule) {
+                        api.sendLog(api.logInteractionType.moduleClosed, {
+                            origin: {module: 'searchBar'},
+                            content: {
+                                name: activeModule
+                            }
+                        });
+                        activeModule = newModule;
+                        api.sendLog(api.logInteractionType.moduleOpened, {
+                            origin: {module: 'searchBar'},
+                            content: {
+                                name: activeModule
+                            }
+                        });
+                    }
+                });
                 // following 3 functions derived from jQuery-UI Tabs
                 $jQueryTabsHeader.tabs().addClass("ui-tabs-vertical ui-helper-clearfix eexcess");
                 $('#eexcess-tabBar-jQueryTabsHeader ul').addClass('eexcess');
@@ -523,6 +563,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     $jQueryTabsHeader.tabs({active: i});
                     activeTabSet = true;
                 }
+                activeModule = $jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
                 $iframeCover.hide();
             });
             // adding resize functionality
