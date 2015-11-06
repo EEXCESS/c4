@@ -14,7 +14,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         base_url: "https://eexcess.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
         timeout: 10000,
         logTimeout: 5000,
-        logggingLevel: 0, 
+        logggingLevel: 0,
         cacheSize: 10,
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails',
@@ -217,15 +217,17 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {Object} logEntry The entry to be logged. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging}
          */
         sendLog: function(interactionType, logEntry) {
-            logEntry.origin = complementOrigin(logEntry.origin);
-            var xhr;
-            xhr = $.ajax({
-                url: settings.base_url + settings.suffix_log + interactionType,
-                data: JSON.stringify(logEntry),
-                type: 'POST',
-                contentType: 'application/json; charset=UTF-8',
-                timeout: settings.logTimeout
-            });
+            if (settings.logggingLevel === 0) {
+                logEntry.origin = complementOrigin(logEntry.origin);
+                var xhr;
+                xhr = $.ajax({
+                    url: settings.base_url + settings.suffix_log + interactionType,
+                    data: JSON.stringify(logEntry),
+                    type: 'POST',
+                    contentType: 'application/json; charset=UTF-8',
+                    timeout: settings.logTimeout
+                });
+            }
         },
         /**
          * Function to retrieve the partner sources registered at the recommender. See {@link https://github.com/EEXCESS/eexcess/wiki/Federated-Recommender-Service#get-registered-partners}.
@@ -252,6 +254,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
                     }
                 }
             });
+        },
+        setLoggingLevel: function(logLevel) {
+            settings.logggingLevel = logLevel;
         }
     };
 });
