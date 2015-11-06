@@ -96,7 +96,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         query: function(profile, callback) {
-            profile.loggingLevel = settings.loggingLevel;
+            if (!profile.loggingLevel) {
+                profile.loggingLevel = settings.loggingLevel;
+            }
             profile.origin = complementOrigin(profile.origin);
             if (!profile.numResults) {
                 profile.numResults = settings.numResults;
