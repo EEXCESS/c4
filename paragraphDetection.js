@@ -28,13 +28,12 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     var getCandidates = function(root) {
         if (typeof root === 'undefined') {
             root = document.body;
-        }
-        ;
+        };
         var pars = [];
         var walker = document.createTreeWalker(
-                root,
-                NodeFilter.SHOW_TEXT
-                );
+            root,
+            NodeFilter.SHOW_TEXT
+        );
 
         var node = walker.nextNode();
         /**
@@ -47,7 +46,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var containsText = node.nodeValue.search(/\S+/);
             var parent = node.parentNode.nodeName;
             var cond1 = parent !== 'SCRIPT'; // exclude script areas
-            var cond2 = parent !== 'STYLE';  // exclude style areas
+            var cond2 = parent !== 'STYLE'; // exclude style areas
             var cond3 = parent !== 'NOSCRIPT'; // exclude noscript areas
             var minLength = node.nodeValue.length > 40;
             if (containsText !== -1 && cond1 && cond2 && cond3 && minLength) {
@@ -65,9 +64,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     };
     var getHeadline = function(paragraphNode) {
         var walker = document.createTreeWalker(
-                document.body,
-                NodeFilter.SHOW_ELEMENT
-                );
+            document.body,
+            NodeFilter.SHOW_ELEMENT
+        );
 
         var node = paragraphNode;
         walker.currentNode = node;
@@ -105,12 +104,13 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             delete this.timeoutID;
         }
     };
-    return {/**
-     * Initializes the module with parameters other than the defaults.
-     * @param {Object} config The configuration to be set. Only the parameters to change need to be specified.
-     * @param {String} config.prefix The prefix to be used in div-ids wrapping detected paragraphs.
-     * @param {String} config.classname The classname to be used in divs, which wrap detected paragraphs.
-     */
+    return {
+        /**
+         * Initializes the module with parameters other than the defaults.
+         * @param {Object} config The configuration to be set. Only the parameters to change need to be specified.
+         * @param {String} config.prefix The prefix to be used in div-ids wrapping detected paragraphs.
+         * @param {String} config.classname The classname to be used in divs, which wrap detected paragraphs.
+         */
         init: function(config) {
             settings = $.extend(settings, config);
         },
@@ -134,7 +134,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var paragraphs = [];
             var counter = 0;
 
-// ######################### connect neighbours ########################
+            // ######################### connect neighbours ########################
             /**
              * find neighbouring candidates and group them together in a single paragraph
              */
@@ -174,16 +174,16 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     i = j;
                 }
             }
-// ############################################## DO NOT CONNECT NEIGHBOURS #################################
-//            candidates = new Set(candidates); // TODO: is this really necessary?
-//            candidates.forEach(function(val) {
-//                var text = $(val).text();
-//                if (text.length > 100 && text.indexOf('.') > -1) {
-//                    paragraphs.push(paragraphUtil([val], counter));
-//                    counter++;
-//                }
-//            });
-// ##############################################################################################################
+            // ############################################## DO NOT CONNECT NEIGHBOURS #################################
+            //            candidates = new Set(candidates); // TODO: is this really necessary?
+            //            candidates.forEach(function(val) {
+            //                var text = $(val).text();
+            //                if (text.length > 100 && text.indexOf('.') > -1) {
+            //                    paragraphs.push(paragraphUtil([val], counter));
+            //                    counter++;
+            //                }
+            //            });
+            // ##############################################################################################################
             extracted_paragraphs = paragraphs;
             return paragraphs;
         },
@@ -302,7 +302,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var result = [];
                         for (var i = 0; i < graph.nodes.length; i++) {
                             var node = graph.nodes[i];
-                            result.push({term: graph.vocabulary[i], weight: node.weightOld});
+                            result.push({
+                                term: graph.vocabulary[i],
+                                weight: node.weightOld
+                            });
                         }
                         result.sort(function(a, b) {
                             return b.weight - a.weight;
@@ -311,8 +314,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var finalSet = new Set();
                         for (var i = 0; i < k && i < result.length; i++) {
                             finalSet.add(result[i].term);
-                        }
-                        ;
+                        };
                         return finalSet;
                     };
 
@@ -330,9 +332,14 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 text = text.trim();
                 var test_split = text.split(/[^a-zA-ZäöüÄÖÜßÀàÂâÆæÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûŸÿ]/);
                 if (test_split.length < 5) {
-                    profile.contextKeywords.push({text: text});
+                    profile.contextKeywords.push({
+                        text: text
+                    });
                     offsets[text] = [paragraphContent.indexOf(text)];
-                    callback({query: profile, offsets: offsets});
+                    callback({
+                        query: profile,
+                        offsets: offsets
+                    });
                     return;
                 }
                 var sents = text.split(/[.!?]/);
@@ -409,7 +416,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                 }
                 keywords.forEach(function(val) {
-                    profile.contextKeywords.push({text: val});
+                    profile.contextKeywords.push({
+                        text: val
+                    });
                     var offset = paragraphContent.indexOf(val);
                     offsets[val] = [];
                     while (offset !== -1) {
@@ -417,7 +426,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         offset = paragraphContent.indexOf(val, offset + val.length);
                     }
                 });
-                callback({query: profile, offsets: offsets});
+                callback({
+                    query: profile,
+                    offsets: offsets
+                });
             };
             guessLang.detect(paragraphContent, function(lang) {
                 if (lang === 'en') {
@@ -429,10 +441,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                     var paragraphs = {
                         paragraphs: [{
-                                id: id,
-                                headline: headline,
-                                content: paragraphContent
-                            }],
+                            id: id,
+                            headline: headline,
+                            content: paragraphContent
+                        }],
                         language: lang
                     };
 
@@ -468,7 +480,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                             if (profile.contextKeywords.length === 0) {
                                 fallback(paragraphContent);
                             } else {
-                                callback({query: profile, offsets: offsets});
+                                callback({
+                                    query: profile,
+                                    offsets: offsets
+                                });
                             }
                         } else {
                             fallback(paragraphContent);
@@ -513,33 +528,33 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         augmentLinks: function(jqElements, icon, triggerFn, classname, extendedParagraphs) {
             var img = $('<img src="' + icon + '" style="cursor:pointer;width:30px;" />');
             img.click(function() {
-                var profile = {
-                    // TODO: split terms
-                    contextKeywords: [{
+                    var profile = {
+                        // TODO: split terms
+                        contextKeywords: [{
                             weight: 1.0,
                             text: $(this).data('query')
                         }]
-                };
-                if (typeof extendedParagraphs !== 'undefined') {
-                    var parID = $(this).data('paragraphID');
-                    var idx = $(this).data('idx');
-                    if (extendedParagraphs[idx].id === parID) {
-                        profile.contextNamedEntities = extendedParagraphs[idx].entities;
-                    } else {
-                        // TODO: order of extendedParagraphs is not guaranteed, search for right id
+                    };
+                    if (typeof extendedParagraphs !== 'undefined') {
+                        var parID = $(this).data('paragraphID');
+                        var idx = $(this).data('idx');
+                        if (extendedParagraphs[idx].id === parID) {
+                            profile.contextNamedEntities = extendedParagraphs[idx].entities;
+                        } else {
+                            // TODO: order of extendedParagraphs is not guaranteed, search for right id
+                        }
                     }
-                }
-                triggerFn(profile);
-            }).hover(function() {
-                delayTimer.clearTimer();
-            }, function() {
-                $(this).hide();
-            }).css('position', 'absolute')
-                    .css('z-index', 9999)
-                    .mouseleave(function() {
-                $(this).hide();
-            })
-                    .hide();
+                    triggerFn(profile);
+                }).hover(function() {
+                    delayTimer.clearTimer();
+                }, function() {
+                    $(this).hide();
+                }).css('position', 'absolute')
+                .css('z-index', 9999)
+                .mouseleave(function() {
+                    $(this).hide();
+                })
+                .hide();
             $('body').append(img);
             var xOffset = 25;
             var yOffset = -2;
@@ -556,9 +571,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var el2 = $(this);
                         var offset = el2.offset();
                         img
-                                .css('top', (offset.top - el2.height() + yOffset) + 'px')
-                                .css('left', offset.left - xOffset + 'px')
-                                .show();
+                            .css('top', (offset.top - el2.height() + yOffset) + 'px')
+                            .css('left', offset.left - xOffset + 'px')
+                            .show();
                     });
                     wrapper.mouseleave(function() {
                         delayTimer.setTimer(function() {
@@ -642,19 +657,21 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 var focusedPar;
                 visiblePars.forEach(function(v1) {
                     v1.pGotRead = w1 * v1.sizeRelation + w2 * v1.distance + w3 * v1.cursorDistance;
-//                var out = w1 * v1.sizeRelation + '+' + w2 * v1.distance + '+' + w3 * v1.cursorDistance + '=' + v1.pGotRead;
-//                if ($(v1.elements[0]).find($('.pgotread')).length > 0) {
-//                    $(v1.elements[0]).find($('.pgotread')).text(out);
-//                } else {
-//                    $(v1.elements[0]).prepend('<span class="pgotread" style="color:red;">' + out + '</span>');
-//                }
+                    //                var out = w1 * v1.sizeRelation + '+' + w2 * v1.distance + '+' + w3 * v1.cursorDistance + '=' + v1.pGotRead;
+                    //                if ($(v1.elements[0]).find($('.pgotread')).length > 0) {
+                    //                    $(v1.elements[0]).find($('.pgotread')).text(out);
+                    //                } else {
+                    //                    $(v1.elements[0]).prepend('<span class="pgotread" style="color:red;">' + out + '</span>');
+                    //                }
                     if (v1.pGotRead > highestProb) {
                         highestProb = v1.pGotRead;
                         focusedPar = v1;
                     }
                 });
                 // event might be dispatched multiple times, leave the handling to the listener
-                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                var event = new CustomEvent('paragraphFocused', {
+                    detail: focusedPar
+                });
                 document.dispatchEvent(event);
             }
 
@@ -726,7 +743,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     updateProbabilities();
                 }, 100);
             });
-        }, /**
+        },
+        /**
          * Find the paragraph the user is currently looking at. 
          * 
          * In this simplified version, the topmost left paragraph is regarded as focused, except for the user explicitly clicking on a paragraph.
@@ -744,7 +762,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             $.each(extracted_paragraphs, function() {
                 var that = this;
                 $(this.elements[0]).parent().click(function(e) {
-                    var event = new CustomEvent('paragraphFocused', {detail: that});
+                    var event = new CustomEvent('paragraphFocused', {
+                        detail: that
+                    });
                     document.dispatchEvent(event);
                 });
             });
@@ -763,7 +783,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                 });
                 // event might be dispatched multiple times, leave the handling to the listener
-                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
+                var event = new CustomEvent('paragraphFocused', {
+                    detail: focusedPar
+                });
                 document.dispatchEvent(event);
             }
 
@@ -789,6 +811,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 });
                 return visibleElements;
             }
+
             function updateDistance() {
                 visiblePars.forEach(function(v1) {
                     var offset = $(v1.elements[0]).offset();
@@ -797,9 +820,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     if (top < 0) {
                         top -= $(window).height();
                     }
-//                    if (top < 0) {
-//                        top = $(window).height();
-//                    }
+                    //                    if (top < 0) {
+                    //                        top = $(window).height();
+                    //                    }
                     v1.distance = Math.sqrt(left * left + top * top);
                 });
             }
@@ -817,9 +840,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var offsets = [];
             var offset = 0;
             var walker = document.createTreeWalker(
-                    paragraph,
-                    NodeFilter.SHOW_TEXT
-                    );
+                paragraph,
+                NodeFilter.SHOW_TEXT
+            );
             var node;
             while (node = walker.nextNode()) {
                 if (node.nodeValue.length > 0) {
@@ -834,18 +857,60 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         },
         activateSelectionAugmentation: function(addKeyword, queryFromSelection) {
             var selection = '';
-            var img1 = $('<div id="bla" style="position:fixed;width:30px;height:30px;background-color:red;"></div>');
-            img1.mousedown(function(e) {
+
+            var img1 = $('<div id="add-ex-aug"></div>')
+                .css('position', 'absolute')
+                .css('width', '30px')
+                .css('height', '30px')
+                .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAT9JREFUeNrs3bERgDAMBEGp/6ZJSUjtR9pTAczPRo6okiRJkpRZj77v2aMrw83mzZs3b968efPmzZs3b968efPmzZs3b968eRtuNm/evHnz5s2bN2/e272vf/TS8Moa3qN38+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx57/ZO+fPIae//7ebNmzdv3rx58+a9wdt7zPubN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s17vHfX6xZ5XynBO2s4b968efPmzZs3b968efPmzZs3b968efPmzdts3rx58+bNmzdv3rx58+bNm/dJ79EnSZIkKbNHgAEAxu6yMayy1K8AAAAASUVORK5CYII=')")
+                .css('background-size', 'contain').hide();
+            img1.click(function(e) {
                 addKeyword(selection);
             });
+
+            var img2 = $('<div id="search-ex-aug"></div>')
+                .css('position', 'absolute')
+                .css('width', '30px')
+                .css('height', '30px')
+                .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAA1xJREFUeNrsnEuW5CAMBJ33v/Rse56np8pYEkoRqnVhgvAPLHFdBEEQBEEQBEH0DI3+/Y49Oi7AwcY3vvGNb3zjG9/4xje+8Y1vfOMb3/jGN77xjW984xvfgIONb3zjG9/4xje+8Y1vfON7sO9/ZQiO993wYsrv0uc82IG+v8wAHub7Qe7zIN8Ps76H+F7Id5/gey3T3933comDt+8XtR3Ovt9Vtbj6fl3O4+k7oI7J0fd3RJd2gwcf/lFrPcEjG3v6BzffC+20Aw9qK2WwevlebmSH8FTsgr/u9/2mhUbgldjv/77N9+t+FwuP8p1wf3DwnfEYNPAd46oQPMh3zqTGzndUZ7r7zlqq6e47rLtlwkN8B3Z2/4m+qbNF4Am+5cCtXqd58CDm+o7tqatvWYAH+M79at7XtyV3Q9861HeJ8GjfkvuJvq+XHr4vfKdkvZ3jW/h28S184xvf3M/xzfsavpmP9fXN/Jv1FtbXunKzft7ze4mP71O/j53zPdTxOzD5Dh3Sehqc5nsSPS4r34Z5XK3yFVskam7osF9+akiXeyRil/fZMv/8fa+7FFoUd9u1vkSxDwSfeiIFTm02ltVUgu+oEQ2sD11tZkc5dGg98FIzmwrgC+q/F6kd3s/XTtmdez2U7e/wmLn/essjnib7VbXbv6UGPOGA5uApY/kFZA14zji/crsZPGs4P490BXjadfXmQt4KnjiiH4+XD555H31x094InjyqH46VDZ793Fx+QG8Drxja69FWXU6+/3+YjUtuda+HP2ckWluHsfMd1TlH363AW/veAi5NBm/uewO4NBm8ve9ycGkyuIHvYnBpMriF71JwaTK4ie9CcGkyuI3vMnBpMriR7yJwaTK4le8ScGkyuJnvAnBpMrid73RwaTK4oe9kcGkyuKXvVHBpMrip70RwaTK4re80cGkyuLHvJHBpMri17xRwaTK4ue8EcGkyuL3vcHBpMvgA38Hg0mTwEb5DwaXJ4EN8B4JLk8HH+H66o8gY7GebOw3y/Wzj1UHYf8Gc8fy+4ZzxvnbDOeP9/AZ0xnzsBnTG/PuGdMZ6S9Tb3eng+MY3vvGNb3zjG9/4xje+8Y1vfOMb3/jGN77xjW984xvsn3sBDv4RBEEQBEEQBNEz/ggwAEWQrFnOy4REAAAAAElFTkSuQmCC')")
+                .css('background-size', 'contain').hide();
+            img2.click(function(e) {
+                //TODO CHANGE FUNCTION CALL
+                addKeyword(selection);
+            });
+            var img3 = $('<div id="gen-para-ex-aug"></div>')
+                .css('position', 'absolute')
+                .css('width', '30px')
+                .css('height', '30px')
+                .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAYFJREFUeNrs3EESwiAQBED8/6d9gVZMVliGHu5WTdrDAtExRERERESkZ17R63Pt6AzF1ebNmzdv3rx58+bNmzdv3rx5r/OuONjaz7vmsHI/76jevHnz5s2bN2/evDO9D9qPZe1SefPmzZs3b968efPmzZs3b968efPmzZs3b968eVd4d/gZ7wrv7Xrz5s2bN2/e5jXzOW/evHnz5s2bN2/evHnz5s2bN+/r53Qd/55igndW1Facd8HHbH9fEtWbN2/evHnzNq+Zz3nz5s2bN2/evHnz5s2bN2/evHkrrjZv3rx/e3zux9yP8ebNm/ez3t/ep032vv5Wee6b1ifNa7x58+bNmzdv3rx58+bNmzdv3rx58+bNm/di7wb3JWOFd/favHnz5s2bt3nNvMabN2/evHnz5s2bN2/evHnz5s2bN+/exSecMrf0/ktv3rx58+bNmzdv3rwfFy9YB+3H7n6JDi3Omzdv3rx58+bNmzdv3rx5z/WOXiIiIiIi0jNvAQYAvE2iCao7QFoAAAAASUVORK5CYII=')")
+                .css('background-size', 'contain').hide();
+            img3.click(function(e) {
+                //TODO CHANGE FUNCTION CALL
+                addKeyword(selection);
+            });
+
             $('body').append(img1);
+            $('body').append(img2);
+            $('body').append(img3);
+
             $(document).bind('mouseup', function(e) {
-                img1.css('top', e.pageY).css('left', e.pageX);
-                var selected_text = window.getSelection().toString();
-                if (selected_text !== '') {
-                    selection = selected_text;
+
+                if (window.getSelection().toString() !== '') {
+
+                    var topPos = e.pageY + 10;
+                    img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
+                    img2.css('top', topPos).css('left', e.pageX + 30).fadeIn('fast');
+                    img3.css('top', topPos).css('left', e.pageX + 60).fadeIn('fast');
+
+                    selection = window.getSelection().toString();
+
+                } else {
+                    img1.fadeOut('fast');
+                    img2.fadeOut('fast');
+                    img3.fadeOut('fast');
                 }
             });
+
         }
     };
 });
