@@ -379,10 +379,16 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             ui.tag.removeClass('eexcess-tag_hover');
                             document.dispatchEvent(event);
                         });
+                if (popup_dim_pos.control !== 'custom') {
+                    popup_dim_pos.resize();
+                }
             },
             afterTagRemoved: function(e, ui) {
                 if (!util.preventQuery) {
                     util.queryUpdater();
+                }
+                if (popup_dim_pos.control !== 'custom') {
+                    popup_dim_pos.resize();
                 }
             },
             onTagClicked: function(e, ui) {
@@ -745,7 +751,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             $(window).resize(function(e) {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(function() {
-                    if(popup_dim_pos.control !== 'custom') {
+                    if (popup_dim_pos.control !== 'custom') {
                         popup_dim_pos.resize();
                     }
                 }, 200);
