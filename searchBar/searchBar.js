@@ -209,11 +209,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
             switch (this.control) {
                 case 'custom':
-                    if (this.width) {
+                    if (this.width || this.width === 0) {
                         dim.width = this.width;
                         dim.height = this.height;
                     }
-                    if (this.left) {
+                    if (this.left || this.left === 0) {
                         dim.top = this.top;
                         dim.left = this.left;
                     }
@@ -244,7 +244,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     break;
             }
             ui_content.$contentArea.css(dim);
-            ui_content.$jQueryTabsHeader.css('width', '').css('height', '');
+            ui_content.$jQueryTabsHeader.css('width', '').css('height', '').css('top','').css('left','');
         }
     };
     var ui_bar = {
@@ -653,12 +653,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (result.popup_control) {
                 popup_dim_pos.control = result.popup_control;
             }
-            if (result.resizeWidth) {
+            if (typeof result.resizeWidth !== 'undefined') {
                 // if width is set, height is also
                 popup_dim_pos.width = parseFloat(result.resizeWidth);
                 popup_dim_pos.height = parseFloat(result.resizeHeight);
             }
-            if (result.dragPositionLeft) {
+            if (typeof result.dragPositionLeft !== 'undefined') {
                 // if left is set, top is also
                 popup_dim_pos.top = parseFloat(result.dragPositionTop);
                 popup_dim_pos.left = parseFloat(result.dragPositionLeft);
@@ -696,9 +696,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui_bar.result_indicator.show();
                 }
             });
-        } else {
-            console.log(msg);
-        }
+        } 
         // TODO: handle other events?
     };
     var resultHandler = function(response) {
@@ -808,6 +806,3 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         }
     };
 });
-
-
-
