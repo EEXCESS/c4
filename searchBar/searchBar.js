@@ -116,6 +116,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             } else {
                 $(ui_bar.taglist.tagit('getTags').css('opacity', '1.0'));
             }
+            // height of search bar may have changed, resize popup
+            if (popup_dim_pos.control !== 'custom') {
+                popup_dim_pos.resize();
+            }
             util.preventQuery = false;
             clearTimeout(timeout);
             setTimeout(function() {
@@ -772,9 +776,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 } else {
                     util.setQuery(contextKeywords);
                 }
-            }
-            if (popup_dim_pos.control !== 'custom') {
-                popup_dim_pos.resize();
             }
         },
         /**
