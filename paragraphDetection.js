@@ -416,6 +416,14 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         offsets[val].push(offset);
                         offset = paragraphContent.indexOf(val, offset + val.length);
                     }
+                    if (offsets[val].length === 0) {
+                        var firstPart = val.split(' ')[0];
+                        offset = paragraphContent.indexOf(firstPart);
+                        while (offset !== -1) {
+                            offsets[val].push(offset);
+                            offset = paragraphContent.indexOf(firstPart, offset + firstPart.length);
+                        }
+                    }
                 });
                 callback({query: profile, offsets: offsets});
             };
