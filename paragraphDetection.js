@@ -164,12 +164,16 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     // single paragraphs must consist of at least 100 characters and contain a dot
                     var text = $(candidates[i]).text();
                     if (text.length > 100 && text.indexOf('.') > -1) {
-                        paragraphs.push(paragraphUtil([candidates[i]], counter));
+                        var detailed_paragraph = paragraphUtil([candidates[i]], counter);
+                        detailed_paragraph.subparagraphs = [candidates[i]];
+                        paragraphs.push(detailed_paragraph);
                         counter++;
                     }
                 } else {
                     neighbours.unshift(candidates[i]);
-                    paragraphs.push(paragraphUtil(neighbours, counter));
+                    var detailed_paragraph = paragraphUtil(neighbours, counter);
+                    detailed_paragraph.subparagraphs = neighbours;
+                    paragraphs.push(detailed_paragraph);
                     counter++;
                     i = j;
                 }
