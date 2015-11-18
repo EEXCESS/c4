@@ -457,7 +457,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     }
                 }
                 api.sendLog(api.logInteractionType.moduleOpened, {
-                    origin: {module: 'searchBar'},
+                    origin: {module: 'c4/searchBar'},
                     content: {
                         name: ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
                     }
@@ -474,7 +474,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 if (!ui_content.contentArea.is(':visible')) {
                     ui_content.contentArea.show('fast');
                     api.sendLog(api.logInteractionType.moduleOpened, {
-                        origin: {module: 'queryCrumbs'},
+                        origin: {module: 'QueryCrumbs'},
                         content: {
                             name: ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
                         }
@@ -535,7 +535,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             ui_content.contentArea.hide();
             ui_bar.window_controls.hide();
             api.sendLog(api.logInteractionType.moduleClosed, {
-                origin: {module: 'searchBar'},
+                origin: {module: 'c4/searchBar'},
                 content: {
                     name: ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
                 }
@@ -572,14 +572,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 var newModule = ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
                 if (newModule !== activeModule) {
                     api.sendLog(api.logInteractionType.moduleClosed, {
-                        origin: {module: 'searchBar'},
+                        origin: {module: 'c4/searchBar'},
                         content: {
                             name: activeModule
                         }
                     });
                     activeModule = newModule;
                     api.sendLog(api.logInteractionType.moduleOpened, {
-                        origin: {module: 'searchBar'},
+                        origin: {module: 'c4/searchBar'},
                         content: {
                             name: activeModule
                         }
