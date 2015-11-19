@@ -171,7 +171,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         if (text.length > 100 && text.indexOf('.') > -1) {
                             var detailed_paragraph = paragraphUtil([candidates[i]], counter);
                             if (options.addSubparagraphs) {
-                                detailed_paragraph.subparagraphs = [candidates[i]];
+                                detailed_paragraph.subparagraphs = [{el:candidates[i]}];
                             }
                             paragraphs.push(detailed_paragraph);
                             counter++;
@@ -182,7 +182,12 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         neighbours.unshift(candidates[i]);
                         var detailed_paragraph = paragraphUtil(neighbours, counter);
                         if (options.addSubparagraphs) {
-                            detailed_paragraph.subparagraphs = neighbours;
+                            detailed_paragraph.subparagraphs = [];
+                            neighbours.forEach(function(val){
+                                detailed_paragraph.subparagraphs.push({
+                                    el:val
+                                });
+                            });
                         }
                         paragraphs.push(detailed_paragraph);
                         counter++;
