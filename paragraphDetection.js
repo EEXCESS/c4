@@ -124,11 +124,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         /**
          * Detects the paragraphs in the HTML document the script is executed.
          * @param {HTMLelement} root The root node from which to start the paragraph detection.
+         * @param {Object} [options] Options for the extraction. options.fast = true will reduce processing time sacrificing accuracy and options.addSubparagraphs will include potentia subparagraphs.
          * @returns {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} The paragraphs
          */
-        getParagraphs: function(root) {
+        getParagraphs: function(root, options) {
             if (typeof root === 'undefined') {
                 root = document;
+            }
+            if (typeof options === 'undefined') {
+                options = {};
             }
             var candidates = getCandidates(root);
             var paragraphs = [];
@@ -161,21 +165,29 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 }
 
                 if (sole) {
-                    // single paragraphs must consist of at least 100 characters and contain a dot
-                    var text = $(candidates[i]).text();
-                    if (text.length > 100 && text.indexOf('.') > -1) {
-                        var detailed_paragraph = paragraphUtil([candidates[i]], counter);
-                        detailed_paragraph.subparagraphs = [candidates[i]];
-                        paragraphs.push(detailed_paragraph);
-                        counter++;
+                    if (options.fast || $(candidates[i]).is(':visible')) {
+                        // single paragraphs must consist of at least 100 characters and contain a dot
+                        var text = $(candidates[i]).text();
+                        if (text.length > 100 && text.indexOf('.') > -1) {
+                            var detailed_paragraph = paragraphUtil([candidates[i]], counter);
+                            if (options.addSubparagraphs) {
+                                detailed_paragraph.subparagraphs = [candidates[i]];
+                            }
+                            paragraphs.push(detailed_paragraph);
+                            counter++;
+                        }
                     }
                 } else {
-                    neighbours.unshift(candidates[i]);
-                    var detailed_paragraph = paragraphUtil(neighbours, counter);
-                    detailed_paragraph.subparagraphs = neighbours;
-                    paragraphs.push(detailed_paragraph);
-                    counter++;
-                    i = j;
+                    if (options.fast || $(candidates[i]).is(':visible')) {
+                        neighbours.unshift(candidates[i]);
+                        var detailed_paragraph = paragraphUtil(neighbours, counter);
+                        if (options.addSubparagraphs) {
+                            detailed_paragraph.subparagraphs = neighbours;
+                        }
+                        paragraphs.push(detailed_paragraph);
+                        counter++;
+                        i = j;
+                    }
                 }
             }
 // ############################################## DO NOT CONNECT NEIGHBOURS #################################
