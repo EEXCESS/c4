@@ -11,6 +11,24 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         preventQuerySetting: false,
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
+        processQuery: function(query, callback) {
+            // TODO: add categories to profile
+            // remove attributes not relevant/known to the recommender
+            var cleanedOutput = {
+                contextKeywords: [],
+                origin: query.origin
+            };
+            query.contextKeywords.forEach(function(keyword) {
+                var newKeyword = {};
+                for (var prop in keyword) {
+                    if (keyword.hasOwnProperty(prop) && prop !== 'categories' && prop !== 'frequency') {
+                        newKeyword[prop] = keyword[prop];
+                    }
+                }
+                cleanedOutput.contextKeywords.push(newKeyword);
+            });
+            settings.queryFn(cleanedOutput, callback);
+        },
         focusBlurDelayTimer: null,
         /**
          * Helper to adjust the size of an input element to its content.
@@ -56,7 +74,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     module: "c4/searchBar"
                 };
                 // query
-                settings.queryFn(lastQuery, resultHandler);
+                util.processQuery(lastQuery, resultHandler);
                 if (ui_content.contentArea.is(':visible')) {
                     iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
                 }
@@ -138,7 +156,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
                 }
                 if (origin && origin.module === 'QueryCrumbs') {
-                    settings.queryFn(lastQuery, function(response) {
+                    util.processQuery(lastQuery, function(response) {
                         if (response.status === 'success') {
                             results = response.data;
                             ui_bar.loader.hide();
@@ -157,7 +175,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                         }
                     });
                 } else {
-                    settings.queryFn(lastQuery, resultHandler);
+                    util.processQuery(lastQuery, resultHandler);
                 }
             }, delay);
         }
@@ -244,7 +262,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     break;
             }
             ui_content.$contentArea.css(dim);
-            ui_content.$jQueryTabsHeader.css('width', '').css('height', '').css('top','').css('left','');
+            ui_content.$jQueryTabsHeader.css('width', '').css('height', '').css('top', '').css('left', '');
         }
     };
     var ui_bar = {
@@ -677,7 +695,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
             ui_bar.result_indicator.hide();
             ui_bar.loader.show();
-            settings.queryFn(lastQuery, function(response) {
+            util.processQuery(lastQuery, function(response) {
                 if (response.status === 'success') {
                     results = response.data;
                     ui_bar.loader.hide();
@@ -696,7 +714,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui_bar.result_indicator.show();
                 }
             });
-        } 
+        }
         // TODO: handle other events?
     };
     var resultHandler = function(response) {
@@ -769,6 +787,36 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @returns {undefined}
          */
         setQuery: function(contextKeywords, immediately) {
+            if (immediately) {
+                clearTimeout(util.focusBlurDelayTimer);
+                util.preventQuerySetting = false;
+                util.setQuery(contextKeywords, 0);
+                util.cachedQuery = null;
+            } else {
+                if (util.preventQuerySetting) {
+                    util.cachedQuery = contextKeywords;
+                } else {
+                    util.setQuery(contextKeywords);
+                }
+            }
+        },
+        /**
+         * similar to setQuery, but with multiple queries provided from which the most appropriate (according to some user profile) is selected
+         * @param {Object} queries The queries, must look like:
+         * {
+         *  main: {
+         *    contextKeywords:<keywords>, // similar to contextKeywords in setQuery, with additional categories and frequency,
+         *    offsets:<offsets of the keywords in the paragraph>
+         *  }
+         *  subs: [] // array of queries similar to main for each subparagraph
+         * }
+         * @param {Boolean} immediately Indicator, whether the query should be triggered immediately or after a short delay
+         * @returns {undefined}
+         */
+        setQueries: function(queries, immediately) {
+            var contextKeywords = queries.main.contextKeywords;
+            // TODO: select appropriate query
+            // TODO: make remaining queries selectable
             if (immediately) {
                 clearTimeout(util.focusBlurDelayTimer);
                 util.preventQuerySetting = false;
