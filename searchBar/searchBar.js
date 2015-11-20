@@ -272,6 +272,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         loader: null,
         result_indicator: null,
         selectmenu: null,
+        selectQuery: null,
         mainTopicDiv: null,
         mainTopicLabelHidden: null,
         mainTopicDesc: null,
@@ -309,6 +310,15 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.queryUpdater();
         });
         ui_bar.left.append(ui_bar.selectmenu);
+        // query select menu
+        ui_bar.selectQuery = $('<select id="eexcess_selectQuery"></select>').hide();
+        ui_bar.selectQuery.change(function(e) {
+            clearTimeout(util.focusBlurDelayTimer);
+            util.preventQuerySetting = false;
+            util.setQuery($(this).children(':selected').data('query'), 0);
+            util.cachedQuery = null;
+        });
+        ui_bar.left.append(ui_bar.selectQuery);
         // main topic
         ui_bar.mainTopicDiv = $('<div id="eexcess_mainTopic"></div>');
         ui_bar.mainTopicDiv.droppable({
@@ -815,6 +825,30 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          */
         setQueries: function(queries, immediately) {
             var contextKeywords = queries.main.contextKeywords;
+            ui_bar.selectQuery.children('option').remove();
+            if (queries.subs.length > 1) {
+                // add main
+                $('<option/>').text('all queries').data('query', queries.main.contextKeywords).appendTo(ui_bar.selectQuery);
+                // add subs
+                var topics = {};
+                queries.subs.forEach(function(query) {
+                    var topicToDisplay = '';
+                    for (var i = 0; i < query.contextKeywords.length; i++) {
+                        if (query.contextKeywords[i].isMainTopic) {
+                            topicToDisplay = query.contextKeywords[i].text;
+                            if(topics.hasOwnProperty(topicToDisplay)) {
+                                topics[topicToDisplay]++;
+                                topicToDisplay += ' #' + topics[topicToDisplay];
+                            } else {
+                                topics[topicToDisplay] = 1;
+                            }
+                            break;
+                        }
+                    }
+                    $('<option/>').text(topicToDisplay).data('query', query.contextKeywords).appendTo(ui_bar.selectQuery);
+                });
+                ui_bar.selectQuery.show();
+            }
             // TODO: select appropriate query
             // TODO: make remaining queries selectable
             if (immediately) {
