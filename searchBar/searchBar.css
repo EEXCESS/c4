@@ -722,6 +722,7 @@
     visibility: visible;
     white-space: pre;
     widows: 1;
+    width:100px;
     will-change: auto;
     word-break: normal;
     word-spacing: 0px;
@@ -980,7 +981,7 @@
     visibility: visible;
     white-space: pre;
     widows: 1;
-    width:79px;
+    width:100px;
     will-change: auto;
     word-break: normal;
     word-spacing: 0px;

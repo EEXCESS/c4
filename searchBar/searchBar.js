@@ -11,8 +11,22 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         preventQuerySetting: false,
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
+        addCategoriesToProfile: function(query) {
+            var categories = new Set();
+            query.contextKeywords.forEach(function(keyword) {
+                if (keyword.hasOwnProperty('categories')) {
+                    keyword.categories.forEach(function(category) {
+                        categories.add(category);
+                    });
+                }
+            });
+            settings.profile.addCategories(Array.from(categories));
+        },
         processQuery: function(query, callback) {
-            // TODO: add categories to profile
+            // add categories to profile
+            if (ui_content.contentArea.is(':visible')) {
+                this.addCategoriesToProfile(query);
+            }
             // remove attributes not relevant/known to the recommender
             var cleanedOutput = {
                 contextKeywords: [],
@@ -214,7 +228,119 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
                 callback(response);
             }
-        }
+        },
+        profile: function() {
+            var db_name = 'eexcess_profile_db';
+            var db_version = 1;
+            var db = {};
+            var CATEGORIES_CONST = 'categories';
+            var openDB = function(callback) {
+                if (typeof db === 'IDBDatabase') {
+                    callback({db: db});
+                } else {
+                    var req = indexedDB.open(db_name, db_version);
+                    // update or create db
+                    req.onupgradeneeded = function() {
+                        console.log('db upgrade needed');
+                        // remove existing object store 'categories' if present
+                        if (req.result.objectStoreNames.contains(CATEGORIES_CONST)) {
+                            req.result.deleteObjectStore(CATEGORIES_CONST);
+                        }
+                        // create object store 'resource_relations'
+                        var os = req.result.createObjectStore(CATEGORIES_CONST);
+                        os.createIndex('frequency', 'frequency');
+                    };
+
+                    req.onsuccess = function() {
+                        db = req.result;
+                        callback({db: db});
+                    };
+
+                    req.onerror = function() {
+                        callback({error: this});
+                    };
+                }
+            };
+            var addCategories = function(categories, callback) {
+                if (categories.length === 0) {
+                    if (typeof callback !== 'undefined') {
+                        callback({error: 'no categories provided'});
+                    }
+                    return;
+                }
+                openDB(function(result) {
+                    if (result.db) {
+                        var tx = result.db.transaction(CATEGORIES_CONST, 'readwrite');
+                        var os = tx.objectStore(CATEGORIES_CONST);
+                        var i = 0;
+                        var handleNext = function() {
+                            if (i < categories.length) {
+                                var curreq = os.openCursor(categories[i].uri);
+                                curreq.onsuccess = function() {
+                                    var cursor = curreq.result;
+                                    if (cursor) {
+                                        // update existing entry
+                                        cursor.value.frequency++;
+                                        cursor.update(cursor.value);
+                                        i++;
+                                        handleNext();
+                                    } else {
+                                        // create new entry
+                                        categories[i].frequency = 1;
+                                        i++;
+                                        os.put(categories[i], categories[i].uri).onsuccess = handleNext;
+                                    }
+                                };
+                            }
+                        };
+                        handleNext();
+                    } else {
+                        if (typeof callback !== 'undefined') {
+                            callback(result);
+                        }
+                    }
+                });
+            };
+            var getMatches = function(categories, callback) {
+                if (categories.length === 0) {
+                    callback({matches: 0});
+                    return;
+                }
+                openDB(function(result) {
+                    if (result.db) {
+                        var matches = 0;
+                        var tx = result.db.transaction(CATEGORIES_CONST);
+                        var os = tx.objectStore(CATEGORIES_CONST);
+                        var i = 0;
+                        var handleNext = function() {
+                            if (i < categories.length) {
+                                var curreq = os.openCursor(categories[i].uri);
+                                curreq.onsuccess = function() {
+                                    var cursor = curreq.result;
+                                    if (cursor) {
+                                        matches++;
+                                        i++;
+                                        handleNext();
+                                    } else {
+                                        i++;
+                                        handleNext();
+                                    }
+                                };
+                            } else {
+                                callback({matches: matches});
+                            }
+                        };
+                        handleNext();
+                    } else {
+                        callback(result);
+                    }
+                });
+            };
+            return {
+                addCategories: addCategories,
+                getMatches: getMatches
+            };
+        }()
     };
     var popup_dim_pos = {
         control: 'fullwidth',
@@ -223,8 +349,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         left: null,
         top: null,
         resize: function() {
-            var dim = {
-            }
+            var dim = {};
             switch (this.control) {
                 case 'custom':
                     if (this.width || this.width === 0) {
@@ -474,6 +599,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.result_indicator = $('<a id="eexcess_result_indicator" href="#">16 results</a>').click(function(e) {
             e.preventDefault();
             ui_bar.window_controls.show();
+            // TODO: handle error indications (i.e. no results are obtained from server e.g.)
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
             iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
             if (!ui_content.contentArea.is(':visible')) {
@@ -490,6 +616,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                         name: ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title')
                     }
                 });
+                util.addCategoriesToProfile(lastQuery);
             }
         }).hide();
         ui_bar.right.append(ui_bar.result_indicator);
@@ -824,44 +951,93 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @returns {undefined}
          */
         setQueries: function(queries, immediately) {
-            var contextKeywords = queries.main.contextKeywords;
+            var contextKeywords;
             ui_bar.selectQuery.children('option').remove();
-            if (queries.subs.length > 1) {
-                // add main
-                $('<option/>').text('all queries').data('query', queries.main.contextKeywords).appendTo(ui_bar.selectQuery);
-                // add subs
-                var topics = {};
-                queries.subs.forEach(function(query) {
-                    var topicToDisplay = '';
-                    for (var i = 0; i < query.contextKeywords.length; i++) {
-                        if (query.contextKeywords[i].isMainTopic) {
-                            topicToDisplay = query.contextKeywords[i].text;
-                            if(topics.hasOwnProperty(topicToDisplay)) {
-                                topics[topicToDisplay]++;
-                                topicToDisplay += ' #' + topics[topicToDisplay];
-                            } else {
-                                topics[topicToDisplay] = 1;
-                            }
-                            break;
-                        }
-                    }
-                    $('<option/>').text(topicToDisplay).data('query', query.contextKeywords).appendTo(ui_bar.selectQuery);
-                });
-                ui_bar.selectQuery.show();
-            }
-            // TODO: select appropriate query
-            // TODO: make remaining queries selectable
-            if (immediately) {
-                clearTimeout(util.focusBlurDelayTimer);
-                util.preventQuerySetting = false;
-                util.setQuery(contextKeywords, 0);
-                util.cachedQuery = null;
-            } else {
-                if (util.preventQuerySetting) {
-                    util.cachedQuery = contextKeywords;
-                } else {
-                    util.setQuery(contextKeywords);
+
+            var finalQuery = function() {
+                if (typeof contextKeywords === 'undefined') {
+                    contextKeywords = queries.main.contextKeywords;
+                    ui_bar.selectQuery.hide();
                 }
+                if (immediately) {
+                    clearTimeout(util.focusBlurDelayTimer);
+                    util.preventQuerySetting = false;
+                    util.setQuery(contextKeywords, 0);
+                    util.cachedQuery = null;
+                } else {
+                    if (util.preventQuerySetting) {
+                        util.cachedQuery = contextKeywords;
+                    } else {
+                        util.setQuery(contextKeywords);
+                    }
+                }
+            };
+
+            if (queries.subs.length > 1) {
+                var highestScore = 0;
+                var setQuery = function() {
+                    // add main
+                    $('<option/>').text('all keywords').data('query', queries.main.contextKeywords).appendTo(ui_bar.selectQuery);
+                    // add subs
+                    var topics = {};
+                    queries.subs.forEach(function(query) {
+                        console.log('query score: ' + query.score);
+                        var topicToDisplay = '';
+                        for (var i = 0; i < query.contextKeywords.length; i++) {
+                            if (query.contextKeywords[i].isMainTopic) {
+                                topicToDisplay = query.contextKeywords[i].text;
+                                if (topics.hasOwnProperty(topicToDisplay)) {
+                                    topics[topicToDisplay]++;
+                                    topicToDisplay += ' #' + topics[topicToDisplay];
+                                } else {
+                                    topics[topicToDisplay] = 1;
+                                }
+                                break;
+                            }
+                        }
+                        var tmp = $('<option/>').text(topicToDisplay).data('query', query.contextKeywords).appendTo(ui_bar.selectQuery);
+                        if (query.score > 0.4 && query.score === highestScore) {
+                            tmp.attr('selected', 'selected');
+                            contextKeywords = query.contextKeywords;
+                        }
+                    });
+                    ui_bar.selectQuery.show();
+                    finalQuery();
+                };
+                // calculate scores
+                var i = 0;
+                var calculateScore = function() {
+                    if (i < queries.subs.length) {
+                        // obtain category set
+                        var categories = new Set();
+                        queries.subs[i].contextKeywords.forEach(function(keyword) {
+                            if (keyword.hasOwnProperty('categories')) {
+                                keyword.categories.forEach(function(category) {
+                                    categories.add(category);
+                                });
+                            }
+                        });
+                        // set score according to portion of matched categories
+                        settings.profile.getMatches(Array.from(categories), function(result) {
+                            if (result.matches) {
+                                queries.subs[i].score = result.matches / categories.size;
+                                if (queries.subs[i].score > highestScore) {
+                                    highestScore = queries.subs[i].score;
+                                }
+                            } else {
+                                queries.subs[i].score = 0;
+                            }
+                            i++;
+                            calculateScore();
+                        });
+                    } else {
+                        // score calculation finished, move on
+                        setQuery();
+                    }
+                };
+                calculateScore();
+            } else {
+                finalQuery();
             }
         },
         /**
