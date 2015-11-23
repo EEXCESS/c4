@@ -153,7 +153,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         },
         /**
          * Function to retrieve details for a set of returned results.
-         * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. There exists a documentbagde for each result entry in the original result set.
+         * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. 
+         *                There exists a documentbagde for each result entry in the original result set. 
+         *                See https://github.com/EEXCESS/eexcess/wiki/Request-and-Response-format-for-call-to-federated-recommender-and-privacy-proxy#details-request-format for more details.
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         getDetails: function(detailReqObj, callback) {
