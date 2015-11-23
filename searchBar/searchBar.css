@@ -42,6 +42,67 @@
 
 /*####################################################*/
 
+#eexcess_bubble, #eexcess_bubble_arrow:after {
+  background: #484847;
+  border: 2px solid white;
+}
+
+#eexcess_bubble {
+  display: inline-block;
+  position: fixed;
+  bottom:53px;
+  right:10px;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 20px;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
+  text-decoration: none;
+  box-shadow: 0 0 7px black;
+  z-index: 2147483647;
+}
+
+#eexcess_bubble p {
+    margin-top:11px;
+    margin-bottom: 0px;
+    font-size:13px;
+}
+
+#eexcess_bubble input {
+    position:relative;
+    top:2px;
+}
+
+#eexcess_bubble_arrow {
+  width: 70px;
+  height: 16px;
+  overflow: hidden;
+  position: absolute;
+  left: 80%;
+  margin-left: -35px;
+  bottom: -16px;
+}
+#eexcess_bubble_arrow:after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: -20px;
+  width: 25px;
+  height: 25px;
+  -webkit-box-shadow: 6px 5px 9px -9px black,
+                      5px 6px 9px -9px black;
+  -moz-box-shadow: 6px 5px 9px -9px black,
+                   5px 6px 9px -9px black;
+  box-shadow: 6px 5px 9px -9px black,
+              5px 6px 9px -9px black;
+  -webkit-transform: rotate(45deg);
+  -moz-transform:    rotate(45deg);
+  -ms-transform:     rotate(45deg);
+  -o-transform:      rotate(45deg);
+}
+
 #eexcess_window_controls {
     position:absolute;
     right:45px;
@@ -72,13 +133,23 @@
     cursor: pointer;
 }
 
+#eexcess_bubble_close {
+    width: 35px;
+    height: 30px;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background-size: 35px;
+    cursor:pointer;
+}
+
 #eexcess-tabBar-contentArea {
     position: fixed;
     width: 40%;
     height: 70%;
     bottom: 20px;
     right: 0px;
-    z-index: 2147483646;
+    z-index: 2147483645;
     border: none;
     background: none;
 }
@@ -472,7 +543,7 @@
     -webkit-writing-mode: horizontal-tb;
     x: 0px;
     y: 0px;
-    z-index: 2147483647;
+    z-index: 2147483646;
     zoom: 1;
 }
 

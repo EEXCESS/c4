@@ -11,6 +11,30 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         preventQuerySetting: false,
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
+        popupTimer: null,
+        fadeOutPopup: function(delay) {
+            if (typeof delay === 'undefined') {
+                delay = 2000;
+            }
+            clearTimeout(this.popupTimer);
+            this.popupTimer = setTimeout(function() {
+                ui_bar.popupBubble.fadeOut(2000, function() {
+                    ui_bar.popupBubbleClose.hide();
+                });
+            }, delay);
+        },
+        showPopup: function() {
+            clearTimeout(this.popupTimer);
+            if (settings.showBubble && !ui_content.contentArea.is(':visible')) {
+                ui_bar.popupBubble.show();
+                this.fadeOutPopup(3000);
+            }
+        },
+        hidePopup: function() {
+            clearTimeout(this.popupTimer);
+            ui_bar.popupBubble.hide();
+            ui_bar.popupBubbleClose.hide();
+        },
         addCategoriesToProfile: function(query) {
             var categories = new Set();
             query.contextKeywords.forEach(function(keyword) {
@@ -74,6 +98,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         queryUpdater: function() {
             ui_bar.loader.show();
             ui_bar.result_indicator.hide();
+            util.hidePopup();
             clearTimeout(timeout);
             timeout = setTimeout(function() {
 // get keywords
@@ -157,6 +182,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             setTimeout(function() {
                 ui_bar.loader.show();
                 ui_bar.result_indicator.hide();
+                util.hidePopup();
                 lastQuery = {contextKeywords: contextKeywords};
                 // add origin
                 if (typeof origin === 'undefined') {
@@ -176,6 +202,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             ui_bar.loader.hide();
                             ui_bar.result_indicator.text(response.data.totalResults + ' results');
                             ui_bar.result_indicator.show();
+                            util.showPopup();
                             if (ui_content.contentArea.is(':visible')) {
                                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                             }
@@ -202,6 +229,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         queryModificationDelay: 500, // the delay before a query is executed due to changes by the user
         queryDelay: 2000, // the delay before a query is executed due to changes from the parent container
         focusBlurDelay: 1000,
+        showBubble: true, // popup bubble for first result indication
         origin: null, // needs to be provided upon initalization
         queryCrumbs: {
             active: false
@@ -210,7 +238,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             set: function(item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
-                        localStorage.setItem(key, item[key]);
+                        localStorage.setItem(key, JSON.stringify(item[key]));
                     }
                 }
                 if (typeof callback === 'function') {
@@ -221,10 +249,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 var response = {};
                 if (Array.isArray(key)) {
                     key.forEach(function(entry) {
-                        response[entry] = localStorage.getItem(entry);
+                        response[entry] = JSON.parse(localStorage.getItem(entry));
                     });
                 } else {
-                    response[key] = localStorage.getItem(key);
+                    response[key] = JSON.parse(localStorage.getItem(key));
                 }
                 callback(response);
             }
@@ -287,8 +315,8 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                                     } else {
                                         // create new entry
                                         categories[i].frequency = 1;
-                                        i++;
                                         os.put(categories[i], categories[i].uri).onsuccess = handleNext;
+                                        i++;
                                     }
                                 };
                             }
@@ -405,7 +433,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         taglist: null,
         taglistDesc: null,
         right: null,
-        window_controls: null
+        window_controls: null,
+        popupBubble: null,
+        popupBubbleClose: null
     };
     var ui_content = {
         contentArea: null,
@@ -589,7 +619,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             popup_dim_pos.resize();
             settings.storage.set({'popup_control': 'fullwidth'});
         });
-
         ui_bar.window_controls.append([maximize, custom, fullheight_left, fullheight_right, fullwidth]);
         ui_bar.right.append(ui_bar.window_controls);
         ui_bar.logo = $('<img id="eexcess_logo" src="' + settings.imgPATH + 'eexcess_Logo.png" />');
@@ -598,6 +627,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.right.append(ui_bar.loader);
         ui_bar.result_indicator = $('<a id="eexcess_result_indicator" href="#">16 results</a>').click(function(e) {
             e.preventDefault();
+            util.hidePopup();
             ui_bar.window_controls.show();
             // TODO: handle error indications (i.e. no results are obtained from server e.g.)
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
@@ -640,6 +670,30 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
             }, settings.queryCrumbs.storage);
         }
+        // popup bubble
+        ui_bar.popupBubbleClose = $('<a id="eexcess_bubble_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').hide().click(function(e) {
+            util.hidePopup();
+        });
+        ui_bar.popupBubble = $('<div id="eexcess_bubble">EEXCESS has found related resources</div>').hide().hover(function() {
+            $(this).stop();
+            $(this).fadeIn(0);
+            clearTimeout(util.popupTimer);
+            ui_bar.popupBubbleClose.show();
+        }, function() {
+            util.fadeOutPopup();
+        });
+        ui_bar.popupBubble.append(ui_bar.popupBubbleClose);
+        var bubble_par = $('<p></p>');
+        var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').click(function(e) {
+            settings.showBubble = !$('#eexcess_chbx_bubble').prop('checked');
+            console.log(settings.showBubble);
+            settings.storage.set({'showPopupBubble': settings.showBubble});
+        });
+        bubble_par.append(bubble_chbx).append('<label for="eexcess_chbx_bubble">do not show this message again</label>');
+        ui_bar.popupBubble.append(bubble_par);
+        ui_bar.popupBubble.append('<div id="eexcess_bubble_arrow"></div>');
+        $('body').append(ui_bar.popupBubble);
+
         // whole bar
         ui_bar.bar.append(ui_bar.left, ui_bar.main, ui_bar.right);
         ui_bar.bar.mouseenter(function() {
@@ -831,6 +885,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             lastQuery = msg.data.data;
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
             ui_bar.result_indicator.hide();
+            util.hidePopup();
             ui_bar.loader.show();
             util.processQuery(lastQuery, function(response) {
                 if (response.status === 'success') {
@@ -838,6 +893,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui_bar.loader.hide();
                     ui_bar.result_indicator.text(response.data.totalResults + ' results');
                     ui_bar.result_indicator.show();
+                    util.showPopup();
                     iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                     if (settings.queryCrumbs.active) {
                         qc.addNewQuery(results);
@@ -860,6 +916,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             ui_bar.loader.hide();
             ui_bar.result_indicator.text(response.data.totalResults + ' results');
             ui_bar.result_indicator.show();
+            util.showPopup();
             if (ui_content.contentArea.is(':visible')) {
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                 if (settings.queryCrumbs.active) {
@@ -895,6 +952,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (typeof config !== 'undefined') {
                 settings = $.extend(settings, config);
             }
+            settings.storage.get('showPopupBubble', function(result) {
+                if (typeof result.showPopupBubble !== 'undefined' && result.showPopupBubble !== null) {
+                    settings.showBubble = result.showPopupBubble;
+                }
+            });
             api.init({origin: settings.origin});
             $(function() {
                 initBar();
