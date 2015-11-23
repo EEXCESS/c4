@@ -21,7 +21,7 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         suffix_favicon: 'getPartnerFavIcon?partnerId=',
         suffix_log: 'log/',
         suffix_getRegisteredPartners: 'getRegisteredPartners',
-        numResults: 30
+        numResults: 80
     };
     peas_indist.init(settings.base_url);
     var xhr;
