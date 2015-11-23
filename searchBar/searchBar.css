@@ -42,9 +42,29 @@
 
 /*####################################################*/
 
+#eexcess_window_controls {
+    position:absolute;
+    right:45px;
+    top:-12px;
+    padding: 2px;
+    padding-bottom: 0px;
+    background-color: rgba(244, 244, 244,0.9);
+    border:1px solid #1d904e;
+    /*border-top: none;*/
+    border-radius: 5px;
+    box-shadow: -5px -5px 5px rgba(0,0,0,0.05), 5px 5px 5px rgba(0,0,0,0.05);
+}
+
+.eexcess.window_controls {
+    width:10px;
+    height:10px;
+    border:1px solid #ddd;
+    margin:2px;
+}
+
 #eexcess_close {
     position: absolute;
-    z-index: 99999;
+    z-index: 2147483647;
     width: 35px;
     height: 35px;
     top: -19px;
@@ -58,7 +78,7 @@
     height: 70%;
     bottom: 20px;
     right: 0px;
-    z-index: 99999;
+    z-index: 2147483646;
     border: none;
     background: none;
 }
@@ -86,7 +106,7 @@
 #eexcess-tabBar-iframeCover {
     position: absolute;
     opacity: 50;
-    z-index: 999999;
+    z-index: 2147483647;
     width: 100%;
     height: 100%;
 }
@@ -116,23 +136,27 @@
 
 
 .mainTopicDropActive {
-    background-color:orange !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    border:1px solid #1d904e !important;
 }
 
 .mainTopicDropHover {
-    background-color:green !important;
+    background-color:rgba(0,0,0,0.0) !important; 
 }
+
 
 #eexcess_logo {
     position:absolute;
     width:100px;
     right:10px;
+    top:15px;
 }
 
 #eexcess_loader {
     position: absolute;
     width: 30px;
     right: 10px;
+    top:15px;
 }
 
 #eexcess_result_indicator {
@@ -143,6 +167,7 @@
     font-size: 12px;
     position: absolute;
     right: 44px;
+    top:15px;
 }
 
 .eexcess > .tagit-label{
@@ -160,7 +185,8 @@
     padding-top: 2.2px !important;  
     padding-left: 5.5px !important;  
     padding-right: 18px !important;  
-    line-height: normal !important;    
+    line-height: normal !important;   
+    width:initial;
 }
 
 .eexcess > .tagit-new{
@@ -446,7 +472,7 @@
     -webkit-writing-mode: horizontal-tb;
     x: 0px;
     y: 0px;
-    z-index: 99999;
+    z-index: 2147483647;
     zoom: 1;
 }
 
@@ -696,6 +722,7 @@
     visibility: visible;
     white-space: pre;
     widows: 1;
+    width:100px;
     will-change: auto;
     word-break: normal;
     word-spacing: 0px;
@@ -708,6 +735,264 @@
     zoom: 1;
 }
 
+#eexcess_selectQuery {
+    -webkit-app-region: no-drag;
+    -webkit-appearance: menulist-button;
+    -webkit-background-composite: source-over;
+    -webkit-border-horizontal-spacing: 0px;
+    -webkit-border-vertical-spacing: 0px;
+    -webkit-box-align: stretch;
+    -webkit-box-decoration-break: slice;
+    -webkit-box-direction: normal;
+    -webkit-box-flex: 0;
+    -webkit-box-flex-group: 1;
+    -webkit-box-lines: single;
+    -webkit-box-ordinal-group: 1;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: start;
+    -webkit-box-reflect: none;
+    -webkit-column-break-after: auto;
+    -webkit-column-break-before: auto;
+    -webkit-column-break-inside: auto;
+    -webkit-column-count: auto;
+    -webkit-column-gap: normal;
+    -webkit-column-rule-color: #484847;
+    -webkit-column-rule-style: none;
+    -webkit-column-rule-width: 0px;
+    -webkit-column-span: none;
+    -webkit-column-width: auto;
+    -webkit-font-smoothing: auto;
+    -webkit-highlight: none;
+    -webkit-hyphenate-character: auto;
+    -webkit-line-box-contain: block inline replaced;
+    -webkit-line-break: auto;
+    -webkit-line-clamp: none;
+    -webkit-locale: "de";
+    -webkit-margin-after-collapse: collapse;
+    -webkit-margin-before-collapse: collapse;
+    -webkit-mask-box-image: none;
+    -webkit-mask-box-image-outset: 0px;
+    -webkit-mask-box-image-repeat: stretch;
+    -webkit-mask-box-image-slice: 0 fill;
+    -webkit-mask-box-image-source: none;
+    -webkit-mask-box-image-width: auto;
+    -webkit-mask-clip: border-box;
+    -webkit-mask-composite: source-over;
+    -webkit-mask-image: none;
+    -webkit-mask-origin: border-box;
+    -webkit-mask-position: 0% 0%;
+    -webkit-mask-repeat: repeat;
+    -webkit-mask-size: auto;
+    -webkit-print-color-adjust: economy;
+    -webkit-rtl-ordering: logical;
+    -webkit-tap-highlight-color: #484847;
+    -webkit-text-combine: none;
+    -webkit-text-decorations-in-effect: none;
+    -webkit-text-emphasis-color: #484847;
+    -webkit-text-emphasis-position: over;
+    -webkit-text-emphasis-style: none;
+    -webkit-text-fill-color: #484847;
+    -webkit-text-orientation: vertical-right;
+    -webkit-text-security: none;
+    -webkit-text-stroke-color: #484847;
+    -webkit-text-stroke-width: 0px;
+    -webkit-user-drag: auto;
+    -webkit-user-modify: read-only;
+    -webkit-user-select: text;
+    align-content: start;
+    align-items: center;
+    align-self: start;
+    alignment-baseline: auto;
+    animation-delay: 0s;
+    animation-direction: normal;
+    animation-duration: 0s;
+    animation-fill-mode: none;
+    animation-iteration-count: 1;
+    animation-name: none;
+    animation-play-state: running;
+    animation-timing-function: ease;
+    backface-visibility: visible;
+    background-attachment: scroll;
+    background-blend-mode: normal;
+    background-clip: border-box;
+    background-color: rgba(0, 0, 0,0);
+    background-image: none;
+    background-origin: padding-box;
+    background-position: 0% 0%;
+    background-repeat: repeat;
+    background-size: auto;
+    baseline-shift: 0px;
+    border-bottom-color: rgb(221, 221, 221);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-collapse: separate;
+    -webkit-border-image: none;
+    border-image-outset: 0px;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-left-color: rgb(221, 221, 221);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right-color: rgb(221, 221, 221);
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-top-color: rgb(221, 221, 221);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top-style: solid;
+    border-top-width: 1px;
+    bottom: auto;
+    box-shadow: rgba(0, 0, 0, 0.247059) 1px 1px 2px 0px inset;
+    box-sizing: border-box;
+    buffered-rendering: auto;
+    caption-side: top;
+    clear: none;
+    clip: auto;
+    clip-path: none;
+    clip-rule: nonzero;
+    color: #484847;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    cursor: default;
+    cx: 0px;
+    cy: 0px;
+    direction: ltr;
+    display: block;
+    dominant-baseline: auto;
+    empty-cells: show;
+    fill: rgb(0, 0, 0);
+    fill-opacity: 1;
+    fill-rule: nonzero;
+    filter: none;
+    flex-basis: auto;
+    flex-direction: row;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-wrap: nowrap;
+    float: left;
+    flood-color: rgb(0, 0, 0);
+    flood-opacity: 1;
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
+    font-kerning: auto;
+    font-size: 13px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-variant-ligatures: normal;
+    font-weight: normal;
+    glyph-orientation-horizontal: 0deg;
+    glyph-orientation-vertical: auto;
+    height: 21px;
+    image-rendering: auto;
+    isolation: auto;
+    justify-content: start;
+    left: auto;
+    letter-spacing: normal;
+    lighting-color: #484847;
+    line-height: normal;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: disc;
+    margin-bottom: 0px;
+    margin-left: 5px;
+    margin-right: 0px;
+    margin-top: 0 ;
+    marker-end: none;
+    marker-mid: none;
+    marker-start: none;
+    mask: none;
+    mask-type: luminance;
+    max-height: none;
+    max-width: none;
+    min-height: 15px;
+    min-width: 0px;
+    mix-blend-mode: normal;
+    object-fit: fill;
+    object-position: 50% 50%;
+    opacity: 1;
+    order: 0;
+    orphans: auto;
+    outline-color: #484847;
+    outline-offset: 0px;
+    outline-style: none;
+    outline-width: 0px;
+    overflow-wrap: normal;
+    overflow-x: visible;
+    overflow-y: visible;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    page-break-after: auto;
+    page-break-before: auto;
+    page-break-inside: auto;
+    paint-order: fill stroke markers;
+    perspective: none;
+    perspective-origin: 61px 10.5px;
+    pointer-events: auto;
+    position: absolute;
+    r: 0px;
+    resize: none;
+    right: auto;
+    rx: 0px;
+    ry: 0px;
+    shape-image-threshold: 0;
+    shape-margin: 0px;
+    shape-outside: none;
+    shape-rendering: auto;
+    speak: normal;
+    stop-color: rgb(0, 0, 0);
+    stop-opacity: 1;
+    stroke: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0px;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    stroke-miterlimit: 4;
+    stroke-opacity: 1;
+    stroke-width: 1px;
+    tab-size: 8;
+    table-layout: auto;
+    text-align: start;
+    text-anchor: start;
+    text-decoration: none;
+    text-indent: 0px;
+    text-overflow: clip;
+    text-rendering: auto;
+    text-shadow: none;
+    text-transform: none;
+    top: 28px;
+    touch-action: auto;
+    transform: none;
+    transform-origin: 61px 10.5px;
+    transform-style: flat;
+    transition-delay: 0s;
+    transition-duration: 0s;
+    transition-property: all;
+    transition-timing-function: ease;
+    unicode-bidi: normal;
+    vector-effect: none;
+    vertical-align: baseline;
+    visibility: visible;
+    white-space: pre;
+    widows: 1;
+    width:100px;
+    will-change: auto;
+    word-break: normal;
+    word-spacing: 0px;
+    word-wrap: normal;
+    writing-mode: lr-tb;
+    -webkit-writing-mode: horizontal-tb;
+    x: 0px;
+    y: 0px;
+    z-index: auto;
+    zoom: 1;
+}
 
 #eexcess_searchBar input.ui-widget-content {
 
@@ -981,6 +1266,7 @@
     height:100%;
     margin-left:10px;
     margin-right:5px;
+    width:initial;
 }
 
 #eexcess_mainTopicLabel{
@@ -990,6 +1276,7 @@
     text-align:center;
     border:none;
     background-color:rgba(0,0,0,0.0);
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
 }
 
 .eexcess_hiddenLabelSpan{
@@ -999,6 +1286,7 @@
     text-align:center;
     border:none;
     background-color:rgba(0,0,0,0.0);
+    font-family: Helvetica, Verdana, Arial, Geneva, sans-serif;
 }
 
 #eexcess_mainTopicDesc {
@@ -1007,6 +1295,7 @@
     opacity:0.8;
     margin-top:6px;
     border-top:1px solid gray;
+    width:initial;
 }
 
 #eexcess_taglistDesc{

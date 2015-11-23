@@ -1,11 +1,22 @@
 require(['../config'], function(config) {
-    require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar'], function($, api, paragraphDetection, searchBar) {
-        // set origin in the APIconnector
-        api.init({origin: {
+    require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar', 'c4/iframes'], function($, api, paragraphDetection, searchBar, iframes) {
+        var origin = {
                 clientType: "c4 example",
                 clientVersion: "0.0.1",
                 userID: "testUser"
-            }});
+            };
+        window.onmessage = function(msg) {
+            if (msg.data.event && msg.data.event === 'eexcess.currentResults') {
+                iframes.sendMsgAll({
+                    event: 'eexcess.newResults',
+                    data: api.getCurrent()
+                });
+            }
+        };
+        // set origin in the APIconnector
+        api.init({
+            origin: origin
+        });
 
         // add searchResultListVis widget to display results
         var tabs = [{
@@ -17,8 +28,9 @@ require(['../config'], function(config) {
             {
                 name: "dashboard",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
-                url: "https://eexcess.github.io/visualization-widgets/Dashboard/index.html?a",
-                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png"
+                url: "https://eexcess.github.io/visualization-widgets-files/Dashboard/index.html",
+                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png",
+                deferLoading: true
             },
 //    {
 //            name:"power search",
@@ -30,10 +42,11 @@ require(['../config'], function(config) {
                 name: "facet scape",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/index.html",
-                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png"
+                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png",
+                deferLoading: true
             }];
         // initialize the searchBar with the specified tabs and the path to the image folder
-        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}});
+        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}, origin:origin});
         // detect paragraphs
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs
@@ -42,18 +55,23 @@ require(['../config'], function(config) {
         // listen for paragraph focused events
         var focusedParagraph;
         $(document).on('paragraphFocused', function(e) {
-            if (focusedParagraph !== e.originalEvent.detail) {
-                focusedParagraph = e.originalEvent.detail;
+            if (focusedParagraph !== e.originalEvent.detail.paragraph) {
+                var eventDetail = e.originalEvent.detail;
+                focusedParagraph = eventDetail.paragraph;
                 // reset background color on all detected paragraphs
                 $.each(paragraphs, function() {
                     $(this.elements[0]).parent().css('background-color', 'white');
                 });
                 // color background on focused paragraph
-                $(e.originalEvent.detail.elements[0]).parent().css('background-color', 'cyan');
+                $(eventDetail.paragraph.elements[0]).parent().css('background-color', 'cyan');
                 // generate query from focused paragraph and set it in the search bar
-                paragraphDetection.paragraphToQuery(e.originalEvent.detail.content, function(paragraphStatistics) {
+                paragraphDetection.paragraphToQuery(eventDetail.paragraph.content, function(paragraphStatistics) {
                     // set query in search bar
-                    searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                    if (eventDetail.trigger && eventDetail.trigger === 'click') {
+                        searchBar.setQuery(paragraphStatistics.query.contextKeywords, true);
+                    } else {
+                        searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                    }
                 });
             }
         });

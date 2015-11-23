@@ -19,6 +19,14 @@
  * if an error message is available, it will be present in the 'error' attribute.
  */
 
+/**
+ * Callback for the paragraphToQueries function
+ * @callback paragraphToQueries~callback
+ * @param {queries:Object,error:String} The result of the extraction. If the extraction was successful,
+ * the generated queries will be present in the attribute 'queries'. Otherwise,
+ * if an error message is available, it will be present in the 'error' attribute.
+ */
+
 define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], function($, ner, guessLang) {
     var extracted_paragraphs = [];
     var settings = {
@@ -124,11 +132,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         /**
          * Detects the paragraphs in the HTML document the script is executed.
          * @param {HTMLelement} root The root node from which to start the paragraph detection.
+         * @param {Object} [options] Options for the extraction. options.fast = true will reduce processing time sacrificing accuracy and options.addSubparagraphs will include potentia subparagraphs.
          * @returns {Array<{elements:HTMLelement[],headline:String,content:String,multi:Boolean,id:String}>} The paragraphs
          */
-        getParagraphs: function(root) {
+        getParagraphs: function(root, options) {
             if (typeof root === 'undefined') {
                 root = document;
+            }
+            if (typeof options === 'undefined') {
+                options = {};
             }
             var candidates = getCandidates(root);
             var paragraphs = [];
@@ -161,17 +173,35 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 }
 
                 if (sole) {
-                    // single paragraphs must consist of at least 100 characters and contain a dot
-                    var text = $(candidates[i]).text();
-                    if (text.length > 100 && text.indexOf('.') > -1) {
-                        paragraphs.push(paragraphUtil([candidates[i]], counter));
-                        counter++;
+                    if (options.fast || $(candidates[i]).is(':visible')) {
+                        // single paragraphs must consist of at least 100 characters and contain a dot
+                        var text = $(candidates[i]).text();
+                        if (text.length > 100 && text.indexOf('.') > -1) {
+                            var detailed_paragraph = paragraphUtil([candidates[i]], counter);
+                            if (options.addSubparagraphs) {
+                                detailed_paragraph.subparagraphs = [{el: candidates[i], text: $(candidates[i]).text()}];
+                            }
+                            paragraphs.push(detailed_paragraph);
+                            counter++;
+                        }
                     }
                 } else {
-                    neighbours.unshift(candidates[i]);
-                    paragraphs.push(paragraphUtil(neighbours, counter));
-                    counter++;
-                    i = j;
+                    if (options.fast || $(candidates[i]).is(':visible')) {
+                        neighbours.unshift(candidates[i]);
+                        var detailed_paragraph = paragraphUtil(neighbours, counter);
+                        if (options.addSubparagraphs) {
+                            detailed_paragraph.subparagraphs = [];
+                            neighbours.forEach(function(val) {
+                                detailed_paragraph.subparagraphs.push({
+                                    el: val,
+                                    text: $(val).text()
+                                });
+                            });
+                        }
+                        paragraphs.push(detailed_paragraph);
+                        counter++;
+                        i = j;
+                    }
                 }
             }
 // ############################################## DO NOT CONNECT NEIGHBOURS #################################
@@ -201,8 +231,6 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
          */
         paragraphToQuery: function(paragraphContent, callback, id, headline) {
             var fallback = function(text) {
-                console.log(text);
-                console.log('fallback');
                 var profile = {
                     contextKeywords: []
                 };
@@ -418,11 +446,18 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         offsets[val].push(offset);
                         offset = paragraphContent.indexOf(val, offset + val.length);
                     }
+                    if (offsets[val].length === 0) {
+                        var firstPart = val.split(' ')[0];
+                        offset = paragraphContent.indexOf(firstPart);
+                        while (offset !== -1) {
+                            offsets[val].push(offset);
+                            offset = paragraphContent.indexOf(firstPart, offset + firstPart.length);
+                        }
+                    }
                 });
                 callback({query: profile, offsets: offsets});
             };
             guessLang.detect(paragraphContent, function(lang) {
-                console.log(lang);
                 if (lang === 'en') {
                     if (typeof id === 'undefined') {
                         id = 1;
@@ -479,6 +514,129 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     });
                 } else {
                     fallback(paragraphContent);
+                }
+            });
+        },
+        /**
+         * Create queries in a format similar to the EEXCESS query profile from the provided paragraph.
+         * 
+         * The entries in the provided paragraphs array must at least have an attribute "text", containing the text of the paragraph
+         * @param {Array} paragraphs The paragraphs for which to create queries
+         * @param {paragraphToQueries~callback} callback The callback function
+         * @param {String} [headline] headline of the paragraphs
+         * @returns {undefined}
+         */
+        paragraphsToQueries: function(paragraphs, callback, headline) {
+            if (paragraphs.length === 0) {
+                callback({error: 'no paragraphs given'});
+                return;
+            }
+            // TODO: create main query from main topic only as soon as available
+            var headline = headline || '';
+            var pars = [];
+
+            var main = {
+                id: 'main',
+                content: '',
+                headline: headline
+            };
+            for (var i = 0; i < paragraphs.length; i++) {
+                pars.push({
+                    id: i,
+                    headline: headline,
+                    content: paragraphs[i].text
+                });
+                main.content += paragraphs[i].text;
+            }
+            pars.push(main);
+            guessLang.detect(main.content, function(lang) {
+                if (lang === 'en') {
+                    var toSubmit = {
+                        paragraphs: pars,
+                        language: lang
+                    };
+                    ner.entitiesAndCategories(toSubmit, function(res) {
+                        if (res.status === 'success') {
+                            var createKeyword = function(val, isMainTopic, freq) {
+                                return {
+                                    text: val.text,
+                                    uri: val.entityUri,
+                                    type: val.type,
+                                    categories: val.categories || [],
+                                    frequency: freq || 1,
+                                    isMainTopic: isMainTopic
+                                };
+                            };
+                            var queries = {
+                                subs: [],
+                                main: {
+                                    contextKeywords: [],
+                                    offsets: []
+                                }
+                            };
+                            // first add main topic to main query
+                            var overallTopic;
+                            res.data.paragraphs.forEach(function(val) {
+                                if (val.id === 'main' && val.topic && typeof val.topic !== 'undefined' && typeof val.topic.text !== 'undefined') {
+                                    overallTopic = createKeyword(val.topic, true);
+                                    // TODO: add categories (not available from server yet);
+                                    queries.main.contextKeywords.push(overallTopic);
+                                }
+                            });
+
+                            var offset = 0;
+                            res.data.paragraphs.forEach(function(val) {
+                                if (val.id !== 'main') {
+                                    var query = {
+                                        contextKeywords: [],
+                                        offsets: []
+                                    };
+                                    var mainTopic;
+                                    if (val.topic && typeof val.topic !== 'undefined' && typeof val.topic.text !== 'undefined') {
+                                        mainTopic = createKeyword(val.topic, true);
+                                        // TODO: add categories (not available from server yet);
+                                        query.contextKeywords.push(mainTopic);
+                                    }
+                                    val.statistic.forEach(function(statVal) {
+                                        var offsets = [];
+                                        statVal.key.offset.forEach(function(offsetVal) {
+                                            offsets.push(offsetVal + offset);
+                                        });
+                                        var keyword = createKeyword(statVal.key, false, statVal.value);
+                                        // add keyword to subquery
+                                        if (!mainTopic || mainTopic.text !== statVal.key.text) {
+                                            query.offsets[statVal.key.text] = offsets;
+                                            query.contextKeywords.push(keyword);
+                                        }
+                                        // add keyword to main query
+                                        if (!overallTopic || overallTopic.text !== statVal.key.text) {
+                                            if (queries.main.offsets[statVal.key.text]) {
+                                                // keyword already present, sum offsets and frequency
+                                                queries.main.offsets[statVal.key.text] = queries.main.offsets[statVal.key.text].concat(offsets);
+                                                for (var i = 0; i < queries.main.contextKeywords.length; i++) {
+                                                    if (queries.main.contextKeywords[i].uri === statVal.key.entityUri) {
+                                                        queries.main.contextKeywords[i].frequency += statVal.value;
+                                                        break;
+                                                    }
+                                                }
+                                            } else {
+                                                // add offsets and keyword
+                                                queries.main.offsets[statVal.key.text] = offsets;
+                                                queries.main.contextKeywords.push(keyword);
+                                            }
+                                        }
+                                    });
+                                    queries.subs.push(query);
+                                    offset += pars[val.id].content.length;
+                                }
+                            });
+                            callback({queries: queries});
+                        } else {
+                            callback({error: res.data});
+                        }
+                    });
+                } else {
+                    callback({error: 'unsupported language: ' + lang});
                 }
             });
         },
@@ -747,15 +905,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             $.each(extracted_paragraphs, function() {
                 var that = this;
                 $(this.elements[0]).parent().click(function(e) {
-                    var event = new CustomEvent('paragraphFocused', {detail: that});
+                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph: that, trigger: 'click'}});
                     document.dispatchEvent(event);
                 });
             });
             var visiblePars = getVisible(extracted_paragraphs);
             updateDistance();
-            updateProbabilities();
+            updateProbabilities('init');
 
-            function updateProbabilities() {
+            function updateProbabilities(trigger) {
                 var highestProb;
                 var focusedPar;
                 visiblePars.forEach(function(v1) {
@@ -765,9 +923,11 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         focusedPar = v1;
                     }
                 });
-                // event might be dispatched multiple times, leave the handling to the listener
-                var event = new CustomEvent('paragraphFocused', {detail: focusedPar});
-                document.dispatchEvent(event);
+                if (focusedPar) {
+                    // event might be dispatched multiple times, leave the handling to the listener
+                    var event = new CustomEvent('paragraphFocused', {detail: {paragraph: focusedPar, trigger: trigger}});
+                    document.dispatchEvent(event);
+                }
             }
 
             $(document).scroll(function(evt) {
@@ -775,7 +935,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 scrollTimer = setTimeout(function() {
                     visiblePars = getVisible(extracted_paragraphs);
                     updateDistance();
-                    updateProbabilities();
+                    updateProbabilities('scroll');
                 }, 100);
             });
 
@@ -797,7 +957,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     var offset = $(v1.elements[0]).offset();
                     var left = offset.left - $(window).scrollLeft();
                     var top = offset.top - $(window).scrollTop();
-                    if(top < 0) {
+                    if (top < 0) {
                         top -= $(window).height();
                     }
 //                    if (top < 0) {
