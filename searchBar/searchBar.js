@@ -1123,6 +1123,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             } else {
                 return null;
             }
+        },
+        showNotificationBubble: function(show) {
+            settings.showBubble = show;
         }
     };
 });
