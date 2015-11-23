@@ -220,25 +220,25 @@
     position:absolute;
     width:100px;
     right:10px;
-    top:15px;
+    bottom:6px;
 }
 
 #eexcess_loader {
     position: absolute;
     width: 30px;
     right: 10px;
-    top:15px;
+    bottom:17px;
 }
 
 #eexcess_result_indicator {
     text-decoration: none;
-    font-weight: regular;
+    font-weight: normal;
     color: #018746;    
     -webkit-text-fill-color: #018746;
     font-size: 12px;
     position: absolute;
     right: 44px;
-    top:15px;
+    bottom:25px;
 }
 
 .eexcess > .tagit-label{
