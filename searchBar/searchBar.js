@@ -686,7 +686,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         var bubble_par = $('<p></p>');
         var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').click(function(e) {
             settings.showBubble = !$('#eexcess_chbx_bubble').prop('checked');
-            console.log(settings.showBubble);
             settings.storage.set({'showPopupBubble': settings.showBubble});
         });
         bubble_par.append(bubble_chbx).append('<label for="eexcess_chbx_bubble">do not show this message again</label>');
