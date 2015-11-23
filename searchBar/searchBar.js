@@ -684,7 +684,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         });
         ui_bar.popupBubble.append(ui_bar.popupBubbleClose);
         var bubble_par = $('<p></p>');
-        var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').click(function(e) {
+        var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').change(function(e) {
             settings.showBubble = !$('#eexcess_chbx_bubble').prop('checked');
             settings.storage.set({'showPopupBubble': settings.showBubble});
         });
@@ -1125,6 +1125,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         },
         showNotificationBubble: function(show) {
             settings.showBubble = show;
+            $('#eexcess_chbx_bubble').prop('checked', !show);
         }
     };
 });
