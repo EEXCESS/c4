@@ -867,20 +867,23 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         activateSelectionAugmentation: function(addKeyword, queryFromSelection, addParagraph) {
             var selection = '';
 
-            var img1 = $('<div id="add-ex-aug"></div>')
+            var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>').tooltip()
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
+                .css('cursor', 'pointer')
                 .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAT9JREFUeNrs3bERgDAMBEGp/6ZJSUjtR9pTAczPRo6okiRJkpRZj77v2aMrw83mzZs3b968efPmzZs3b968efPmzZs3b968eRtuNm/evHnz5s2bN2/e272vf/TS8Moa3qN38+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx58+bNmzdv3rx57/ZO+fPIae//7ebNmzdv3rx58+a9wdt7zPubN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s2bN2/evHnz5s17vHfX6xZ5XynBO2s4b968efPmzZs3b968efPmzZs3b968efPmzdts3rx58+bNmzdv3rx58+bNm/dJ79EnSZIkKbNHgAEAxu6yMayy1K8AAAAASUVORK5CYII=')")
                 .css('background-size', 'contain').hide();
             img1.click(function(e) {
                 addKeyword(selection);
             });
 
-            var img2 = $('<div id="search-ex-aug"></div>')
+            var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>').tooltip()
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
+                .css('cursor', 'pointer')
+                .css('title', '"button2"')
                 .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAA1xJREFUeNrsnEuW5CAMBJ33v/Rse56np8pYEkoRqnVhgvAPLHFdBEEQBEEQBEH0DI3+/Y49Oi7AwcY3vvGNb3zjG9/4xje+8Y1vfOMb3/jGN77xjW984xvfgIONb3zjG9/4xje+8Y1vfON7sO9/ZQiO993wYsrv0uc82IG+v8wAHub7Qe7zIN8Ps76H+F7Id5/gey3T3933comDt+8XtR3Ovt9Vtbj6fl3O4+k7oI7J0fd3RJd2gwcf/lFrPcEjG3v6BzffC+20Aw9qK2WwevlebmSH8FTsgr/u9/2mhUbgldjv/77N9+t+FwuP8p1wf3DwnfEYNPAd46oQPMh3zqTGzndUZ7r7zlqq6e47rLtlwkN8B3Z2/4m+qbNF4Am+5cCtXqd58CDm+o7tqatvWYAH+M79at7XtyV3Q9861HeJ8GjfkvuJvq+XHr4vfKdkvZ3jW/h28S184xvf3M/xzfsavpmP9fXN/Jv1FtbXunKzft7ze4mP71O/j53zPdTxOzD5Dh3Sehqc5nsSPS4r34Z5XK3yFVskam7osF9+akiXeyRil/fZMv/8fa+7FFoUd9u1vkSxDwSfeiIFTm02ltVUgu+oEQ2sD11tZkc5dGg98FIzmwrgC+q/F6kd3s/XTtmdez2U7e/wmLn/essjnib7VbXbv6UGPOGA5uApY/kFZA14zji/crsZPGs4P490BXjadfXmQt4KnjiiH4+XD555H31x094InjyqH46VDZ793Fx+QG8Drxja69FWXU6+/3+YjUtuda+HP2ckWluHsfMd1TlH363AW/veAi5NBm/uewO4NBm8ve9ycGkyuIHvYnBpMriF71JwaTK4ie9CcGkyuI3vMnBpMriR7yJwaTK4le8ScGkyuJnvAnBpMrid73RwaTK4oe9kcGkyuKXvVHBpMrip70RwaTK4re80cGkyuLHvJHBpMri17xRwaTK4ue8EcGkyuL3vcHBpMvgA38Hg0mTwEb5DwaXJ4EN8B4JLk8HH+H66o8gY7GebOw3y/Wzj1UHYf8Gc8fy+4ZzxvnbDOeP9/AZ0xnzsBnTG/PuGdMZ6S9Tb3eng+MY3vvGNb3zjG9/4xje+8Y1vfOMb3/jGN77xjW984xvsn3sBDv4RBEEQBEEQBNEz/ggwAEWQrFnOy4REAAAAAElFTkSuQmCC')")
                 .css('background-size', 'contain').hide();
             img2.click(function(e) {
@@ -890,10 +893,11 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 // ners = ner.entitiesAndCategories.entities(selection);
                 // console.log(ners);
             });
-            var img3 = $('<div id="gen-para-ex-aug"></div>')
+            var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>').tooltip()
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
+                .css('cursor', 'pointer')
                 .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAYFJREFUeNrs3EESwiAQBED8/6d9gVZMVliGHu5WTdrDAtExRERERESkZ17R63Pt6AzF1ebNmzdv3rx58+bNmzdv3rx5r/OuONjaz7vmsHI/76jevHnz5s2bN2/evDO9D9qPZe1SefPmzZs3b968efPmzZs3b968efPmzZs3b968eVd4d/gZ7wrv7Xrz5s2bN2/e5jXzOW/evHnz5s2bN2/evHnz5s2bN+/r53Qd/55igndW1Facd8HHbH9fEtWbN2/evHnzNq+Zz3nz5s2bN2/evHnz5s2bN2/evHkrrjZv3rx/e3zux9yP8ebNm/ez3t/ep032vv5Wee6b1ifNa7x58+bNmzdv3rx58+bNmzdv3rx58+bNm/di7wb3JWOFd/favHnz5s2bt3nNvMabN2/evHnz5s2bN2/evHnz5s2bN+/exSecMrf0/ktv3rx58+bNmzdv3rwfFy9YB+3H7n6JDi3Omzdv3rx58+bNmzdv3rx5z/WOXiIiIiIi0jNvAQYAvE2iCao7QFoAAAAASUVORK5CYII=')")
                 .css('background-size', 'contain').hide();
             img3.click(function(e) {
