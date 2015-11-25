@@ -1018,7 +1018,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             var finalQuery = function() {
                 if (typeof contextKeywords === 'undefined') {
                     contextKeywords = queries.main.contextKeywords;
-                    ui_bar.selectQuery.hide();
+                    if (queries.subs.length < 2) {
+                        ui_bar.selectQuery.hide();
+                    }
                 }
                 if (immediately) {
                     clearTimeout(util.focusBlurDelayTimer);
