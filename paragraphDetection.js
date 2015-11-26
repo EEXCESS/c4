@@ -163,7 +163,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 if (sole) {
                     // single paragraphs must consist of at least 100 characters and contain a dot
                     var text = $(candidates[i]).text();
-                    if (text.length > 100 && text.indexOf('.') > -1) {
+                    if (text.length > 100 && text.indexOf('.') > -1) {                        
                         paragraphs.push(paragraphUtil([candidates[i]], counter));
                         counter++;
                     }
@@ -855,19 +855,20 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             }
             return offsets;
         },
-        
-                
-        queryFromSelection: function(selection){
+
+
+        queryFromSelection: function(selection) {
             //ners = ner.entitiesAndCategories.entities(selection);
             //console.log(ners);
             console.log("hildee");
-            
-        },
-        
-        activateSelectionAugmentation: function(addKeyword, queryFromSelection, addParagraph) {
-            var selection = '';
 
-            var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>').tooltip()
+        },
+
+        activateSelectionAugmentation: function(addKeyword, queryFromSelection, addParagraph) {
+            var selection;
+            var selectedElement;
+
+            var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
@@ -878,7 +879,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 addKeyword(selection);
             });
 
-            var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>').tooltip()
+            var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
@@ -893,16 +894,18 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 // ners = ner.entitiesAndCategories.entities(selection);
                 // console.log(ners);
             });
-            var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>').tooltip()
+            var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
                 .css('position', 'absolute')
                 .css('width', '30px')
                 .css('height', '30px')
                 .css('cursor', 'pointer')
                 .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAYFJREFUeNrs3EESwiAQBED8/6d9gVZMVliGHu5WTdrDAtExRERERESkZ17R63Pt6AzF1ebNmzdv3rx58+bNmzdv3rx5r/OuONjaz7vmsHI/76jevHnz5s2bN2/evDO9D9qPZe1SefPmzZs3b968efPmzZs3b968efPmzZs3b968eVd4d/gZ7wrv7Xrz5s2bN2/e5jXzOW/evHnz5s2bN2/evHnz5s2bN+/r53Qd/55igndW1Facd8HHbH9fEtWbN2/evHnzNq+Zz3nz5s2bN2/evHnz5s2bN2/evHkrrjZv3rx/e3zux9yP8ebNm/ez3t/ep032vv5Wee6b1ifNa7x58+bNmzdv3rx58+bNmzdv3rx58+bNm/di7wb3JWOFd/favHnz5s2bt3nNvMabN2/evHnz5s2bN2/evHnz5s2bN+/exSecMrf0/ktv3rx58+bNmzdv3rwfFy9YB+3H7n6JDi3Omzdv3rx58+bNmzdv3rx5z/WOXiIiIiIi0jNvAQYAvE2iCao7QFoAAAAASUVORK5CYII=')")
                 .css('background-size', 'contain').hide();
-            img3.click(function(e) {
-                //TODO CHANGE FUNCTION CALL
-                addParagraph(selection);
+            img3.click(function(e) {          
+
+                var selectedParagraph = [selectedElement];
+                extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
+      
             });
 
             $('body').append(img1);
@@ -910,15 +913,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             $('body').append(img3);
 
             $(document).bind('mouseup', function(e) {
-
+                console.log("mouseup event");
                 if (window.getSelection().toString() !== '') {
+                    selection = window.getSelection();
+                    selectedElement = selection.extentNode.parentElement;
 
                     var topPos = e.pageY + 10;
                     img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
                     img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
                     img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
-
-                    selection = window.getSelection().toString();
 
                 } else {
                     img1.fadeOut('fast');

@@ -80,7 +80,10 @@ require(['../config'], function(config) {
                 searchBar.setQuery(paragraphStatistics.query.contextKeywords);
             });
         }, function(selection) {
-            // console.log(paragraphs);
+             
+            // $(selection).html('<div id="eexcess_par_selection" data-idx="9999999" class="eexcess_detected_par">'+selection+'</div>');
+            /*
+            $(selection).parent().css('border', '1px dotted silver');
             var paragraph = {
                 content: selection,
                 distance: 0,
@@ -89,8 +92,9 @@ require(['../config'], function(config) {
                 id: "eexcess_par_selection",
                 multi: true,
                 pGotRead: 0
-            }
-            paragraphs.push(paragraph);
+            };
+
+            paragraphs.push(paragraph);*/
         });
     });
 });
