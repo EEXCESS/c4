@@ -202,7 +202,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             ui_bar.loader.hide();
                             ui_bar.result_indicator.text(response.data.totalResults + ' results');
                             ui_bar.result_indicator.show();
-                            util.showPopup();
+                            if (results.totalResults > 0) {
+                                util.showPopup();
+                            }
                             if (ui_content.contentArea.is(':visible')) {
                                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                             }
@@ -892,7 +894,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     ui_bar.loader.hide();
                     ui_bar.result_indicator.text(response.data.totalResults + ' results');
                     ui_bar.result_indicator.show();
-                    util.showPopup();
+                    if (results.totalResults > 0) {
+                        util.showPopup();
+                    }
                     iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                     if (settings.queryCrumbs.active) {
                         qc.addNewQuery(results);
@@ -915,7 +919,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             ui_bar.loader.hide();
             ui_bar.result_indicator.text(response.data.totalResults + ' results');
             ui_bar.result_indicator.show();
-            util.showPopup();
+            if (results.totalResults > 0) {
+                util.showPopup();
+            }
             if (ui_content.contentArea.is(':visible')) {
                 iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
                 if (settings.queryCrumbs.active) {
