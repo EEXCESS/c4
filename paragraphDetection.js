@@ -864,7 +864,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
 
         },
 
-        activateSelectionAugmentation: function(addKeyword, queryFromSelection, addParagraph) {
+        activateSelectionAugmentation: function(addKeyword, queryFromSelection, pd) {
             var selection;
             var selectedElement;
 
@@ -902,10 +902,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 .css('background-image', "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPcAAAD1CAMAAAC7mpNqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRFAJ9j////3xx38QAAAYFJREFUeNrs3EESwiAQBED8/6d9gVZMVliGHu5WTdrDAtExRERERESkZ17R63Pt6AzF1ebNmzdv3rx58+bNmzdv3rx5r/OuONjaz7vmsHI/76jevHnz5s2bN2/evDO9D9qPZe1SefPmzZs3b968efPmzZs3b968efPmzZs3b968eVd4d/gZ7wrv7Xrz5s2bN2/e5jXzOW/evHnz5s2bN2/evHnz5s2bN+/r53Qd/55igndW1Facd8HHbH9fEtWbN2/evHnzNq+Zz3nz5s2bN2/evHnz5s2bN2/evHkrrjZv3rx/e3zux9yP8ebNm/ez3t/ep032vv5Wee6b1ifNa7x58+bNmzdv3rx58+bNmzdv3rx58+bNm/di7wb3JWOFd/favHnz5s2bt3nNvMabN2/evHnz5s2bN2/evHnz5s2bN+/exSecMrf0/ktv3rx58+bNmzdv3rwfFy9YB+3H7n6JDi3Omzdv3rx58+bNmzdv3rx5z/WOXiIiIiIi0jNvAQYAvE2iCao7QFoAAAAASUVORK5CYII=')")
                 .css('background-size', 'contain').hide();
             img3.click(function(e) {          
-
-                var selectedParagraph = [selectedElement];
+                var selectedParagraph = [selectedElement];                
                 extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
-      
+                pd.findFocusedParagraphSimple(extracted_paragraphs);
             });
 
             $('body').append(img1);

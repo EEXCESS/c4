@@ -79,22 +79,6 @@ require(['../config'], function(config) {
                 // set query in search bar
                 searchBar.setQuery(paragraphStatistics.query.contextKeywords);
             });
-        }, function(selection) {
-             
-            // $(selection).html('<div id="eexcess_par_selection" data-idx="9999999" class="eexcess_detected_par">'+selection+'</div>');
-            /*
-            $(selection).parent().css('border', '1px dotted silver');
-            var paragraph = {
-                content: selection,
-                distance: 0,
-                elements: $(selection).parent(),
-                headline: "",
-                id: "eexcess_par_selection",
-                multi: true,
-                pGotRead: 0
-            };
-
-            paragraphs.push(paragraph);*/
-        });
+        }, paragraphDetection);
     });
 });
