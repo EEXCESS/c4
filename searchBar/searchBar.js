@@ -151,7 +151,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.preventQuery = true;
             ui_bar.taglist.tagit('removeAll');
             ui_bar.mainTopicLabel.val('').data('properties', null);
-            this.resizeForText.call(ui_bar.mainTopicLabel, '', true);
+            ui_bar.mainTopicLabel.css('width','50px');
             $.each(contextKeywords, function() {
                 if (this.isMainTopic) {
 // TODO: support multiple topics?
