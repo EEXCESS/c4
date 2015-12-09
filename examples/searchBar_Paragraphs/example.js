@@ -45,6 +45,7 @@ require(['../config'], function(config) {
             }
         });
         // detect paragraphs
+        paragraphDetection.init({img_PATH:'../../img/'});
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs
         $('.eexcess_detected_par').css('border', '1px dotted silver');
