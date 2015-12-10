@@ -3,7 +3,7 @@
  *
  * @module c4/searchBar
  */
-define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/QueryCrumbs/querycrumbs'], function($, ui, tagit, api, iframes, qc) {
+define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/QueryCrumbs/querycrumbs'], function ($, ui, tagit, api, iframes, qc) {
     var util = {
 // flag to determine if queries should be surpressed
         preventQuery: false,
@@ -12,41 +12,65 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
         popupTimer: null,
-        fadeOutPopup: function(delay) {
+        fadeOutPopup: function (delay) {
             if (typeof delay === 'undefined') {
                 delay = 2000;
             }
             clearTimeout(this.popupTimer);
-            this.popupTimer = setTimeout(function() {
-                ui_bar.popupBubble.fadeOut(2000, function() {
+            this.popupTimer = setTimeout(function () {
+                ui_bar.popupBubble.fadeOut(2000, function () {
                     ui_bar.popupBubbleClose.hide();
                 });
             }, delay);
         },
-        showPopup: function() {
+        highlightTags: function (terms) {
+            ui_bar.taglist.tagit('getTags').each(function (idx,val) {
+                var tag = $(val);
+                var event = new CustomEvent('c4_keywordMouseLeave', {detail: tag.data('properties')});
+                tag.removeClass('eexcess-tag_hover');
+                document.dispatchEvent(event);
+            });
+            var tagset = ui_bar.taglist.tagit('getTagsByLabels', terms);
+            tagset.forEach(function (val) {
+                var tag = $(val);
+                tag.addClass('eexcess-tag_hover');
+
+                var event = new CustomEvent('c4_keywordMouseEnter', {detail: tag.data('properties')});
+                document.dispatchEvent(event);
+            });
+        },
+        unhighlightTags: function () {
+            ui_bar.taglist.tagit('getTags').each(function (idx,val) {
+                var tag = $(val);
+                var event = new CustomEvent('c4_keywordMouseLeave', {detail: tag.data('properties')});
+                tag.removeClass('eexcess-tag_hover');
+                document.dispatchEvent(event);
+            });
+        },
+        showPopup: function () {
             clearTimeout(this.popupTimer);
             if (settings.showBubble && !ui_content.contentArea.is(':visible')) {
                 ui_bar.popupBubble.show();
                 this.fadeOutPopup(3000);
             }
         },
-        hidePopup: function() {
+        hidePopup: function () {
             clearTimeout(this.popupTimer);
             ui_bar.popupBubble.hide();
             ui_bar.popupBubbleClose.hide();
         },
-        addCategoriesToProfile: function(query) {
+        addCategoriesToProfile: function (query) {
             var categories = new Set();
-            query.contextKeywords.forEach(function(keyword) {
+            query.contextKeywords.forEach(function (keyword) {
                 if (keyword.hasOwnProperty('categories')) {
-                    keyword.categories.forEach(function(category) {
+                    keyword.categories.forEach(function (category) {
                         categories.add(category);
                     });
                 }
             });
             settings.profile.addCategories(Array.from(categories));
         },
-        processQuery: function(query, callback) {
+        processQuery: function (query, callback) {
             // add categories to profile
             if (ui_content.contentArea.is(':visible')) {
                 this.addCategoriesToProfile(query);
@@ -56,7 +80,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 contextKeywords: [],
                 origin: query.origin
             };
-            query.contextKeywords.forEach(function(keyword) {
+            query.contextKeywords.forEach(function (keyword) {
                 var newKeyword = {};
                 for (var prop in keyword) {
                     if (keyword.hasOwnProperty(prop) && prop !== 'categories' && prop !== 'frequency') {
@@ -78,7 +102,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @param {boolean} minify wheter the input should also scale down or only scale up
          * @returns {undefined}
          */
-        resizeForText: function(text, minify) {
+        resizeForText: function (text, minify) {
             var $this = $(this);
             var $span = $this.parent().find('span');
             $span.text(text);
@@ -95,12 +119,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * sends the query.
          * @returns {undefined}
          */
-        queryUpdater: function() {
+        queryUpdater: function () {
             ui_bar.loader.show();
             ui_bar.result_indicator.hide();
             util.hidePopup();
             clearTimeout(timeout);
-            timeout = setTimeout(function() {
+            timeout = setTimeout(function () {
 // get keywords
                 lastQuery.contextKeywords = ui_bar.taglist.tagit('getActiveTagsProperties');
                 // get main topic
@@ -126,7 +150,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @param {Object} topic
          * @returns {undefined}
          */
-        setMainTopic: function(topic) {
+        setMainTopic: function (topic) {
             topic.isMainTopic = true;
             ui_bar.mainTopicLabel.val(topic.text).data('properties', topic);
             this.resizeForText.call(ui_bar.mainTopicLabel, topic.text, true);
@@ -144,15 +168,15 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * }
          * @returns {undefined}
          */
-        setQuery: function(contextKeywords, delay, origin) {
+        setQuery: function (contextKeywords, delay, origin) {
             if (typeof delay === 'undefined') {
                 delay = settings.queryDelay;
             }
             util.preventQuery = true;
             ui_bar.taglist.tagit('removeAll');
             ui_bar.mainTopicLabel.val('').data('properties', null);
-            ui_bar.mainTopicLabel.css('width','50px');
-            $.each(contextKeywords, function() {
+            ui_bar.mainTopicLabel.css('width', '50px');
+            $.each(contextKeywords, function () {
                 if (this.isMainTopic) {
 // TODO: support multiple topics?
                     util.setMainTopic(this);
@@ -163,7 +187,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             // filter keywords according to 'show all', 'persons', 'locations'
             var type = ui_bar.selectmenu.children(':selected').text();
             if (type !== 'show all') {
-                $.each(ui_bar.taglist.tagit('getTags'), function() {
+                $.each(ui_bar.taglist.tagit('getTags'), function () {
                     if ($(this).data('properties').type && $(this).data('properties').type.toLowerCase() + 's' === type) {
                         $(this).css('opacity', '1.0');
                     } else {
@@ -179,7 +203,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
             util.preventQuery = false;
             clearTimeout(timeout);
-            setTimeout(function() {
+            setTimeout(function () {
                 ui_bar.loader.show();
                 ui_bar.result_indicator.hide();
                 util.hidePopup();
@@ -196,7 +220,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
                 }
                 if (origin && origin.module === 'QueryCrumbs') {
-                    util.processQuery(lastQuery, function(response) {
+                    util.processQuery(lastQuery, function (response) {
                         if (response.status === 'success') {
                             results = response.data;
                             ui_bar.loader.hide();
@@ -237,7 +261,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             active: false
         },
         storage: {// wrapper for local storage
-            set: function(item, callback) {
+            set: function (item, callback) {
                 for (var key in item) {
                     if (item.hasOwnProperty(key)) {
                         localStorage.setItem(key, JSON.stringify(item[key]));
@@ -247,10 +271,10 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     callback();
                 }
             },
-            get: function(key, callback) {
+            get: function (key, callback) {
                 var response = {};
                 if (Array.isArray(key)) {
-                    key.forEach(function(entry) {
+                    key.forEach(function (entry) {
                         response[entry] = JSON.parse(localStorage.getItem(entry));
                     });
                 } else {
@@ -259,18 +283,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 callback(response);
             }
         },
-        profile: function() {
+        profile: function () {
             var db_name = 'eexcess_profile_db';
             var db_version = 1;
             var db = {};
             var CATEGORIES_CONST = 'categories';
-            var openDB = function(callback) {
+            var openDB = function (callback) {
                 if (typeof db === 'IDBDatabase') {
                     callback({db: db});
                 } else {
                     var req = indexedDB.open(db_name, db_version);
                     // update or create db
-                    req.onupgradeneeded = function() {
+                    req.onupgradeneeded = function () {
                         console.log('db upgrade needed');
                         // remove existing object store 'categories' if present
                         if (req.result.objectStoreNames.contains(CATEGORIES_CONST)) {
@@ -281,32 +305,32 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                         os.createIndex('frequency', 'frequency');
                     };
 
-                    req.onsuccess = function() {
+                    req.onsuccess = function () {
                         db = req.result;
                         callback({db: db});
                     };
 
-                    req.onerror = function() {
+                    req.onerror = function () {
                         callback({error: this});
                     };
                 }
             };
-            var addCategories = function(categories, callback) {
+            var addCategories = function (categories, callback) {
                 if (categories.length === 0) {
                     if (typeof callback !== 'undefined') {
                         callback({error: 'no categories provided'});
                     }
                     return;
                 }
-                openDB(function(result) {
+                openDB(function (result) {
                     if (result.db) {
                         var tx = result.db.transaction(CATEGORIES_CONST, 'readwrite');
                         var os = tx.objectStore(CATEGORIES_CONST);
                         var i = 0;
-                        var handleNext = function() {
+                        var handleNext = function () {
                             if (i < categories.length) {
                                 var curreq = os.openCursor(categories[i].uri);
-                                curreq.onsuccess = function() {
+                                curreq.onsuccess = function () {
                                     var cursor = curreq.result;
                                     if (cursor) {
                                         // update existing entry
@@ -331,21 +355,21 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     }
                 });
             };
-            var getMatches = function(categories, callback) {
+            var getMatches = function (categories, callback) {
                 if (categories.length === 0) {
                     callback({matches: 0});
                     return;
                 }
-                openDB(function(result) {
+                openDB(function (result) {
                     if (result.db) {
                         var matches = 0;
                         var tx = result.db.transaction(CATEGORIES_CONST);
                         var os = tx.objectStore(CATEGORIES_CONST);
                         var i = 0;
-                        var handleNext = function() {
+                        var handleNext = function () {
                             if (i < categories.length) {
                                 var curreq = os.openCursor(categories[i].uri);
-                                curreq.onsuccess = function() {
+                                curreq.onsuccess = function () {
                                     var cursor = curreq.result;
                                     if (cursor) {
                                         matches++;
@@ -378,7 +402,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         height: null,
         left: null,
         top: null,
-        resize: function() {
+        resize: function () {
             var dim = {};
             switch (this.control) {
                 case 'custom':
@@ -445,16 +469,16 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         $iframeCover: null,
         $contentArea: null
     };
-    var initBar = function() {
+    var initBar = function () {
         ui_bar.bar = $('<div id="eexcess_searchBar"></div>');
         ui_bar.left = $('<div id="eexcess_barLeft"></div>');
         // select menu
         ui_bar.selectmenu = $('<select id="eexcess_selectmenu"><option selected="selected">show all</option><option>persons</option><option>locations</option></select>');
-        ui_bar.selectmenu.change(function(e) {
+        ui_bar.selectmenu.change(function (e) {
             lastQuery = {contextKeywords: []};
             var type = $(this).children(':selected').text();
             if (type !== 'show all') {
-                $.each(ui_bar.taglist.tagit('getTags'), function() {
+                $.each(ui_bar.taglist.tagit('getTags'), function () {
                     if ($(this).data('properties').type && $(this).data('properties').type.toLowerCase() + 's' === type) {
                         $(this).css('opacity', '1.0');
                     } else {
@@ -469,7 +493,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.left.append(ui_bar.selectmenu);
         // query select menu
         ui_bar.selectQuery = $('<select id="eexcess_selectQuery"></select>').hide();
-        ui_bar.selectQuery.change(function(e) {
+        ui_bar.selectQuery.change(function (e) {
             clearTimeout(util.focusBlurDelayTimer);
             util.preventQuerySetting = false;
             util.setQuery($(this).children(':selected').data('query'), 0);
@@ -482,7 +506,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             activeClass: "mainTopicDropActive",
             hoverClass: "mainTopicDropHover",
             accept: ".eexcess",
-            drop: function(event, ui) {
+            drop: function (event, ui) {
                 var tag = $(ui.draggable[0]).data('properties');
                 var old_topic = ui_bar.mainTopicLabel.data('properties');
                 util.preventQuery = true;
@@ -496,18 +520,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
         });
         ui_bar.mainTopicLabel = $('<input id="eexcess_mainTopicLabel" />');
-        ui_bar.mainTopicLabel.on('focus', function() {
+        ui_bar.mainTopicLabel.on('focus', function () {
             var $this = $(this)
-                    .one('mouseup.mouseupSelect', function() {
-                $this.select();
-                return false;
-            })
-                    .one('mousedown', function() {
-                $this.off('mouseup.mouseupSelect');
-            })
+                    .one('mouseup.mouseupSelect', function () {
+                        $this.select();
+                        return false;
+                    })
+                    .one('mousedown', function () {
+                        $this.off('mouseup.mouseupSelect');
+                    })
                     .select();
         });
-        ui_bar.mainTopicLabel.keypress(function(e) {
+        ui_bar.mainTopicLabel.keypress(function (e) {
             var $this = $(this);
             if (e.keyCode === 13) {
                 $this.blur();
@@ -532,34 +556,34 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.taglist.tagit({
             allowSpaces: true,
             placeholderText: '',
-            beforeTagAdded: function(event, ui) {
+            beforeTagAdded: function (event, ui) {
                 $(ui.tag).addClass('eexcess');
                 $(ui.tag).draggable({
                     revert: 'invalid',
                     scroll: false,
                     stack: '#eexcess_mainTopic',
                     appendTo: 'body',
-                    start: function() {
+                    start: function () {
                         $(this).css('z-index', '100000');
                     },
-                    stop: function() {
+                    stop: function () {
                         $(this).css('z-index', '99999');
                     }
                 });
             },
-            afterTagAdded: function(e, ui) {
+            afterTagAdded: function (e, ui) {
                 ui.tag.find('.ui-icon-close').css('background-image', 'url("' + settings.imgPATH + 'ui-icons_cd0a0a_256x240.png")');
                 if (!util.preventQuery) {
                     util.queryUpdater();
                 }
                 var data = ui.tag.data('properties');
                 ui.tag.hover(
-                        function() {
+                        function () {
                             var event = new CustomEvent('c4_keywordMouseEnter', {detail: data});
                             ui.tag.addClass('eexcess-tag_hover');
                             document.dispatchEvent(event);
                         },
-                        function() {
+                        function () {
                             var event = new CustomEvent('c4_keywordMouseLeave', {detail: data});
                             ui.tag.removeClass('eexcess-tag_hover');
                             document.dispatchEvent(event);
@@ -568,7 +592,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     popup_dim_pos.resize();
                 }
             },
-            afterTagRemoved: function(e, ui) {
+            afterTagRemoved: function (e, ui) {
                 if (!util.preventQuery) {
                     util.queryUpdater();
                 }
@@ -576,7 +600,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     popup_dim_pos.resize();
                 }
             },
-            onTagClicked: function(e, ui) {
+            onTagClicked: function (e, ui) {
                 if ($(ui.tag[0]).css('opacity') === '0.4') {
                     $(ui.tag[0]).css('opacity', '1.0');
                 } else {
@@ -591,31 +615,31 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // right bar pane
         ui_bar.right = $('<div id="eexcess_barRight"></div>');
         ui_bar.window_controls = $('<div id="eexcess_window_controls"></div>').hide();
-        var maximize = $('<a href="#" title="maximize popup"><img src="' + settings.imgPATH + 'maximize.png" class="eexcess window_controls" /></a>').click(function(e) {
+        var maximize = $('<a href="#" title="maximize popup"><img src="' + settings.imgPATH + 'maximize.png" class="eexcess window_controls" /></a>').click(function (e) {
             e.preventDefault();
             popup_dim_pos.control = 'maximize';
             popup_dim_pos.resize();
             settings.storage.set({'popup_control': 'maximize'});
         });
-        var custom = $('<a href="#" title="resize popup to custom dimensions"><img src="' + settings.imgPATH + 'custom.png" class="eexcess window_controls" /></a>').click(function(e) {
+        var custom = $('<a href="#" title="resize popup to custom dimensions"><img src="' + settings.imgPATH + 'custom.png" class="eexcess window_controls" /></a>').click(function (e) {
             e.preventDefault();
             popup_dim_pos.control = 'custom';
             popup_dim_pos.resize();
             settings.storage.set({'popup_control': 'custom'});
         });
-        var fullheight_right = $('<a href="#" title="resize popup to full height - half width, placed right"><img src="' + settings.imgPATH + 'fullheight-right.png" class="eexcess window_controls" /></a>').click(function(e) {
+        var fullheight_right = $('<a href="#" title="resize popup to full height - half width, placed right"><img src="' + settings.imgPATH + 'fullheight-right.png" class="eexcess window_controls" /></a>').click(function (e) {
             e.preventDefault();
             popup_dim_pos.control = 'fullheight_right';
             popup_dim_pos.resize();
             settings.storage.set({'popup_control': 'fullheight_right'});
         });
-        var fullheight_left = $('<a href="#" title="resize popup to full height - half width, placed left"><img src="' + settings.imgPATH + 'fullheight-left.png" class="eexcess window_controls" /></a>').click(function(e) {
+        var fullheight_left = $('<a href="#" title="resize popup to full height - half width, placed left"><img src="' + settings.imgPATH + 'fullheight-left.png" class="eexcess window_controls" /></a>').click(function (e) {
             e.preventDefault();
             popup_dim_pos.control = 'fullheight_left';
             popup_dim_pos.resize();
             settings.storage.set({'popup_control': 'fullheight_left'});
         });
-        var fullwidth = $('<a href="#" title="resize popup to full width - half height"><img src="' + settings.imgPATH + 'fullwidth.png" class="eexcess window_controls" /></a>').click(function(e) {
+        var fullwidth = $('<a href="#" title="resize popup to full width - half height"><img src="' + settings.imgPATH + 'fullwidth.png" class="eexcess window_controls" /></a>').click(function (e) {
             e.preventDefault();
             popup_dim_pos.control = 'fullwidth';
             popup_dim_pos.resize();
@@ -627,7 +651,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.right.append(ui_bar.logo);
         ui_bar.loader = $('<img id="eexcess_loader" src="' + settings.imgPATH + 'eexcess_loader.gif" />').hide();
         ui_bar.right.append(ui_bar.loader);
-        ui_bar.result_indicator = $('<a id="eexcess_result_indicator" href="#">16 results</a>').click(function(e) {
+        ui_bar.result_indicator = $('<a id="eexcess_result_indicator" href="#">16 results</a>').click(function (e) {
             e.preventDefault();
             util.hidePopup();
             ui_bar.window_controls.show();
@@ -656,7 +680,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             ui_bar.right.css('width', '460px');
             var qc_div = $('<div id="queryCrumbs"></div>');
             ui_bar.right.append(qc_div);
-            qc.init(qc_div.get(0), function(query) {
+            qc.init(qc_div.get(0), function (query) {
                 util.setQuery(query.profile.contextKeywords, 0, query.origin);
                 if (!ui_content.contentArea.is(':visible')) {
                     ui_content.contentArea.show('fast');
@@ -673,20 +697,20 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }, settings.queryCrumbs.storage);
         }
         // popup bubble
-        ui_bar.popupBubbleClose = $('<a id="eexcess_bubble_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').hide().click(function(e) {
+        ui_bar.popupBubbleClose = $('<a id="eexcess_bubble_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').hide().click(function (e) {
             util.hidePopup();
         });
-        ui_bar.popupBubble = $('<div id="eexcess_bubble">EEXCESS has found related resources</div>').hide().hover(function() {
+        ui_bar.popupBubble = $('<div id="eexcess_bubble">EEXCESS has found related resources</div>').hide().hover(function () {
             $(this).stop();
             $(this).fadeIn(0);
             clearTimeout(util.popupTimer);
             ui_bar.popupBubbleClose.show();
-        }, function() {
+        }, function () {
             util.fadeOutPopup();
         });
         ui_bar.popupBubble.append(ui_bar.popupBubbleClose);
         var bubble_par = $('<p></p>');
-        var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').change(function(e) {
+        var bubble_chbx = $('<input type="checkbox" id="eexcess_chbx_bubble" />').change(function (e) {
             settings.showBubble = !$('#eexcess_chbx_bubble').prop('checked');
             settings.storage.set({'showPopupBubble': settings.showBubble});
         });
@@ -697,11 +721,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
 
         // whole bar
         ui_bar.bar.append(ui_bar.left, ui_bar.main, ui_bar.right);
-        ui_bar.bar.mouseenter(function() {
+        ui_bar.bar.mouseenter(function () {
             clearTimeout(util.focusBlurDelayTimer);
             util.preventQuerySetting = true;
-        }).mouseleave(function() {
-            util.focusBlurDelayTimer = setTimeout(function() {
+        }).mouseleave(function () {
+            util.focusBlurDelayTimer = setTimeout(function () {
                 util.preventQuerySetting = false;
                 if (util.cachedQuery) {
                     util.setQuery(util.cachedQuery);
@@ -714,23 +738,23 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // set background image for new tag
         var $tag_input = $('#eexcess_searchBar input.ui-widget-content');
         $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
-        $tag_input.focus(function(e) {
+        $tag_input.focus(function (e) {
             $tag_input.css('background-image', 'none');
         });
-        $tag_input.blur(function(e) {
+        $tag_input.blur(function (e) {
             $tag_input.css('background-image', 'url("' + settings.imgPATH + 'plus.png")');
         });
     };
-    var initPopup = function(tabs) {
+    var initPopup = function (tabs) {
         ui_content.contentArea = $("<div id = 'eexcess-tabBar-contentArea'><div id='eexcess-tabBar-iframeCover'></div><div id='eexcess-tabBar-jQueryTabsHeader'><ul></ul><div id = 'eexcess-tabBar-jQueryTabsContent' class='flex-container intrinsic-container intrinsic-container-ratio' ></div></div></div>").hide();
         $('body').append(ui_content.contentArea);
         ui_content.$jQueryTabsHeader = $("#eexcess-tabBar-jQueryTabsHeader");
         // prevent changes of query while the mouse is over the widget area
-        ui_content.$jQueryTabsHeader.mouseenter(function() {
+        ui_content.$jQueryTabsHeader.mouseenter(function () {
             util.preventQuerySetting = true;
             clearTimeout(util.focusBlurDelayTimer);
-        }).mouseleave(function() {
-            util.focusBlurDelayTimer = setTimeout(function() {
+        }).mouseleave(function () {
+            util.focusBlurDelayTimer = setTimeout(function () {
                 util.preventQuerySetting = false;
                 if (util.cachedQuery) {
                     util.setQuery(util.cachedQuery);
@@ -741,7 +765,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_content.$iframeCover = $("#eexcess-tabBar-iframeCover");
         ui_content.$contentArea = $("#eexcess-tabBar-contentArea");
         // close button
-        var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function(e) {
+        var $close_button = $('<a id="eexcess_close"></a>').css('background-image', 'url("' + settings.imgPATH + 'close.png")').click(function (e) {
             ui_content.contentArea.hide();
             ui_bar.window_controls.hide();
             api.sendLog(api.logInteractionType.moduleClosed, {
@@ -756,7 +780,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         tabModel.tabs = tabs;
         var activeTabSet = false;
         var activeModule;
-        $.each(tabModel.tabs, function(i, tab) {
+        $.each(tabModel.tabs, function (i, tab) {
             if (tab.icon) {
                 var link = $("<a href='#tabs-" + i + "' title='" + tab.name + "'><img src='" + tab.icon + "' /> </a>").css('padding', '0.5em 0.4em 0.3em');
                 tab.renderedHead = $("<li></li>").append(link);
@@ -768,7 +792,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             if (tab.deferLoading) {
                 tab.renderedContent = $("<div id='tabs-" + i + "'></div>");
                 $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
-                tab.renderedHead.click(function() {
+                tab.renderedHead.click(function () {
                     if (tab.renderedContent.children('iframe').length === 0) {
                         tab.renderedContent.append("<iframe src='" + tab.url + "' />");
                     }
@@ -778,7 +802,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 $("#eexcess-tabBar-jQueryTabsContent").append(tab.renderedContent);
             }
             // log opening/closing module
-            tab.renderedHead.click(function() {
+            tab.renderedHead.click(function () {
                 var newModule = ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
                 if (newModule !== activeModule) {
                     api.sendLog(api.logInteractionType.moduleClosed, {
@@ -819,14 +843,14 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // adding drag functionality to parent div
         ui_content.$contentArea.draggable({scroll: "true"});
         // on resize or drag start, show iframeCover to allow changes when mouse pointer is entering iframe area
-        ui_content.$jQueryTabsHeader.on("resizestart", function(event, ui) {
+        ui_content.$jQueryTabsHeader.on("resizestart", function (event, ui) {
             ui_content.$iframeCover.show();
         });
-        ui_content.$contentArea.on("dragstart", function(event, ui) {
+        ui_content.$contentArea.on("dragstart", function (event, ui) {
             ui_content.$iframeCover.show();
         });
         //storing new values and hide iframeCover after size has been changed
-        ui_content.$jQueryTabsHeader.on("resizestop", function(event, ui) {
+        ui_content.$jQueryTabsHeader.on("resizestop", function (event, ui) {
             popup_dim_pos.control = 'custom';
             settings.storage.set({'popup_control': 'custom'});
             var heightToStore = ui_content.$jQueryTabsHeader.height();
@@ -846,7 +870,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             ui_content.$iframeCover.hide();
         });
         //storing new values and hide iframeCover after position has been changed
-        ui_content.$contentArea.on("dragstop", function(event, ui) {
+        ui_content.$contentArea.on("dragstop", function (event, ui) {
             popup_dim_pos.control = 'custom';
             settings.storage.set({'popup_control': 'custom'});
             var positionToStoreTop = ui_content.$contentArea.position().top + ui_content.$jQueryTabsHeader.position().top;
@@ -859,7 +883,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         });
         //sets size and position of the tab area according to previous changes by the user stored in chrome
         // local storage
-        settings.storage.get(['resizeHeight', 'resizeWidth', 'dragPositionTop', 'dragPositionLeft', 'popup_control'], function(result) {
+        settings.storage.get(['resizeHeight', 'resizeWidth', 'dragPositionTop', 'dragPositionLeft', 'popup_control'], function (result) {
             if (result.popup_control) {
                 popup_dim_pos.control = result.popup_control;
             }
@@ -880,40 +904,46 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
     var tabModel = {
         tabs: []
     };
-    window.onmessage = function(msg) {
-        // visualization has triggered a query -> widgets must be visible
-        if (msg.data.event && msg.data.event === 'eexcess.queryTriggered') {
-            lastQuery = msg.data.data;
-            iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
-            ui_bar.result_indicator.hide();
-            util.hidePopup();
-            ui_bar.loader.show();
-            util.processQuery(lastQuery, function(response) {
-                if (response.status === 'success') {
-                    results = response.data;
-                    ui_bar.loader.hide();
-                    ui_bar.result_indicator.text(response.data.totalResults + ' results');
-                    ui_bar.result_indicator.show();
-                    if (results.totalResults > 0) {
-                        util.showPopup();
-                    }
-                    iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
-                    if (settings.queryCrumbs.active) {
-                        qc.addNewQuery(results);
-                        if (typeof settings.queryCrumbs.updateTrigger === 'function') {
-                            settings.queryCrumbs.updateTrigger();
+    window.onmessage = function (msg) {
+        if (msg.data.event) {
+            // visualization has triggered a query -> widgets must be visible
+            if (msg.data.event === 'eexcess.queryTriggered') {
+                lastQuery = msg.data.data;
+                iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
+                ui_bar.result_indicator.hide();
+                util.hidePopup();
+                ui_bar.loader.show();
+                util.processQuery(lastQuery, function (response) {
+                    if (response.status === 'success') {
+                        results = response.data;
+                        ui_bar.loader.hide();
+                        ui_bar.result_indicator.text(response.data.totalResults + ' results');
+                        ui_bar.result_indicator.show();
+                        if (results.totalResults > 0) {
+                            util.showPopup();
                         }
+                        iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+                        if (settings.queryCrumbs.active) {
+                            qc.addNewQuery(results);
+                            if (typeof settings.queryCrumbs.updateTrigger === 'function') {
+                                settings.queryCrumbs.updateTrigger();
+                            }
+                        }
+                    } else {
+                        iframes.sendMsgAll({event: 'eexcess.error', data: response.data});
+                        ui_bar.result_indicator.text('error');
+                        ui_bar.result_indicator.show();
                     }
-                } else {
-                    iframes.sendMsgAll({event: 'eexcess.error', data: response.data});
-                    ui_bar.result_indicator.text('error');
-                    ui_bar.result_indicator.show();
-                }
-            });
+                });
+            } else if(msg.data.event === 'eexcess.explanation.highlight') {
+                util.highlightTags(msg.data.data);
+            } else if(msg.data.event === 'eexcess.explanation.unhighlight') {
+                util.unhighlightTags();
+            }
         }
-        // TODO: handle other events?
+        ;
     };
-    var resultHandler = function(response) {
+    var resultHandler = function (response) {
         if (response.status === 'success') {
             results = response.data;
             ui_bar.loader.hide();
@@ -953,24 +983,24 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @param {object} [config] Custom settings
          * @returns {undefined}
          */
-        init: function(tabs, config) {
+        init: function (tabs, config) {
             if (typeof config !== 'undefined') {
                 settings = $.extend(settings, config);
             }
-            settings.storage.get('showPopupBubble', function(result) {
+            settings.storage.get('showPopupBubble', function (result) {
                 if (typeof result.showPopupBubble !== 'undefined' && result.showPopupBubble !== null) {
                     settings.showBubble = result.showPopupBubble;
                 }
             });
             api.init({origin: settings.origin});
-            $(function() {
+            $(function () {
                 initBar();
                 initPopup(tabs);
             });
             var resizeTimer;
-            $(window).resize(function(e) {
+            $(window).resize(function (e) {
                 clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(function() {
+                resizeTimer = setTimeout(function () {
                     if (popup_dim_pos.control !== 'custom') {
                         popup_dim_pos.resize();
                     }
@@ -990,7 +1020,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * }
          * @returns {undefined}
          */
-        setQuery: function(contextKeywords, immediately) {
+        setQuery: function (contextKeywords, immediately) {
             if (immediately) {
                 clearTimeout(util.focusBlurDelayTimer);
                 util.preventQuerySetting = false;
@@ -1017,11 +1047,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @param {Boolean} immediately Indicator, whether the query should be triggered immediately or after a short delay
          * @returns {undefined}
          */
-        setQueries: function(queries, immediately) {
+        setQueries: function (queries, immediately) {
             var contextKeywords;
             ui_bar.selectQuery.children('option').remove();
 
-            var finalQuery = function() {
+            var finalQuery = function () {
                 if (typeof contextKeywords === 'undefined') {
                     contextKeywords = queries.main.contextKeywords;
                     if (queries.subs.length < 2) {
@@ -1044,12 +1074,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
 
             if (queries.subs.length > 1) {
                 var highestScore = 0;
-                var setQuery = function() {
+                var setQuery = function () {
                     // add main
                     $('<option/>').text('all keywords').data('query', queries.main.contextKeywords).appendTo(ui_bar.selectQuery);
                     // add subs
                     var topics = {};
-                    queries.subs.forEach(function(query) {
+                    queries.subs.forEach(function (query) {
                         console.log('query score: ' + query.score);
                         var topicToDisplay = '';
                         for (var i = 0; i < query.contextKeywords.length; i++) {
@@ -1075,19 +1105,19 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 };
                 // calculate scores
                 var i = 0;
-                var calculateScore = function() {
+                var calculateScore = function () {
                     if (i < queries.subs.length) {
                         // obtain category set
                         var categories = new Set();
-                        queries.subs[i].contextKeywords.forEach(function(keyword) {
+                        queries.subs[i].contextKeywords.forEach(function (keyword) {
                             if (keyword.hasOwnProperty('categories')) {
-                                keyword.categories.forEach(function(category) {
+                                keyword.categories.forEach(function (category) {
                                     categories.add(category);
                                 });
                             }
                         });
                         // set score according to portion of matched categories
-                        settings.profile.getMatches(Array.from(categories), function(result) {
+                        settings.profile.getMatches(Array.from(categories), function (result) {
                             if (result.matches) {
                                 queries.subs[i].score = result.matches / categories.size;
                                 if (queries.subs[i].score > highestScore) {
@@ -1112,18 +1142,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         /**
          * Refresh QueryCrums if active
          */
-        refreshQC: function() {
+        refreshQC: function () {
             if (settings.queryCrumbs.active) {
                 qc.refresh();
             }
         },
-        addKeyword: function(keyword) {
+        addKeyword: function (keyword) {
             util.preventQuery = true;
             ui_bar.taglist.tagit('createTag', keyword.text, keyword);
             util.preventQuery = false;
             util.queryUpdater();
         },
-        getCurrentModule: function() {
+        getCurrentModule: function () {
 
             if (ui_content.contentArea && ui_content.contentArea.is(':visible')) {
                 return ui_content.$jQueryTabsHeader.find('li.ui-state-active').children('a').attr('title');
@@ -1131,7 +1161,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 return null;
             }
         },
-        showNotificationBubble: function(show) {
+        showNotificationBubble: function (show) {
             settings.showBubble = show;
             $('#eexcess_chbx_bubble').prop('checked', !show);
         }

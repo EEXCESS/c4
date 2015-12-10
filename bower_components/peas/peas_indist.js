@@ -64,6 +64,8 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 			 * @return {JSONObject} A query of format QF2. 
 			 */
 			obfuscateQuery:function(query, k){
+				var expected = (k*1) + 1;
+				console.log("k = " + k + ", expected = " + expected);
 				var obfuscatedQuery = JSON.parse(JSON.stringify(query));
 				var arrayCK = []; // CK = Context Keywords
 				var profile = []; // XXX Should be initialized with the user profile 
@@ -76,34 +78,40 @@ define(["jquery", "peas/util", "graph"], function ($, util, graph) {
 
 				var idxFakeQuery = 0; 
 				var nbRemainingAttempts = 10 * k; // We limit the number of attempts
-				while ((idxFakeQuery < k) && (nbRemainingAttempts > 0)){ // XXX Risk of infinite loop
+				while ((idxFakeQuery < k) && (nbRemainingAttempts > 0)){ 
 					var fakeCK = generateFakeQuery(originalCK, freqWindow.lowerBound, freqWindow.upperBound);
 					if (fakeCK.length == 0){
-						// It happens when the co-occurrence graph, the cliques and therefore the vocabulary are empty.
+						// It happens when the co-occurrence graph, 
+						// the cliques and therefore the vocabulary are empty.
 						nbRemainingAttempts = 0;
 					} else {
-						if (!util.intersect(usedTerms, ckToArray(fakeCK))){
+						var cond1 = !util.intersect(usedTerms, ckToArray(fakeCK));
+						var cond2 = (nbRemainingAttempts <= (k - idxFakeQuery));
+						if (cond1 || cond2){
 							arrayCK[idxFakeQuery] = fakeCK;
 							idxFakeQuery++;
 							usedTerms = util.merge(usedTerms, ckToArray(fakeCK));
-						}
+						} 
 					}
 					nbRemainingAttempts--;
 				}
 				// The original query is added at the end
+				
 				arrayCK[arrayCK.length] = query.contextKeywords;
+				var lastIdx = arrayCK.length - 1; 
 				if (arrayCK.length > 1){
 					// If at least one fake query has been generated, then the original query is swap with a randomly chosen element. 
 					// It is done to ensure that the original query is not always at the end. 
 					var randomIndex = Math.floor(Math.random() * arrayCK.length);
-					if (randomIndex != k){
+					if (randomIndex != lastIdx){
 						// If the element picked is not the original query, the two elements are switched
 						var swap = arrayCK[randomIndex];
-						arrayCK[randomIndex] = arrayCK[k];
-						arrayCK[k] = swap;
+						arrayCK[randomIndex] = arrayCK[lastIdx];
+						arrayCK[lastIdx] = swap;
 					}
 				}
 				obfuscatedQuery.contextKeywords = arrayCK;
+				console.log("actual = " + arrayCK.length);
 				return obfuscatedQuery;
 			}, 
 
