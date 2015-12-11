@@ -24,23 +24,28 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }, delay);
         },
         highlightTags: function (terms) {
-            ui_bar.taglist.tagit('getTags').each(function (idx,val) {
-                var tag = $(val);
-                var event = new CustomEvent('c4_keywordMouseLeave', {detail: tag.data('properties')});
-                tag.removeClass('eexcess-tag_hover');
-                document.dispatchEvent(event);
+            ui_bar.mainTopicLabel.removeClass('eexcess-tag_hover');
+            var mTopic = ui_bar.mainTopicLabel.val().toLowerCase();
+            terms.forEach(function (val) {
+                if (val.length > 3 && mTopic.indexOf(val.toLowerCase()) !== -1) {
+                    ui_bar.mainTopicLabel.addClass('eexcess-tag_hover');
+                    var event = new CustomEvent('c4_keywordMouseEnter', {detail: ui_bar.mainTopicLabel.data('properties')});
+                    document.dispatchEvent(event);
+                }
             });
             var tagset = ui_bar.taglist.tagit('getTagsByLabels', terms);
             tagset.forEach(function (val) {
                 var tag = $(val);
                 tag.addClass('eexcess-tag_hover');
-
                 var event = new CustomEvent('c4_keywordMouseEnter', {detail: tag.data('properties')});
                 document.dispatchEvent(event);
             });
         },
         unhighlightTags: function () {
-            ui_bar.taglist.tagit('getTags').each(function (idx,val) {
+            ui_bar.mainTopicLabel.removeClass('eexcess-tag_hover');
+            var event = new CustomEvent('c4_keywordMouseLeave', {detail: ui_bar.mainTopicLabel.data('properties')});
+            document.dispatchEvent(event);
+            ui_bar.taglist.tagit('getTags').each(function (idx, val) {
                 var tag = $(val);
                 var event = new CustomEvent('c4_keywordMouseLeave', {detail: tag.data('properties')});
                 tag.removeClass('eexcess-tag_hover');
@@ -519,7 +524,30 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 util.queryUpdater();
             }
         });
-        ui_bar.mainTopicLabel = $('<input id="eexcess_mainTopicLabel" />');
+        ui_bar.mainTopicLabel = $('<input id="eexcess_mainTopicLabel" />').hover(function (e) {
+            var $this = $(this);
+            var event = new CustomEvent('c4_keywordMouseEnter', {detail: $this.data('properties')});
+            $this.addClass('eexcess-tag_hover');
+            document.dispatchEvent(event);
+            iframes.sendMsgAll({
+                event: 'eexcess.explanation.highlight',
+                data: $this.val().split(/[ .?!-:;,]+/)
+            });
+        }, function (e) {
+            var $this = $(this);
+            var event = new CustomEvent('c4_keywordMouseLeave', {detail: $this.data('properties')});
+            $this.removeClass('eexcess-tag_hover');
+            document.dispatchEvent(event);
+            iframes.sendMsgAll({
+                event: 'eexcess.explanation.unhighlight'
+            });
+        }).click(function (e) {
+
+            iframes.sendMsgAll({
+                event: 'eexcess.results.filter',
+                data: $(this).val().split(/[ .?!-:;,]+/)
+            });
+        });
         ui_bar.mainTopicLabel.on('focus', function () {
             var $this = $(this)
                     .one('mouseup.mouseupSelect', function () {
@@ -582,11 +610,18 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             var event = new CustomEvent('c4_keywordMouseEnter', {detail: data});
                             ui.tag.addClass('eexcess-tag_hover');
                             document.dispatchEvent(event);
+                            iframes.sendMsgAll({
+                                event: 'eexcess.explanation.highlight',
+                                data: data.text.split(/[ .?!-:;,]+/)
+                            });
                         },
                         function () {
                             var event = new CustomEvent('c4_keywordMouseLeave', {detail: data});
                             ui.tag.removeClass('eexcess-tag_hover');
                             document.dispatchEvent(event);
+                            iframes.sendMsgAll({
+                                event: 'eexcess.explanation.unhighlight'
+                            });
                         });
                 if (popup_dim_pos.control !== 'custom') {
                     popup_dim_pos.resize();
@@ -601,12 +636,16 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
             },
             onTagClicked: function (e, ui) {
-                if ($(ui.tag[0]).css('opacity') === '0.4') {
-                    $(ui.tag[0]).css('opacity', '1.0');
-                } else {
-                    $(ui.tag[0]).css('opacity', '0.4');
-                }
-                util.queryUpdater();
+                iframes.sendMsgAll({
+                    event: 'eexcess.results.filter',
+                    data: ui.tag.text().split(/[ .?!-:;,]+/)
+                });
+//                if ($(ui.tag[0]).css('opacity') === '0.4') {
+//                    $(ui.tag[0]).css('opacity', '1.0');
+//                } else {
+//                    $(ui.tag[0]).css('opacity', '0.4');
+//                }
+//                util.queryUpdater();
             }
         });
         ui_bar.main.append(ui_bar.taglist);
@@ -935,9 +974,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                         ui_bar.result_indicator.show();
                     }
                 });
-            } else if(msg.data.event === 'eexcess.explanation.highlight') {
+            } else if (msg.data.event === 'eexcess.explanation.highlight') {
                 util.highlightTags(msg.data.data);
-            } else if(msg.data.event === 'eexcess.explanation.unhighlight') {
+            } else if (msg.data.event === 'eexcess.explanation.unhighlight') {
                 util.unhighlightTags();
             }
         }
@@ -1164,6 +1203,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         showNotificationBubble: function (show) {
             settings.showBubble = show;
             $('#eexcess_chbx_bubble').prop('checked', !show);
+        },
+        highlightTags: function (terms) {
+            util.highlightTags(terms);
         }
     };
 });
