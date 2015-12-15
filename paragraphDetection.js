@@ -21,6 +21,7 @@
 
 define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], function($, ner, guessLang) {
     var extracted_paragraphs = [];
+    var selectionAugmentationActive = true;
     var settings = {
         prefix: 'eexcess',
         classname: 'eexcess_detected_par',
@@ -856,68 +857,85 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             }
             return offsets;
         },
-
+        
+        
+        
+        /**
+         *The SelectionAugmentation can be switched on/off
+         *onoff is boolean;
+         */
+        setSelectionAugmentation: function(onoff) {
+            selectionAugmentationActive = onoff;
+        },
+        
+        
+        
+        
+        
+        
         activateSelectionAugmentation: function(addKeyword, queryFromSelection, pd) {
-            var selection;
-            var selectedElement;
+            if (selectionAugmentationActive) {        
+                var selection;
+                var selectedElement;
 
-            var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
-                .css('position', 'absolute')
-                .css('width', '30px')
-                .css('height', '30px')
-                .css('cursor', 'pointer')
-                .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
-                .css('background-size', 'contain').hide();
-            img1.click(function(e) {
-                addKeyword(selection);
-            });
+                var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
+                    .css('position', 'absolute')
+                    .css('width', '30px')
+                    .css('height', '30px')
+                    .css('cursor', 'pointer')
+                    .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
+                    .css('background-size', 'contain').hide();
+                img1.click(function(e) {
+                    addKeyword(selection);
+                });
 
-            var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
-                .css('position', 'absolute')
-                .css('width', '30px')
-                .css('height', '30px')
-                .css('cursor', 'pointer')
-                .css('title', '"button2"')
-                .css('background-image', 'url("' + settings.img_PATH + 'search.png")')
-                .css('background-size', 'contain').hide();
-            img2.click(function(e) {
-                queryFromSelection(selection);
-            });
-            var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
-                .css('position', 'absolute')
-                .css('width', '30px')
-                .css('height', '30px')
-                .css('cursor', 'pointer')
-                .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
-                .css('background-size', 'contain').hide();
-            img3.click(function(e) {          
-                var selectedParagraph = [selectedElement];                
-                extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
-                pd.findFocusedParagraphSimple(extracted_paragraphs);
-            });
+                var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
+                    .css('position', 'absolute')
+                    .css('width', '30px')
+                    .css('height', '30px')
+                    .css('cursor', 'pointer')
+                    .css('title', '"button2"')
+                    .css('background-image', 'url("' + settings.img_PATH + 'search.png")')
+                    .css('background-size', 'contain').hide();
+                img2.click(function(e) {
+                    queryFromSelection(selection);
+                });
+                var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
+                    .css('position', 'absolute')
+                    .css('width', '30px')
+                    .css('height', '30px')
+                    .css('cursor', 'pointer')
+                    .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
+                    .css('background-size', 'contain').hide();
+                img3.click(function(e) {          
+                    var selectedParagraph = [selectedElement];                
+                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
+                    pd.findFocusedParagraphSimple(extracted_paragraphs);
+                });
 
-            $('body').append(img1);
-            $('body').append(img2);
-            $('body').append(img3);
+                $('body').append(img1);
+                $('body').append(img2);
+                $('body').append(img3);
 
-            $(document).bind('mouseup', function(e) {
-                if (window.getSelection().toString() !== '') {
-                    selection = window.getSelection();
-                    selectedElement = selection.extentNode.parentElement;
-                    selection = selection.toString();
+                $(document).bind('mouseup', function(e) {
+                    if (window.getSelection().toString() !== '') {
+                        selection = window.getSelection();
+                        selectedElement = selection.extentNode.parentElement;
+                        selection = selection.toString();
 
-                    var topPos = e.pageY + 10;
-                    img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
-                    img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
-                    img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
+                        var topPos = e.pageY + 10;
+                        img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
+                        img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
+                        img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
 
-                } else {
-                    img1.fadeOut('fast');
-                    img2.fadeOut('fast');
-                    img3.fadeOut('fast');
-                }
-            });
+                    } else {
+                        img1.fadeOut('fast');
+                        img2.fadeOut('fast');
+                        img3.fadeOut('fast');
+                    }
+                });
 
-        }
+            }
+        }    
     };
 });
