@@ -20,8 +20,36 @@
  */
 
 define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], function($, ner, guessLang) {
+    var augmentationComponents = {
+        img1: null,
+        img2: null,
+        img3: null,
+        selection: null,
+        selectedElement: null
+    };
+    var pgf = function(e) {
+        console.log(e);
+        if (window.getSelection().toString() !== '') {
+            augmentationComponents.selection = window.getSelection();
+            augmentationComponents.selectedElement = augmentationComponents.selection.extentNode.parentElement;
+            augmentationComponents.selection = augmentationComponents.selection.toString();
+
+            var topPos = e.pageY + 10;
+            augmentationComponents.img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
+            augmentationComponents.img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
+            if(augmentationComponents.img3) {
+            augmentationComponents.img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
+            }
+
+        } else {
+            augmentationComponents.img1.fadeOut('fast');
+            augmentationComponents.img2.fadeOut('fast');
+            if(augmentationComponents.img3) {
+            augmentationComponents.img3.fadeOut('fast');
+            }
+        }
+    };
     var extracted_paragraphs = [];
-    var selectionAugmentationActive = true;
     var settings = {
         prefix: 'eexcess',
         classname: 'eexcess_detected_par',
@@ -30,12 +58,13 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     var getCandidates = function(root) {
         if (typeof root === 'undefined') {
             root = document.body;
-        };
+        }
+        ;
         var pars = [];
         var walker = document.createTreeWalker(
-            root,
-            NodeFilter.SHOW_TEXT
-        );
+                root,
+                NodeFilter.SHOW_TEXT
+                );
 
         var node = walker.nextNode();
         /**
@@ -66,9 +95,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     };
     var getHeadline = function(paragraphNode) {
         var walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_ELEMENT
-        );
+                document.body,
+                NodeFilter.SHOW_ELEMENT
+                );
 
         var node = paragraphNode;
         walker.currentNode = node;
@@ -165,7 +194,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 if (sole) {
                     // single paragraphs must consist of at least 100 characters and contain a dot
                     var text = $(candidates[i]).text();
-                    if (text.length > 100 && text.indexOf('.') > -1) {                        
+                    if (text.length > 100 && text.indexOf('.') > -1) {
                         paragraphs.push(paragraphUtil([candidates[i]], counter));
                         counter++;
                     }
@@ -316,7 +345,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var finalSet = new Set();
                         for (var i = 0; i < k && i < result.length; i++) {
                             finalSet.add(result[i].term);
-                        };
+                        }
+                        ;
                         return finalSet;
                     };
 
@@ -443,10 +473,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                     var paragraphs = {
                         paragraphs: [{
-                            id: id,
-                            headline: headline,
-                            content: paragraphContent
-                        }],
+                                id: id,
+                                headline: headline,
+                                content: paragraphContent
+                            }],
                         language: lang
                     };
 
@@ -530,33 +560,33 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         augmentLinks: function(jqElements, icon, triggerFn, classname, extendedParagraphs) {
             var img = $('<img src="' + icon + '" style="cursor:pointer;width:30px;" />');
             img.click(function() {
-                    var profile = {
-                        // TODO: split terms
-                        contextKeywords: [{
+                var profile = {
+                    // TODO: split terms
+                    contextKeywords: [{
                             weight: 1.0,
                             text: $(this).data('query')
                         }]
-                    };
-                    if (typeof extendedParagraphs !== 'undefined') {
-                        var parID = $(this).data('paragraphID');
-                        var idx = $(this).data('idx');
-                        if (extendedParagraphs[idx].id === parID) {
-                            profile.contextNamedEntities = extendedParagraphs[idx].entities;
-                        } else {
-                            // TODO: order of extendedParagraphs is not guaranteed, search for right id
-                        }
+                };
+                if (typeof extendedParagraphs !== 'undefined') {
+                    var parID = $(this).data('paragraphID');
+                    var idx = $(this).data('idx');
+                    if (extendedParagraphs[idx].id === parID) {
+                        profile.contextNamedEntities = extendedParagraphs[idx].entities;
+                    } else {
+                        // TODO: order of extendedParagraphs is not guaranteed, search for right id
                     }
-                    triggerFn(profile);
-                }).hover(function() {
-                    delayTimer.clearTimer();
-                }, function() {
-                    $(this).hide();
-                }).css('position', 'absolute')
-                .css('z-index', 9999)
-                .mouseleave(function() {
-                    $(this).hide();
-                })
-                .hide();
+                }
+                triggerFn(profile);
+            }).hover(function() {
+                delayTimer.clearTimer();
+            }, function() {
+                $(this).hide();
+            }).css('position', 'absolute')
+                    .css('z-index', 9999)
+                    .mouseleave(function() {
+                $(this).hide();
+            })
+                    .hide();
             $('body').append(img);
             var xOffset = 25;
             var yOffset = -2;
@@ -573,9 +603,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var el2 = $(this);
                         var offset = el2.offset();
                         img
-                            .css('top', (offset.top - el2.height() + yOffset) + 'px')
-                            .css('left', offset.left - xOffset + 'px')
-                            .show();
+                                .css('top', (offset.top - el2.height() + yOffset) + 'px')
+                                .css('left', offset.left - xOffset + 'px')
+                                .show();
                     });
                     wrapper.mouseleave(function() {
                         delayTimer.setTimer(function() {
@@ -842,9 +872,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var offsets = [];
             var offset = 0;
             var walker = document.createTreeWalker(
-                paragraph,
-                NodeFilter.SHOW_TEXT
-            );
+                    paragraph,
+                    NodeFilter.SHOW_TEXT
+                    );
             var node;
             while (node = walker.nextNode()) {
                 if (node.nodeValue.length > 0) {
@@ -853,43 +883,31 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         el: node
                     });
                     offset += node.nodeValue.length;
-                }
+        }
             }
-            return offsets;
+    return offsets;
         },
-        
-        
-        
-        /**
-         *The SelectionAugmentation can be switched on/off
-         *onoff is boolean;
-         */
-        setSelectionAugmentation: function(onoff) {
-            selectionAugmentationActive = onoff;
+        deactivateSelectionAugmentation: function() {
+            // remove images
+            // unbind listener
+            augmentationComponents.img1.remove();
+            augmentationComponents.img2.remove();
+            augmentationComponents.img3.remove();
+            $(document).unbind('mouseup', pgf);
         },
-        
-        
-        
-        
-        
-        
         activateSelectionAugmentation: function(addKeyword, queryFromSelection, pd) {
-            if (selectionAugmentationActive) {        
-                var selection;
-                var selectedElement;
-
-                var img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
+            augmentationComponents.img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')
                     .css('height', '30px')
                     .css('cursor', 'pointer')
                     .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
                     .css('background-size', 'contain').hide();
-                img1.click(function(e) {
-                    addKeyword(selection);
-                });
+            augmentationComponents.img1.click(function(e) {
+                addKeyword(augmentationComponents.selection);
+            });
 
-                var img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
+            augmentationComponents.img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')
                     .css('height', '30px')
@@ -897,45 +915,33 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     .css('title', '"button2"')
                     .css('background-image', 'url("' + settings.img_PATH + 'search.png")')
                     .css('background-size', 'contain').hide();
-                img2.click(function(e) {
-                    queryFromSelection(selection);
+            augmentationComponents.img2.click(function(e) {
+                queryFromSelection(augmentationComponents.selection);
+            });
+            if (typeof pd === 'function') {
+                augmentationComponents.img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('cursor', 'pointer')
+                        .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
+                        .css('background-size', 'contain').hide();
+                augmentationComponents.img3.click(function(e) {
+                    var selectedParagraph = [augmentationComponents.selectedElement];
+                    pd(selectedParagraph);
+//                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
+//                    pd.findFocusedParagraphSimple(extracted_paragraphs);
                 });
-                var img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('cursor', 'pointer')
-                    .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
-                    .css('background-size', 'contain').hide();
-                img3.click(function(e) {          
-                    var selectedParagraph = [selectedElement];                
-                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
-                    pd.findFocusedParagraphSimple(extracted_paragraphs);
-                });
-
-                $('body').append(img1);
-                $('body').append(img2);
-                $('body').append(img3);
-
-                $(document).bind('mouseup', function(e) {
-                    if (window.getSelection().toString() !== '') {
-                        selection = window.getSelection();
-                        selectedElement = selection.extentNode.parentElement;
-                        selection = selection.toString();
-
-                        var topPos = e.pageY + 10;
-                        img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
-                        img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
-                        img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
-
-                    } else {
-                        img1.fadeOut('fast');
-                        img2.fadeOut('fast');
-                        img3.fadeOut('fast');
-                    }
-                });
-
+                
+                $('body').append(augmentationComponents.img3);
             }
-        }    
+
+            $('body').append(augmentationComponents.img1);
+            $('body').append(augmentationComponents.img2);
+
+            $(document).bind('mouseup', pgf);
+
+
+        }
     };
 });

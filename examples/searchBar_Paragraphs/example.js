@@ -80,6 +80,9 @@ require(['../config'], function(config) {
                 // set query in search bar
                 searchBar.setQuery(paragraphStatistics.query.contextKeywords);
             });
-        }, paragraphDetection);
+        }, function(domEL){
+            $(domEL).css('background-color', 'red');
+            console.log(domEL);
+        });
     });
 });
