@@ -28,20 +28,23 @@
                 return -1;
             },
             /**
-             * Creates the markup code for the given document badge.
+             * Creates the markup code for the given document document information.
              *
-             * @param documentBadge
-             * @param markup_identifier
-             * @param options
-             * @return {string} Markup code for the document badge. If markup's identifier is unknown 'undefined'.
+             * @param documentInformation   contains the documents' information needed for the markup creation
+             * @param markup_identifier specifies the markup type to produce
+             * @return {string} Markup code for the document. If the document's information is incomplete or the markup's identifier is unknown 'undefined'.
              */
-            createMarkup: function (documentBadge, markup_identifier, options) {
+            createMarkup: function (documentInformation, markup_identifier) {
                 switch (markup_identifier) {
                     case this.markup.WIKI_CODE:
-                        return "markup in wikicode"; // TODO return markup in wikicode
-                    default: // unknown identifier
-                        return undefined;
+                        switch (documentInformation.mediaType.toLowerCase()) {
+                            case "text":
+                                return documentInformation.title + ' <ref>[' + documentInformation.documentBadge.uri + ' ' + documentInformation.title + ']</ref>';
+                        }
+                        break;
                 }
+
+                return undefined; // unknown markup identifier or content
             }
         };
     };

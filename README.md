@@ -29,6 +29,7 @@ where `myScript` is the script you want to execute and in which you use c4 modul
 * ```iframes``` A utility module for communication with iframes, which enables broadcasting messages.
 * ```namedEntityRecognition``` A utility module for communication with the [DoSer](https://github.com/quhfus/DoSeR) named entity recognition service.
 * ```logging``` A module that simplifies the handling of different types of logging events. 
+* ```markup``` A module that detects the markup of the current page and produces citations for the detected markup.
 
 # APIconnector
 The APIconnector module provides means to communicate with the (EEXCESS) Federated Recommender via the Privacy Proxy.  
@@ -465,3 +466,28 @@ The following examples demonstrate the usage of these methods:
     });
   ```
     
+# markup
+
+## functions
+
+### detectMarkup
+
+Detects the used CMS and returns the identifier of its markup language.
+Currently available identifiers: 
+* ```markup.WIKI_CODE``` (MediaWiki)
+
+### createMarkup
+
+Creates the markup code for the given document information.
+The document information has to provide at least the following information:
+
+```
+documentInformation =
+{
+    documentBadge: {
+        uri: "http://www.example.org"
+    },
+    mediaType: "text",
+    title: "Example Paper"
+};
+```
