@@ -71,6 +71,7 @@ require(['../config'], function(config) {
         // start detection of focused paragraphs
         paragraphDetection.findFocusedParagraphSimple();
         //manually do stuff
+
         paragraphDetection.activateSelectionAugmentation(function(keywordToADD) {
             searchBar.addKeyword({
                 text: keywordToADD
@@ -83,6 +84,13 @@ require(['../config'], function(config) {
         }, function(domEL){
             $(domEL).css('background-color', 'red');
             console.log(domEL);
+        },
+        function(mainTopic){
+            //TODO SET MAINTOPIC ?!?
+           /* searchBar.addKeyword({                
+                text : mainTopic,
+                isMainTopic : true
+            });*/
         });
     });
 });
