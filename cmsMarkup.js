@@ -9,6 +9,7 @@
         return {
             // known markups
             markup: {
+                UNKNOWN: -1,
                 WIKI_CODE: 0
             },
 
@@ -25,7 +26,7 @@
                 if (detected)
                     return this.markup.WIKI_CODE;
 
-                return -1;
+                return this.markup.UNKNOWN;
             },
             /**
              * Creates the markup code for the given document document information.
@@ -35,16 +36,21 @@
              * @return {string} Markup code for the document. If the document's information is incomplete or the markup's identifier is unknown 'undefined'.
              */
             createMarkup: function (documentInformation, markup_identifier) {
+                var mediaType = documentInformation.mediaType.toLowerCase();
+
                 switch (markup_identifier) {
                     case this.markup.WIKI_CODE:
-                        switch (documentInformation.mediaType.toLowerCase()) {
-                            case "text":
-                                return documentInformation.title + ' <ref>[' + documentInformation.documentBadge.uri + ' ' + documentInformation.title + ']</ref>';
+                        var title = documentInformation.title;
+
+                        if (mediaType === "text") {
+                            return title + ' <ref>[' + documentInformation.documentBadge.uri + ' ' + title + ']</ref>';
+                        } else if (mediaType === "image") {
+                            var caption = title.split(/[:.]+/)[1]; // 'File:Example.jpg' -> 'Example'
+                            return '[[' + title + '|thumbnail|' + caption + ']]';
                         }
-                        break;
                 }
 
-                return undefined; // unknown markup identifier or content
+                return undefined; // unknown markup identifier or media type
             }
         };
     };

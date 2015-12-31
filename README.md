@@ -478,16 +478,24 @@ Currently available identifiers:
 
 ### createMarkup
 
-Creates the markup code for the given document information.
-The document information has to provide at least the following information:
+Creates the markup code for the given document information.  
+The document information has to provide at least the following information:  
 
-```
-documentInformation =
-{
+* text references:  
+  ```
+  documentInformation = {
     documentBadge: {
-        uri: "http://www.example.org"
+      uri: "http://www.example.org"
     },
     mediaType: "text",
     title: "Example Paper"
-};
-```
+  };
+  ```  
+
+* images:  
+  ```
+  documentInformation = {
+    mediaType: "image",
+    title: "File:Example Image.jpg"
+  };
+  ```

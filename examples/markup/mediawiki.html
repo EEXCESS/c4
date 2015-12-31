@@ -11,15 +11,24 @@
     <div id="bodyContent">
         <div id="mw-content-text">
             <form id="editform" name="editform">
-                <textarea id="wpTextbox1" name="wpTextbox1">Edit Textbox...</textarea>
+                <textarea id="wpTextbox1" name="wpTextbox1" style="width: 100%; height: 150px">Edit Textbox...</textarea>
             </form>
         </div>
     </div>
 </div>
 
-<label>Detected Markup = MediaWiki?</label>
-<span id="detected-markup"></span>
-<button id="insert-text-ref">Insert text reference</button>
+<ul>
+    <li>
+        <label>Detected Markup = MediaWiki?</label>
+        <span id="detected-markup"></span>
+    </li>
+    <li>
+        <button id="insert-text-ref">Insert text reference</button>
+    </li>
+    <li>
+        <button id="insert-image-ref">Insert image reference</button>
+    </li>
+</ul>
 
 <!-- include script via requirejs -->
 <script data-main="example" src="../../bower_components/requirejs/require.js"></script>
