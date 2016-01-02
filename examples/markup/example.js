@@ -2,8 +2,8 @@ require(['../config'], function (config) {
     // load dependencies
     require(['c4/cmsMarkup'], function (cms) {
         // detect markup
-        var detected_Markup = cms.detectMarkup();
-        $('#detected-markup').text(detected_Markup === cms.markup.WIKI_CODE);
+        var detected_markup = cms.detectMarkup();
+        $('#detected-markup').text(detected_markup === cms.markup.WIKI_CODE);
 
         var insertReference = function(reference) {
             var textarea = $('#wpTextbox1')[0];
@@ -31,5 +31,9 @@ require(['../config'], function (config) {
             };
             insertReference(cms.createMarkup(documentInformation, detected_Markup));
         });
+
+        // detect language
+        var detected_language = cms.detectLang(detected_markup);
+        $('#detected-language').text(detected_language);
     });
 });

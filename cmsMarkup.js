@@ -32,8 +32,9 @@
              * Creates the markup code for the given document document information.
              *
              * @param documentInformation   contains the documents' information needed for the markup creation
-             * @param markup_identifier specifies the markup type to produce
-             * @return {string} Markup code for the document. If the document's information is incomplete or the markup's identifier is unknown 'undefined'.
+             * @param markup_identifier     specifies the markup type to produce
+             * @return {string}             Markup code for the document. If the document's information is incomplete or the
+             *                              markup's identifier is unknown 'undefined'.
              */
             createMarkup: function (documentInformation, markup_identifier) {
                 var mediaType = documentInformation.mediaType.toLowerCase();
@@ -51,6 +52,27 @@
                 }
 
                 return undefined; // unknown markup identifier or media type
+            },
+
+            /**
+             * Returns the linguistic instance of the current CMS specified by its markup identifier or the browser's
+             * language, if the linguistic instance can't be determined specifically.
+             *
+             * @param markup_identifier specifies the markup used by the current CMS
+             * @return {string}         2-digit country code of the detected language
+             */
+            detectLang: function (markup_identifier) {
+                switch (markup_identifier) {
+                    case this.markup.WIKI_CODE:
+                        var language = document.location.origin.split(/[/.]+/)[1];
+
+                        if (language.length === 2)
+                            return language;
+                }
+
+                // linguistic instance can't be determined specifically for the CMS -> return the browser's language
+                var browserLang = navigator.language || navigator.userLanguage;
+                return browserLang.substr(0, 2);
             }
         };
     };
