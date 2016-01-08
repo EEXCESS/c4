@@ -690,7 +690,6 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                             res.data.paragraphs.forEach(function(val) {
                                 if (val.id === 'main' && val.topic && typeof val.topic !== 'undefined' && typeof val.topic.text !== 'undefined') {
                                     overallTopic = createKeyword(val.topic, true);
-                                    // TODO: add categories (not available from server yet);
                                     queries.main.contextKeywords.push(overallTopic);
                                 }
                             });
@@ -734,6 +733,12 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                                                 // add offsets and keyword
                                                 queries.main.offsets[statVal.key.text] = offsets;
                                                 queries.main.contextKeywords.push(keyword);
+                                            }
+                                        } else if (overallTopic && overallTopic.text === statVal.key.text) {
+                                            if(queries.main.offsets[statVal.key.text]) {
+                                                queries.main.offsets[statVal.key.text] = queries.main.offsets[statVal.key.text].concat(offsets);
+                                            } else {
+                                                queries.main.offsets[statVal.key.text] = offsets;
                                             }
                                         }
                                     });
