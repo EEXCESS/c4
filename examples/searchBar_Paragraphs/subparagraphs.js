@@ -1,10 +1,10 @@
 require(['../config'], function(config) {
     require(['jquery', 'c4/APIconnector', 'c4/paragraphDetection', 'c4/searchBar/searchBar', 'c4/iframes'], function($, api, paragraphDetection, searchBar, iframes) {
         var origin = {
-                clientType: "c4 example",
-                clientVersion: "0.0.1",
-                userID: "testUser"
-            };
+            clientType: "c4 example",
+            clientVersion: "0.0.1",
+            userID: "testUser"
+        };
         window.onmessage = function(msg) {
             if (msg.data.event && msg.data.event === 'eexcess.currentResults') {
                 iframes.sendMsgAll({
@@ -24,19 +24,7 @@ require(['../config'], function(config) {
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/feature/SearchResVis/SearchResultListVis/index.html",
                 icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/icon.png"
-            }, {
-                name: "dashboard",
-                // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
-                url: "https://eexcess.github.io/visualization-widgets-files/Dashboard/index.html",
-                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png",
-                deferLoading: true
             },
-            //    {
-            //            name:"power search",
-            //            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
-            //            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/index.html",
-            //            icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/icon.png"
-            //    },
             {
                 name: "facet scape",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
@@ -45,10 +33,9 @@ require(['../config'], function(config) {
                 deferLoading: true
             }];
         // initialize the searchBar with the specified tabs and the path to the image folder
-        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}, origin:origin});
+        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}, origin: origin});
         // detect paragraphs
-        paragraphDetection.init({img_PATH:'../../img/'});
-        var paragraphs = paragraphDetection.getParagraphs();
+        var paragraphs = paragraphDetection.getParagraphs(document, {addSubparagraphs: true});
         // draw silver border around detected paragraphs
         $('.eexcess_detected_par').css('border', '1px dotted silver');
 
@@ -65,39 +52,14 @@ require(['../config'], function(config) {
                 // color background on focused paragraph
                 $(eventDetail.paragraph.elements[0]).parent().css('background-color', 'cyan');
                 // generate query from focused paragraph and set it in the search bar
-                paragraphDetection.paragraphToQuery(eventDetail.paragraph.content, function(paragraphStatistics) {
-                    // set query in search bar
-                    if (eventDetail.trigger && eventDetail.trigger === 'click') {
-                        searchBar.setQuery(paragraphStatistics.query.contextKeywords, true);
-                    } else {
-                        searchBar.setQuery(paragraphStatistics.query.contextKeywords);
-                    }
-                });
+                var immediately = eventDetail.trigger && eventDetail.trigger === 'click';
+                paragraphDetection.paragraphsToQueries(focusedParagraph.subparagraphs, function(res) {
+                    searchBar.setQueries(res.queries, immediately);
+                }, focusedParagraph.headline);
             }
         });
         // start detection of focused paragraphs
         paragraphDetection.findFocusedParagraphSimple();
-        //manually do stuff
-
-        paragraphDetection.activateSelectionAugmentation(function(keywordToADD) {
-            searchBar.addKeyword({
-                text: keywordToADD
-            });
-        }, function(selection) {
-            paragraphDetection.paragraphToQuery(selection, function(paragraphStatistics) {
-                // set query in search bar
-                searchBar.setQuery(paragraphStatistics.query.contextKeywords);
-            });
-        }, function(domEL){
-            $(domEL).css('background-color', 'red');
-            console.log(domEL);
-        },
-        function(mainTopic){
-            //TODO SET MAINTOPIC ?!?
-           /* searchBar.addKeyword({                
-                text : mainTopic,
-                isMainTopic : true
-            });*/
-        });
     });
 });
+

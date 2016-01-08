@@ -14,14 +14,14 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         base_url: "https://eexcess.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/",
         timeout: 10000,
         logTimeout: 5000,
-        logggingLevel: 0, 
+        loggingLevel: 0,
         cacheSize: 10,
         suffix_recommend: 'recommend',
         suffix_details: 'getDetails',
         suffix_favicon: 'getPartnerFavIcon?partnerId=',
         suffix_log: 'log/',
         suffix_getRegisteredPartners: 'getRegisteredPartners',
-        numResults: 30
+        numResults: 80
     };
     peas_indist.init(settings.base_url);
     var xhr;
@@ -96,7 +96,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         query: function(profile, callback) {
-            profile.loggingLevel = settings.logggingLevel;
+            if (!profile.loggingLevel) {
+                profile.loggingLevel = settings.loggingLevel;
+            }
             profile.origin = complementOrigin(profile.origin);
             if (!profile.numResults) {
                 profile.numResults = settings.numResults;
@@ -151,11 +153,13 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         },
         /**
          * Function to retrieve details for a set of returned results.
-         * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. There exists a documentbagde for each result entry in the original result set.
+         * @param {Array} documentBadges The set of documentbadges for which details should be retrieved. 
+         *                There exists a documentbagde for each result entry in the original result set. 
+         *                See https://github.com/EEXCESS/eexcess/wiki/Request-and-Response-format-for-call-to-federated-recommender-and-privacy-proxy#details-request-format for more details.
          * @param {APIconnector~onResponse} callback Callback function called on success or error. 
          */
         getDetails: function(detailReqObj, callback) {
-            detailReqObj.loggingLevel = settings.logggingLevel;
+            detailReqObj.loggingLevel = settings.loggingLevel;
             detailReqObj.origin = complementOrigin(detailReqObj.origin);
             var xhr = $.ajax({
                 url: settings.base_url + settings.suffix_details,
@@ -217,15 +221,17 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
          * @param {Object} logEntry The entry to be logged. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging}
          */
         sendLog: function(interactionType, logEntry) {
-            logEntry.origin = complementOrigin(logEntry.origin);
-            var xhr;
-            xhr = $.ajax({
-                url: settings.base_url + settings.suffix_log + interactionType,
-                data: JSON.stringify(logEntry),
-                type: 'POST',
-                contentType: 'application/json; charset=UTF-8',
-                timeout: settings.logTimeout
-            });
+            if (settings.loggingLevel === 0) {
+                logEntry.origin = complementOrigin(logEntry.origin);
+                var xhr;
+                xhr = $.ajax({
+                    url: settings.base_url + settings.suffix_log + interactionType,
+                    data: JSON.stringify(logEntry),
+                    type: 'POST',
+                    contentType: 'application/json; charset=UTF-8',
+                    timeout: settings.logTimeout
+                });
+            }
         },
         /**
          * Function to retrieve the partner sources registered at the recommender. See {@link https://github.com/EEXCESS/eexcess/wiki/Federated-Recommender-Service#get-registered-partners}.
@@ -252,6 +258,9 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
                     }
                 }
             });
+        },
+        setLoggingLevel: function(logLevel) {
+            settings.loggingLevel = logLevel;
         }
     };
 });
