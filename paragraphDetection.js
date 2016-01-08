@@ -666,7 +666,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         paragraphs: pars,
                         language: lang
                     };
-                    ner.entitiesAndCategories(toSubmit, function(res) {
+                    chrome.runtime.sendMessage({method: 'ner', data: toSubmit}, function(res) {
                         if (res.status === 'success') {
                             var createKeyword = function(val, isMainTopic, freq) {
                                 return {
