@@ -583,7 +583,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     };
 
 
-                    ner.entitiesAndCategories(paragraphs, function(res) {
+                    chrome.runtime.sendMessage({method: 'ner', data: paragraphs}, function(res) {
                         if (res.status === 'success') {
                             var profile = {
                                 contextKeywords: []

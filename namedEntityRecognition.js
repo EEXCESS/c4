@@ -12,7 +12,7 @@
  */
 
 define(['jquery'], function($) {
-    var endpoint = 'https://eexcess.joanneum.at/eexcess-privacy-proxy-issuer-1.0-SNAPSHOT/issuer/recognizeEntity';
+    var endpoint = 'http://zaire.dimis.fim.uni-passau.de:8999/doser-disambiguationserverstable/webclassify/entityAndCategoryStatistic';
     var xhr;
 
     return {
@@ -30,8 +30,7 @@ define(['jquery'], function($) {
                 data: JSON.stringify(paragraphs),
                 type: 'POST',
                 contentType: 'application/json',
-                dataType: 'json',
-                timeout:5000
+                dataType: 'json'
             });
             xhr.done(function(response) {
                 if (typeof callback !== 'undefined') {
