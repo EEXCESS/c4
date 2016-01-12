@@ -501,7 +501,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.selectQuery = $('<select id="eexcess_selectQuery"></select>').hide();
         ui_bar.selectQuery.change(function(e) {
             var subquery = $(this).children(':selected').data('query');
-            chrome.runtime.sendMessage({method: 'queryAdaptation', data: {menu: 'subquery', query: type}});
+            chrome.runtime.sendMessage({method: 'queryAdaptation', data: {menu: 'subquery', query: subquery}});
             clearTimeout(util.focusBlurDelayTimer);
             util.preventQuerySetting = false;
             util.setQuery(subquery, 0);
