@@ -482,6 +482,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.selectmenu.change(function(e) {
             lastQuery = {contextKeywords: []};
             var type = $(this).children(':selected').text();
+            chrome.runtime.sendMessage({method: 'queryAdaptation', data: {menu: 'type', type: type}});
             if (type !== 'show all') {
                 $.each(ui_bar.taglist.tagit('getTags'), function() {
                     if ($(this).data('properties').type && $(this).data('properties').type.toLowerCase() + 's' === type) {
@@ -499,9 +500,11 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         // query select menu
         ui_bar.selectQuery = $('<select id="eexcess_selectQuery"></select>').hide();
         ui_bar.selectQuery.change(function(e) {
+            var subquery = $(this).children(':selected').data('query');
+            chrome.runtime.sendMessage({method: 'queryAdaptation', data: {menu: 'subquery', query: type}});
             clearTimeout(util.focusBlurDelayTimer);
             util.preventQuerySetting = false;
-            util.setQuery($(this).children(':selected').data('query'), 0);
+            util.setQuery(subquery, 0);
             util.cachedQuery = null;
         });
         ui_bar.left.append(ui_bar.selectQuery);
