@@ -1137,7 +1137,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             }
                         }
                         var tmp = $('<option/>').text(topicToDisplay).data('query', query.contextKeywords).appendTo(ui_bar.selectQuery);
-                        if (query.score > 0.4 && query.score === highestScore) {
+                        if (query.score > 0 && query.score === highestScore) {
                             tmp.attr('selected', 'selected');
                             contextKeywords = query.contextKeywords;
                         }
