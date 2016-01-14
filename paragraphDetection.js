@@ -20,6 +20,12 @@
  */
 
 define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], function($, ner, guessLang) {
+
+    /**
+     *
+     * Block comment
+     *
+     */
     var augmentationComponents = {
         img1: null,
         img2: null,
@@ -30,6 +36,18 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         selection: null,
         selectedElement: null
     };
+    /**
+     *
+     * Object for Augmentation Parameters
+     *
+     */
+    var augmentationData = {
+        addKeyword: null,
+        queryFromSelection: null,
+        pd: null,
+        mainTopic: null
+    };
+
     var pgf = function(e) {
         // console.log(e);
         if (window.getSelection().toString() !== '') {
@@ -83,8 +101,11 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         classname: 'eexcess_detected_par',
         img_PATH: 'img/'
     };
+    /**
+     * go recursivley into DOM Elements to find all relevant texts.
+     */
     var findChildElement = function(element) {
-        //TODO Performance - treewalker maybe? not needed maybe ?
+        //better Performance with treewalker maybe?
         if (element.hasChildNodes()) {
             //Nodetype 3 == TEXT
             if (element.childNodes[0].nodeType == 3) {
@@ -94,26 +115,45 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         }
         return false;
     };
-
+    /**
+     * decides, if selection is okay for using it the 
+     * "make this selection as a paragraph" function.
+     * decission is based on the width and the X-coords
+     * of all involved DOM-Elements.
+     * Only if this is everywhere the same, the selection 
+     * can be used.
+     */
     var isSelectionForParagraph = function(selection) {
         var out = false;
         var range = selection.getRangeAt(0);
+        //looking for childnotes
         var allWithinRangeParent = range.commonAncestorContainer.hasChildNodes() ? range.commonAncestorContainer.getElementsByTagName("*") : selection;
-
+        // in one Array
         var allSelected = [];
         for (var i = 0, el; el = allWithinRangeParent[i]; i++) {
             if (selection.containsNode(el, true)) {
                 var lastchild = findChildElement(el);
                 if (lastchild && $(lastchild).width() >= 0) {
-                    allSelected.push($(lastchild).width());
+                    allSelected.push({
+                        //Checking for same width and position
+                        width: $(lastchild).width(),
+                        pos: $(lastchild).offset()
+                    });
+
                 }
             }
         }
 
+        /**
+         * Same Width & Position
+         */
+         //console.log(allSelected);
         if (allSelected.length >= 1) {
             var notSameWidth = false;
             for (var i = 0; i <= allSelected.length - 1; i++) {
-                if (allSelected[0] !== allSelected[i]) {
+
+                if (allSelected[0].width !== allSelected[i].width
+                    && allSelected[0].pos.left !== allSelected[i].pos.left) {
                     out = true;
                 }
             };
@@ -962,8 +1002,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             augmentationComponents.img6.remove();
             $(document).unbind('mouseup', pgf);
         },
-        activateSelectionAugmentation: function(addKeyword, queryFromSelection, pd, mainTopic) {
-            if (typeof addKeyword === 'function') {
+        activateSelectionAugmentation: function(augmentationData) {
+            if (typeof augmentationData.addKeyword === 'function') {
                 augmentationComponents.img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')
@@ -972,11 +1012,11 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
                     .css('background-size', 'contain').hide();
                 augmentationComponents.img1.click(function(e) {
-                    addKeyword(augmentationComponents.selection);
+                    augmentationData.addKeyword(augmentationComponents.selection);
                 });
                 $('body').append(augmentationComponents.img1);
             }
-            if (typeof queryFromSelection === 'function') {
+            if (typeof augmentationData.queryFromSelection === 'function') {
                 augmentationComponents.img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')
@@ -990,7 +1030,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 });
                 $('body').append(augmentationComponents.img2);
             }
-            if (typeof pd === 'function') {
+            if (typeof augmentationData.pd === 'function') {
                 augmentationComponents.img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')
@@ -1000,7 +1040,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     .css('background-size', 'contain').hide();
                 augmentationComponents.img3.click(function(e) {
                     var selectedParagraph = [augmentationComponents.selectedElement];
-                    pd(selectedParagraph);
+                    augmentationData.pd(selectedParagraph);
                     //                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
                     //                    pd.findFocusedParagraphSimple(extracted_paragraphs);
                 });
@@ -1016,7 +1056,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 $('body').append(augmentationComponents.img4);
             }
 
-            if (typeof mainTopic === 'function') {
+            if (typeof augmentationData.mainTopic === 'function') {
                 augmentationComponents.img5 = $('<div id="main-topic-ex-aug" title="Select as a maintopic"></div>')
                     .css('position', 'absolute')
                     .css('width', '30px')

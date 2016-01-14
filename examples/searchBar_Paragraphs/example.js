@@ -45,7 +45,9 @@ require(['../config'], function(config) {
             }
         });
         // detect paragraphs
-        paragraphDetection.init({img_PATH:'../../img/'});
+        paragraphDetection.init({
+            img_PATH: '../../img/'
+        });
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs
         $('.eexcess_detected_par').css('border', '1px dotted silver');
@@ -71,26 +73,31 @@ require(['../config'], function(config) {
         // start detection of focused paragraphs
         paragraphDetection.findFocusedParagraphSimple();
         //manually do stuff
+        var augmentationData = {
+            addKeyword: function(keywordToADD) {
+                searchBar.addKeyword({
+                    text: keywordToADD
+                })
+            },
+            queryFromSelection: function(selection) {
+                paragraphDetection.paragraphToQuery(selection, function(paragraphStatistics) {
+                    // set query in search bar
+                    searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                })
+            },
+            pd: function(domEL) {
+                $(domEL).css('background-color', 'red');
+                console.log(domEL);
+            },
+            mainTopic: function(mainTopic) {
+                //TODO SET MAINTOPIC ?!?
+                /* searchBar.addKeyword({                
+                     text : mainTopic,
+                     isMainTopic : true
+                 });*/
+            }
+        }
 
-        paragraphDetection.activateSelectionAugmentation(function(keywordToADD) {
-            searchBar.addKeyword({
-                text: keywordToADD
-            });
-        }, function(selection) {
-            paragraphDetection.paragraphToQuery(selection, function(paragraphStatistics) {
-                // set query in search bar
-                searchBar.setQuery(paragraphStatistics.query.contextKeywords);
-            });
-        }, function(domEL){
-            $(domEL).css('background-color', 'red');
-            console.log(domEL);
-        },
-        function(mainTopic){
-            //TODO SET MAINTOPIC ?!?
-           /* searchBar.addKeyword({                
-                text : mainTopic,
-                isMainTopic : true
-            });*/
-        });
+        paragraphDetection.activateSelectionAugmentation(augmentationData);
     });
 });
