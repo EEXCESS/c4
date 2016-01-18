@@ -652,7 +652,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
         });
         ui_bar.main.append(ui_bar.taglist);
-        ui_bar.taglistDesc = $('<p id="eexcess_taglistDesc">Drag and Drop keywords to change the main topic, click to (de)activate</p>');
+        ui_bar.taglistDesc = $('<p id="eexcess_taglistDesc">Drag and Drop keywords to change the main topic</p>');
         ui_bar.taglist.after(ui_bar.taglistDesc);
         // right bar pane
         ui_bar.right = $('<div id="eexcess_barRight"></div>');
