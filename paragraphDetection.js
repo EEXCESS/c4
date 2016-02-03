@@ -49,31 +49,42 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     };
 
     var pgf = function(e) {
-        // console.log(e);
+         console.log(e);
         if (window.getSelection().toString() !== '') {
             augmentationComponents.selection = window.getSelection();
+            console.log(augmentationComponents.selection);
+            augmentationComponents.firstSelectedElement = augmentationComponents.selection.anchorNode.parentElement;
+            augmentationComponents.lastSelectedElement = augmentationComponents.selection.extentNode.parentElement;
             augmentationComponents.selectedElement = augmentationComponents.selection.extentNode.parentElement;
             augmentationComponents.selection = augmentationComponents.selection.toString();
 
+            var leftPos = e.pageX;
             var topPos = e.pageY + 10;
-            augmentationComponents.img1.css('top', topPos).css('left', e.pageX).fadeIn('fast');
-            augmentationComponents.img2.css('top', topPos).css('left', e.pageX + 35).fadeIn('fast');
+            if (($(window).width() - 145) <= e.pageX) {
+                leftPos = e.pageX - 145;
+            }
+            if (($(window).height() - 45) <= e.pageY) {
+                topPos = e.pageY - 45;
+            }
+            
+            augmentationComponents.img1.css('top', topPos).css('left', leftPos).fadeIn('fast');
+            augmentationComponents.img2.css('top', topPos).css('left', leftPos + 35).fadeIn('fast');
             if (augmentationComponents.img3) {
                 augmentationComponents.img4.fadeOut('fast');
-                augmentationComponents.img3.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
+                augmentationComponents.img3.css('top', topPos).css('left', leftPos + 70).fadeIn('fast');
 
             }
 
-            if (isSelectionForParagraph(window.getSelection())) {
-                augmentationComponents.img3.fadeOut('fast');
-                augmentationComponents.img4.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
-            }
+            // if (isSelectionForParagraph(window.getSelection())) {
+            //     augmentationComponents.img3.fadeOut('fast');
+            //     augmentationComponents.img4.css('top', topPos).css('left', e.pageX + 70).fadeIn('fast');
+            // }
 
             if (window.getSelection().toString().split(" ").length <= 4) {
-                augmentationComponents.img5.css('top', topPos).css('left', e.pageX + 105).fadeIn('fast');
+                augmentationComponents.img5.css('top', topPos).css('left', leftPos + 105).fadeIn('fast');
                 augmentationComponents.img6.fadeOut('fast');
             } else {
-                augmentationComponents.img6.css('top', topPos).css('left', e.pageX + 105).fadeIn('fast');
+                augmentationComponents.img6.css('top', topPos).css('left', leftPos + 105).fadeIn('fast');
                 augmentationComponents.img5.fadeOut('fast');
             }
 
@@ -1039,8 +1050,25 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
                     .css('background-size', 'contain').hide();
                 augmentationComponents.img3.click(function(e) {
-                    var selectedParagraph = [augmentationComponents.selectedElement];
-                    augmentationData.pd(selectedParagraph);
+                    var element1 = $(augmentationComponents.firstSelectedElement);
+                    var element2 = $(augmentationComponents.lastSelectedElement);                   
+                    var maxframewidth = (element1.width() > element2.width())?element1.width():element2.width();
+                    //remove frame if it was added before
+                    if ($('body').has('#gen-para-ex-selected')) {
+                        $('#gen-para-ex-selected').remove();
+                    }                    
+                    var newframe = $('<div id="gen-para-ex-selected"></div>')
+                    .css('position', 'absolute')
+                    .css('top',element1.offset().top)
+                    .css('width',maxframewidth)
+                    .css('pointer-events','none')
+                    .css('height',(element2.offset().top - element1.offset().top) + element2.height() )
+                    .css('border','1px solid green');
+                    $('body').append(newframe);
+
+                    // console.log(augmentationComponents);
+                    // var selectedParagraph = [augmentationComponents.selectedElement];                    
+                    // augmentationData.pd(selectedParagraph);
                     //                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
                     //                    pd.findFocusedParagraphSimple(extracted_paragraphs);
                 });
