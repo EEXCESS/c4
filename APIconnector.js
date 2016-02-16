@@ -65,6 +65,31 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         return origin;
     };
 
+    var logInteractionType = {
+        moduleOpened: "moduleOpened",
+        moduleClosed: "moduleClosed",
+        moduleStatisticsCollected: "moduleStatisticsCollected",
+        itemOpened: "itemOpened",
+        itemClosed: "itemClosed",
+        itemCitedAsImage: "itemCitedAsImage",
+        itemCitedAsText: "itemCitedAsText",
+        itemCitedAsHyperlink: "itemCitedAsHyperlink",
+        itemRated: "itemRated"
+    };
+    var sendLog = function(interactionType, logEntry) {
+        if (settings.loggingLevel === 0) {
+            logEntry.origin = complementOrigin(logEntry.origin);
+            var xhr;
+            xhr = $.ajax({
+                url: settings.base_url + settings.suffix_log + interactionType,
+                data: JSON.stringify(logEntry),
+                type: 'POST',
+                contentType: 'application/json; charset=UTF-8',
+                timeout: settings.logTimeout
+            });
+        }
+    };
+
     return {
         /**
          * Initializes the module with parameters other than the defaults.
@@ -204,33 +229,51 @@ define(["jquery", "peas/peas_indist"], function($, peas_indist) {
         /**
          * Enum for logging interaction types
          */
-        logInteractionType: {
-            moduleOpened: "moduleOpened",
-            moduleClosed: "moduleClosed",
-            moduleStatisticsCollected: "moduleStatisticsCollected",
-            itemOpened: "itemOpened",
-            itemClosed: "itemClosed",
-            itemCitedAsImage: "itemCitedAsImage",
-            itemCitedAsText: "itemCitedAsText",
-            itemCitedAsHyperlink: "itemCitedAsHyperlink",
-            itemRated: "itemRated"
-        },
+        logInteractionType: logInteractionType,
         /**
          * Function to send a log event to the logging endpoint
          * @param {String} interactionType The type of interaction to be logged. See `APIconnector.logInteractionType` for a list of possible interactions
          * @param {Object} logEntry The entry to be logged. The format is described at {@link https://github.com/EEXCESS/eexcess/wiki/EEXCESS---Logging}
          */
-        sendLog: function(interactionType, logEntry) {
-            if (settings.loggingLevel === 0) {
-                logEntry.origin = complementOrigin(logEntry.origin);
-                var xhr;
-                xhr = $.ajax({
-                    url: settings.base_url + settings.suffix_log + interactionType,
-                    data: JSON.stringify(logEntry),
-                    type: 'POST',
-                    contentType: 'application/json; charset=UTF-8',
-                    timeout: settings.logTimeout
-                });
+        sendLog: sendLog,
+        /**
+         * Handler for logging events
+         * @param {Object} msg logging-object, containing the logging-event in msg.event and the data to be logged in msg.data
+         */
+        logMsgHandler: function(msg) {
+            if (msg.event && msg.event.startsWith('eexcess.log')) {
+                switch (msg.event) {
+                    case 'eexcess.log.moduleOpened':
+                        sendLog(logInteractionType.moduleOpened, msg.data);
+                        break;
+                    case 'eexcess.log.moduleClosed':
+                        sendLog(logInteractionType.moduleClosed, msg.data);
+                        break;
+                    case 'eexcess.log.moduleStatisticsCollected':
+                        sendLog(logInteractionType.moduleStatisticsCollected, msg.data);
+                        break;
+                    case 'eexcess.log.itemOpened':
+                        sendLog(logInteractionType.itemOpened, msg.data);
+                        break;
+                    case 'eexcess.log.itemClosed':
+                        sendLog(logInteractionType.itemClosed, msg.data);
+                        break;
+                    case 'eexcess.log.itemCitedAsImage':
+                        sendLog(logInteractionType.itemCitedAsImage, msg.data);
+                        break;
+                    case 'eexcess.log.itemCitedAsText':
+                        sendLog(logInteractionType.itemCitedAsText, msg.data);
+                        break;
+                    case 'eexcess.log.itemCitedAsHyperlink':
+                        sendLog(logInteractionType.itemCitedAsHyperlink, msg.data);
+                        break;
+                    case 'eexcess.log.itemRated':
+                        sendLog(logInteractionType.itemRated, msg.data);
+                        break;
+                    default:
+                        console.log('unknown log method: ' + msg.event);
+                        break;
+                }
             }
         },
         /**
