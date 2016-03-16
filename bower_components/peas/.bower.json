@@ -28,11 +28,11 @@
     "graph": "https://github.com/tantalor/graphjs.git"
   },
   "homepage": "https://github.com/EEXCESS/peas",
-  "_release": "e846ef6c71",
+  "_release": "27c460d51c",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "e846ef6c711930706ede4bf1de6cbcebb8bd4d2b"
+    "commit": "27c460d51c72d7abc71deb3bcd1b28f4c07d83bd"
   },
   "_source": "https://github.com/EEXCESS/peas.git",
   "_target": "*",
