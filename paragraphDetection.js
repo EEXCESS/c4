@@ -34,7 +34,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         img5: null,
         img6: null,
         selection: null,
-        selectedElement: null
+        selectedElement: null,
+        framecords: null
     };
     /**
      *
@@ -49,14 +50,15 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     };
 
     var pgf = function(e) {
-         console.log(e);
+        // console.log(e);
         if (window.getSelection().toString() !== '') {
             augmentationComponents.selection = window.getSelection();
-            console.log(augmentationComponents.selection);
+            augmentationComponents.selectedElements = getSelectedElements(augmentationComponents.selection);
             augmentationComponents.firstSelectedElement = augmentationComponents.selection.anchorNode.parentElement;
             augmentationComponents.lastSelectedElement = augmentationComponents.selection.extentNode.parentElement;
             augmentationComponents.selectedElement = augmentationComponents.selection.extentNode.parentElement;
-            augmentationComponents.selection = augmentationComponents.selection.toString();
+            /*augmentationComponents.selection = augmentationComponents.selection.toString();*/
+            augmentationComponents.selection = augmentationComponents.selectedElements.selectionText;
 
             var leftPos = e.pageX;
             var topPos = e.pageY + 10;
@@ -66,7 +68,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             if (($(window).height() - 45) <= e.pageY) {
                 topPos = e.pageY - 45;
             }
-            
+
             augmentationComponents.img1.css('top', topPos).css('left', leftPos).fadeIn('fast');
             augmentationComponents.img2.css('top', topPos).css('left', leftPos + 35).fadeIn('fast');
             if (augmentationComponents.img3) {
@@ -127,6 +129,48 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         return false;
     };
     /**
+     * Gets Coordinates for user selected paragraph
+     */
+    var getSelectedElements = function(selection) {
+        var out = false;
+        var range = selection.getRangeAt(0);
+        //looking for childnodes
+        var allWithinRangeParent = range.commonAncestorContainer.hasChildNodes() ? range.commonAncestorContainer.getElementsByTagName("*") : selection;
+
+
+        var coords = {
+            left: 0,
+            width: 0,
+            selectionText: ''
+        };
+
+        for (var i = 0, el; el = allWithinRangeParent[i]; i++) {
+            if (selection.containsNode(el, true)) {
+                var lastchild = (el);
+                if (lastchild && $(lastchild).width() >= 0) {      
+                    coords.selectionText += $(lastchild).text();
+                    if (coords.width <= 0) {
+                        coords.width = $(lastchild).width();
+                    }
+                    if (coords.left <= 0) {
+                        coords.left = $(lastchild).offset().left;
+                    }
+                    // console.log($(lastchild).offset().left);
+                    // console.log($(lastchild).width());
+                    if ($(lastchild).width()  > coords.width) {
+                        coords.width = $(lastchild).width();
+                    }
+                    if ($(lastchild).offset().left < coords.left) {
+                        coords.left = $(lastchild).offset().left;
+                    }
+                }
+            }
+        }
+        // console.log(coords);
+        return coords;
+    };
+
+    /**
      * decides, if selection is okay for using it the 
      * "make this selection as a paragraph" function.
      * decission is based on the width and the X-coords
@@ -158,13 +202,12 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         /**
          * Same Width & Position
          */
-         //console.log(allSelected);
+        //console.log(allSelected);
         if (allSelected.length >= 1) {
             var notSameWidth = false;
             for (var i = 0; i <= allSelected.length - 1; i++) {
 
-                if (allSelected[0].width !== allSelected[i].width
-                    && allSelected[0].pos.left !== allSelected[i].pos.left) {
+                if (allSelected[0].width !== allSelected[i].width && allSelected[0].pos.left !== allSelected[i].pos.left) {
                     out = true;
                 }
             };
@@ -1051,26 +1094,26 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     .css('background-size', 'contain').hide();
                 augmentationComponents.img3.click(function(e) {
                     var element1 = $(augmentationComponents.firstSelectedElement);
-                    var element2 = $(augmentationComponents.lastSelectedElement);                   
-                    var maxframewidth = (element1.width() > element2.width())?element1.width():element2.width();
+                    var element2 = $(augmentationComponents.lastSelectedElement);
+                    var selecteElement = $(augmentationComponents.selectedElement);
+                    var cords = augmentationComponents.selectedElements;
+                    
+                    var element1Width = element1.width() + element1.offset().left;
+                    var element2Width = element2.width() + element2.offset().left;
+                    var maxframewidth = (element1Width > element2Width) ? element1Width : element2Width;
                     //remove frame if it was added before
                     if ($('body').has('#gen-para-ex-selected')) {
                         $('#gen-para-ex-selected').remove();
-                    }                    
+                    }
                     var newframe = $('<div id="gen-para-ex-selected"></div>')
-                    .css('position', 'absolute')
-                    .css('top',element1.offset().top)
-                    .css('width',maxframewidth)
-                    .css('pointer-events','none')
-                    .css('height',(element2.offset().top - element1.offset().top) + element2.height() )
-                    .css('border','1px solid green');
+                        .css('position', 'absolute')
+                        .css('top', element1.offset().top)
+                        .css('left', cords.left)
+                        .css('width', cords.width)
+                        .css('pointer-events', 'none')
+                        .css('height', (element2.offset().top - element1.offset().top) + element2.height())
+                        .css('border', '1px solid green');
                     $('body').append(newframe);
-
-                    // console.log(augmentationComponents);
-                    // var selectedParagraph = [augmentationComponents.selectedElement];                    
-                    // augmentationData.pd(selectedParagraph);
-                    //                    extracted_paragraphs.push(paragraphUtil(selectedParagraph, extracted_paragraphs.length+1));
-                    //                    pd.findFocusedParagraphSimple(extracted_paragraphs);
                 });
 
                 $('body').append(augmentationComponents.img3);
