@@ -36,6 +36,8 @@ The `query` parameter is assumed to be in [this format](https://github.com/EEXCE
 ## Installable Demo
 If you want to see the QueryCrumbs in action, take a look at the [EEXCESS Chrome extension](https://chrome.google.com/webstore/detail/eexcess/mnicfonfoiffhekefgjlaihcpnbchdbc) in the [Chrome webstore](https://chrome.google.com/webstore/).
 
+We also provide an [installable demo](https://chrome.google.com/webstore/detail/querycrumbs/keaphphnhpggbokapedeokdgkojhppjp) that exhibits different layers of the QueryCrumbs. The layer can be selected in the profile (button in the upper right corner) via `mode` at `display settings`.
+
 
 
 
