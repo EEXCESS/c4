@@ -769,6 +769,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 if (util.cachedQuery) {
                     util.setQuery(util.cachedQuery);
                     util.cachedQuery = null;
+                    if (ui_bar.selectQuery.children('option').length > 0) {
+                        ui_bar.selectQuery.show();
+                    }
                 }
             }, settings.focusBlurDelay);
         });
@@ -798,6 +801,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 if (util.cachedQuery) {
                     util.setQuery(util.cachedQuery);
                     util.cachedQuery = null;
+                    if (ui_bar.selectQuery.children('option').length > 0) {
+                        ui_bar.selectQuery.show();
+                    }
                 }
             }, settings.focusBlurDelay);
         });
@@ -1102,6 +1108,9 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.preventQuerySetting = false;
                     util.setQuery(contextKeywords, 0);
                     util.cachedQuery = null;
+                    if (ui_bar.selectQuery.children('option').length > 0) {
+                        ui_bar.selectQuery.show();
+                    }
                 } else {
                     if (util.preventQuerySetting) {
                         util.cachedQuery = contextKeywords;
@@ -1119,7 +1128,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     // add subs
                     var topics = {};
                     queries.subs.forEach(function (query) {
-                        console.log('query score: ' + query.score);
                         var topicToDisplay = '';
                         for (var i = 0; i < query.contextKeywords.length; i++) {
                             if (query.contextKeywords[i].isMainTopic) {
@@ -1139,7 +1147,6 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                             contextKeywords = query.contextKeywords;
                         }
                     });
-                    ui_bar.selectQuery.show();
                     finalQuery();
                 };
                 // calculate scores
