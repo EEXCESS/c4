@@ -1085,6 +1085,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @returns {undefined}
          */
         setQuery: function(contextKeywords, immediately) {
+            var delayed = function(){
             if (immediately) {
                 clearTimeout(util.focusBlurDelayTimer);
                 util.preventQuerySetting = false;
@@ -1102,6 +1103,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.cachedSubqueries = null;
                     util.setQuery(contextKeywords);
                 }
+            }
+            };
+            if (ui_bar.selectmenu) {
+                delayed();
+            } else {
+                window.setTimeout(delayed,250);
             }
         },
         /**
