@@ -458,7 +458,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 callback({query: profile, offsets: offsets});
             };
             guessLang.detect(paragraphContent, function(lang) {
-                if (lang === 'en') {
+                if (lang === 'en' || lang === 'de') {
                     if (typeof id === 'undefined') {
                         id = 1;
                     }
@@ -550,7 +550,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             }
             pars.push(main);
             guessLang.detect(main.content, function(lang) {
-                if (lang === 'en') {
+                if (lang === 'en' || lang === 'de') {
                     var toSubmit = {
                         paragraphs: pars,
                         language: lang
