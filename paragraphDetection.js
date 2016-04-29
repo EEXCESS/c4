@@ -1270,9 +1270,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         .css('left', cords.left)
                         .css('width', cords.width)
                         .css('pointer-events', 'none')
-                        .css('height', (element2.offset().top - element1.offset().top) + element2.height())
-                        .css('border', '1px solid green');
+                        .css('height', (element2.offset().top - element1.offset().top) + element2.height());
                     $('body').append(newframe);
+                    augmentationData.pd(newframe);
                 });
 
                 $('body').append(augmentationComponents.img3);
