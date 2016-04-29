@@ -24,30 +24,38 @@ require(['../config'], function(config) {
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/feature/SearchResVis/SearchResultListVis/index.html",
                 icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/SearchResultListVis/icon.png"
-            },
-            {
+            }, {
                 name: "dashboard",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "https://eexcess.github.io/visualization-widgets-files/Dashboard/index.html",
                 icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/Dashboard/icon.png",
                 deferLoading: true
             },
-//    {
-//            name:"power search",
-//            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
-//            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/index.html",
-//            icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/icon.png"
-//    },
+            //    {
+            //            name:"power search",
+            //            // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
+            //            url:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/index.html",
+            //            icon:"http://rawgit.com/EEXCESS/visualization-widgets/master/PowerSearch/icon.png"
+            //    },
             {
                 name: "facet scape",
                 // here we use the widget from Github directly for demonstration purposes. You should avoid this and instead clone the visualization-widgets repository into your project or add it as submodule.
                 url: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/index.html",
-                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png",
-                deferLoading: true
-            }];
+
+                icon: "http://rawgit.com/EEXCESS/visualization-widgets/master/FacetScape/icon.png"
+            }
+        ];
         // initialize the searchBar with the specified tabs and the path to the image folder
-        searchBar.init(tabs, {imgPATH: '../../searchBar/img/', queryCrumbs: {active: true}, origin:origin});
+        searchBar.init(tabs, {
+            imgPATH: '../../searchBar/img/',
+            queryCrumbs: {
+                active: true
+            }
+        });
         // detect paragraphs
+        paragraphDetection.init({
+            img_PATH: '../../img/'
+        });
         var paragraphs = paragraphDetection.getParagraphs();
         // draw silver border around detected paragraphs
         $('.eexcess_detected_par').css('border', '1px dotted silver');
@@ -77,6 +85,32 @@ require(['../config'], function(config) {
         });
         // start detection of focused paragraphs
         paragraphDetection.findFocusedParagraphSimple();
+        //manually do stuff
+        var augmentationData = {
+            addKeyword: function(keywordToADD) {
+                searchBar.addKeyword({
+                    text: keywordToADD
+                })
+            },
+            queryFromSelection: function(selection) {
+                paragraphDetection.paragraphToQuery(selection, function(paragraphStatistics) {
+                    // set query in search bar
+                    searchBar.setQuery(paragraphStatistics.query.contextKeywords);
+                })
+            },
+            pd: function(domEL) {
+                $(domEL).css('background-color', 'red');
+                console.log(domEL);
+            },
+            mainTopic: function(mainTopic) {
+                //TODO SET MAINTOPIC ?!?
+                /* searchBar.addKeyword({                
+                     text : mainTopic,
+                     isMainTopic : true
+                 });*/
+            }
+        }
+
+        paragraphDetection.activateSelectionAugmentation(augmentationData);
     });
 });
-
