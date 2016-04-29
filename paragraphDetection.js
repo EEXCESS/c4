@@ -65,8 +65,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             augmentationComponents.firstSelectedElement = augmentationComponents.selection.anchorNode.parentElement;
             augmentationComponents.lastSelectedElement = augmentationComponents.selection.extentNode.parentElement;
             augmentationComponents.selectedElement = augmentationComponents.selection.extentNode.parentElement;
-            /*augmentationComponents.selection = augmentationComponents.selection.toString();*/
-            augmentationComponents.selection = augmentationComponents.selectedElements.selectionText;
+            augmentationComponents.selection = augmentationComponents.selection.toString();
+//            augmentationComponents.selection = augmentationComponents.selectedElements.selectionText;
 
             var leftPos = e.pageX;
             var topPos = e.pageY + 10;
@@ -155,7 +155,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         for (var i = 0, el; el = allWithinRangeParent[i]; i++) {
             if (selection.containsNode(el, true)) {
                 var lastchild = (el);
-                if (lastchild && $(lastchild).width() >= 0) {      
+                if (lastchild && $(lastchild).width() >= 0) {
                     coords.selectionText += $(lastchild).text();
                     if (coords.width <= 0) {
                         coords.width = $(lastchild).width();
@@ -165,7 +165,7 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                     // console.log($(lastchild).offset().left);
                     // console.log($(lastchild).width());
-                    if ($(lastchild).width()  > coords.width) {
+                    if ($(lastchild).width() > coords.width) {
                         coords.width = $(lastchild).width();
                     }
                     if ($(lastchild).offset().left < coords.left) {
@@ -218,7 +218,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                 if (allSelected[0].width !== allSelected[i].width && allSelected[0].pos.left !== allSelected[i].pos.left) {
                     out = true;
                 }
-            };
+            }
+            ;
         }
 
         return out;
@@ -226,12 +227,13 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     var getCandidates = function(root) {
         if (typeof root === 'undefined') {
             root = document.body;
-        };
+        }
+        ;
         var pars = [];
         var walker = document.createTreeWalker(
-            root,
-            NodeFilter.SHOW_TEXT
-        );
+                root,
+                NodeFilter.SHOW_TEXT
+                );
 
         var node = walker.nextNode();
         /**
@@ -262,9 +264,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
     };
     var getHeadline = function(paragraphNode) {
         var walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_ELEMENT
-        );
+                document.body,
+                NodeFilter.SHOW_ELEMENT
+                );
 
         var node = paragraphNode;
         walker.currentNode = node;
@@ -534,7 +536,8 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var finalSet = new Set();
                         for (var i = 0; i < k && i < result.length; i++) {
                             finalSet.add(result[i].term);
-                        };
+                        }
+                        ;
                         return finalSet;
                     };
 
@@ -669,10 +672,10 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                     }
                     var paragraphs = {
                         paragraphs: [{
-                            id: id,
-                            headline: headline,
-                            content: paragraphContent
-                        }],
+                                id: id,
+                                headline: headline,
+                                content: paragraphContent
+                            }],
                         language: lang
                     };
 
@@ -879,33 +882,33 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
         augmentLinks: function(jqElements, icon, triggerFn, classname, extendedParagraphs) {
             var img = $('<img src="' + icon + '" style="cursor:pointer;width:30px;" />');
             img.click(function() {
-                    var profile = {
-                        // TODO: split terms
-                        contextKeywords: [{
+                var profile = {
+                    // TODO: split terms
+                    contextKeywords: [{
                             weight: 1.0,
                             text: $(this).data('query')
                         }]
-                    };
-                    if (typeof extendedParagraphs !== 'undefined') {
-                        var parID = $(this).data('paragraphID');
-                        var idx = $(this).data('idx');
-                        if (extendedParagraphs[idx].id === parID) {
-                            profile.contextNamedEntities = extendedParagraphs[idx].entities;
-                        } else {
-                            // TODO: order of extendedParagraphs is not guaranteed, search for right id
-                        }
+                };
+                if (typeof extendedParagraphs !== 'undefined') {
+                    var parID = $(this).data('paragraphID');
+                    var idx = $(this).data('idx');
+                    if (extendedParagraphs[idx].id === parID) {
+                        profile.contextNamedEntities = extendedParagraphs[idx].entities;
+                    } else {
+                        // TODO: order of extendedParagraphs is not guaranteed, search for right id
                     }
-                    triggerFn(profile);
-                }).hover(function() {
-                    delayTimer.clearTimer();
-                }, function() {
-                    $(this).hide();
-                }).css('position', 'absolute')
-                .css('z-index', 9999)
-                .mouseleave(function() {
-                    $(this).hide();
-                })
-                .hide();
+                }
+                triggerFn(profile);
+            }).hover(function() {
+                delayTimer.clearTimer();
+            }, function() {
+                $(this).hide();
+            }).css('position', 'absolute')
+                    .css('z-index', 9999)
+                    .mouseleave(function() {
+                $(this).hide();
+            })
+                    .hide();
             $('body').append(img);
             var xOffset = 25;
             var yOffset = -2;
@@ -922,9 +925,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
                         var el2 = $(this);
                         var offset = el2.offset();
                         img
-                            .css('top', (offset.top - el2.height() + yOffset) + 'px')
-                            .css('left', offset.left - xOffset + 'px')
-                            .show();
+                                .css('top', (offset.top - el2.height() + yOffset) + 'px')
+                                .css('left', offset.left - xOffset + 'px')
+                                .show();
                     });
                     wrapper.mouseleave(function() {
                         delayTimer.setTimer(function() {
@@ -1189,9 +1192,9 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             var offsets = [];
             var offset = 0;
             var walker = document.createTreeWalker(
-                paragraph,
-                NodeFilter.SHOW_TEXT
-            );
+                    paragraph,
+                    NodeFilter.SHOW_TEXT
+                    );
             var node;
             while (node = walker.nextNode()) {
                 if (node.nodeValue.length > 0) {
@@ -1214,16 +1217,19 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             augmentationComponents.img5.remove();
             augmentationComponents.img6.remove();
             $(document).unbind('mouseup', pgf);
+            if ($('body').has('#gen-para-ex-selected')) {
+                $('#gen-para-ex-selected').remove();
+            }
         },
         activateSelectionAugmentation: function(augmentationData) {
             if (typeof augmentationData.addKeyword === 'function') {
                 augmentationComponents.img1 = $('<div id="add-ex-aug" title="Add this selection as a Keyword-Tag in the SearchBar"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('cursor', 'pointer')
-                    .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('cursor', 'pointer')
+                        .css('background-image', 'url("' + settings.img_PATH + 'add.png")')
+                        .css('background-size', 'contain').hide();
                 augmentationComponents.img1.click(function(e) {
                     augmentationData.addKeyword(augmentationComponents.selection);
                 });
@@ -1231,82 +1237,86 @@ define(['jquery', 'c4/namedEntityRecognition', 'guessLang/guessLanguage'], funct
             }
             if (typeof augmentationData.queryFromSelection === 'function') {
                 augmentationComponents.img2 = $('<div id="search-ex-aug" title="Search with the (automatically recognised) Named Entities in this selection"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('cursor', 'pointer')
-                    .css('title', '"button2"')
-                    .css('background-image', 'url("' + settings.img_PATH + 'search.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('cursor', 'pointer')
+                        .css('title', '"button2"')
+                        .css('background-image', 'url("' + settings.img_PATH + 'search.png")')
+                        .css('background-size', 'contain').hide();
                 augmentationComponents.img2.click(function(e) {
-                    queryFromSelection(augmentationComponents.selection);
+                    augmentationData.queryFromSelection(augmentationComponents.selection);
                 });
                 $('body').append(augmentationComponents.img2);
             }
             if (typeof augmentationData.pd === 'function') {
                 augmentationComponents.img3 = $('<div id="gen-para-ex-aug" title="Handle this selection as a paragraph"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('cursor', 'pointer')
-                    .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('cursor', 'pointer')
+                        .css('background-image', 'url("' + settings.img_PATH + 'gen-para.png")')
+                        .css('background-size', 'contain').hide();
                 augmentationComponents.img3.click(function(e) {
                     var element1 = $(augmentationComponents.firstSelectedElement);
                     var element2 = $(augmentationComponents.lastSelectedElement);
                     var selecteElement = $(augmentationComponents.selectedElement);
                     var cords = augmentationComponents.selectedElements;
-                    
                     var element1Width = element1.width() + element1.offset().left;
                     var element2Width = element2.width() + element2.offset().left;
                     var maxframewidth = (element1Width > element2Width) ? element1Width : element2Width;
+                    if (cords.width === 0) {
+                        cords.width = element1.width();
+                        cords.left = element1.offset().left;
+                        cords.selectionText = $(augmentationComponents.selectedElement).text();
+                    }
                     //remove frame if it was added before
                     if ($('body').has('#gen-para-ex-selected')) {
                         $('#gen-para-ex-selected').remove();
                     }
                     var newframe = $('<div id="gen-para-ex-selected"></div>')
-                        .css('position', 'absolute')
-                        .css('top', element1.offset().top)
-                        .css('left', cords.left)
-                        .css('width', cords.width)
-                        .css('pointer-events', 'none')
-                        .css('height', (element2.offset().top - element1.offset().top) + element2.height());
+                            .css('position', 'absolute')
+                            .css('top', element1.offset().top)
+                            .css('left', cords.left)
+                            .css('width', cords.width)
+                            .css('pointer-events', 'none')
+                            .css('height', (element2.offset().top - element1.offset().top) + element2.height());
                     $('body').append(newframe);
-                    augmentationData.pd(newframe);
+                    augmentationData.pd(newframe, cords.selectionText);
                 });
 
                 $('body').append(augmentationComponents.img3);
                 augmentationComponents.img4 = $('<div id="gen-para-ex-aug" title="Can not handle this selection as a paragraph"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('background-image', 'url("' + settings.img_PATH + 'gen-para-grey.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('background-image', 'url("' + settings.img_PATH + 'gen-para-grey.png")')
+                        .css('background-size', 'contain').hide();
 
                 $('body').append(augmentationComponents.img4);
             }
 
             if (typeof augmentationData.mainTopic === 'function') {
                 augmentationComponents.img5 = $('<div id="main-topic-ex-aug" title="Select as a maintopic"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('cursor', 'pointer')
-                    .css('title', '"button2"')
-                    .css('background-image', 'url("' + settings.img_PATH + 'main-topic.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('cursor', 'pointer')
+                        .css('title', '"button2"')
+                        .css('background-image', 'url("' + settings.img_PATH + 'main-topic.png")')
+                        .css('background-size', 'contain').hide();
                 augmentationComponents.img5.click(function(e) {
-                    mainTopic(augmentationComponents.selection);
+                    augmentationData.mainTopic(augmentationComponents.selection);
                 });
                 $('body').append(augmentationComponents.img5);
 
                 augmentationComponents.img6 = $('<div id="main-topic-grey-ex-aug" title="Selection too long for maintopic"></div>')
-                    .css('position', 'absolute')
-                    .css('width', '30px')
-                    .css('height', '30px')
-                    .css('title', '"button2"')
-                    .css('background-image', 'url("' + settings.img_PATH + 'main-topic-grey.png")')
-                    .css('background-size', 'contain').hide();
+                        .css('position', 'absolute')
+                        .css('width', '30px')
+                        .css('height', '30px')
+                        .css('title', '"button2"')
+                        .css('background-image', 'url("' + settings.img_PATH + 'main-topic-grey.png")')
+                        .css('background-size', 'contain').hide();
 
                 $('body').append(augmentationComponents.img6);
             }

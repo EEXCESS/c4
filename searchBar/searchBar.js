@@ -11,21 +11,21 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         preventQuerySetting: false,
         // a temporarily stored set of contextKeywords
         cachedQuery: null,
-        cachedSubqueries:null,
-        setSubQueries:function(subqueries){
-                ui_bar.selectmenu.children('option.subquery').remove();
-                ui_bar.selectmenu.children('option:selected').attr('selected','');
-                        var notSelected = true;
-                        ui_bar.selectmenu.children('option').first().data('query', subqueries.full);
-                        for (var i = 0; i < subqueries.sub.length; i++) {
-                            var q = subqueries.sub[i];
-                            var tmp_option = $('<option class="subquery" />').data('query', q.keywords).text(q.topic);
-                            if(q.score >= subqueries.highestScore && notSelected) {
-                                tmp_option.attr('selected', 'selected');
-                                notSelected = false;
-                            }
-                            tmp_option.appendTo(ui_bar.selectmenu);
-                        }
+        cachedSubqueries: null,
+        setSubQueries: function(subqueries) {
+            ui_bar.selectmenu.children('option.subquery').remove();
+            ui_bar.selectmenu.children('option:selected').attr('selected', '');
+            var notSelected = true;
+            ui_bar.selectmenu.children('option').first().data('query', subqueries.full);
+            for (var i = 0; i < subqueries.sub.length; i++) {
+                var q = subqueries.sub[i];
+                var tmp_option = $('<option class="subquery" />').data('query', q.keywords).text(q.topic);
+                if (q.score >= subqueries.highestScore && notSelected) {
+                    tmp_option.attr('selected', 'selected');
+                    notSelected = false;
+                }
+                tmp_option.appendTo(ui_bar.selectmenu);
+            }
         },
         popupTimer: null,
         fadeOutPopup: function(delay) {
@@ -174,7 +174,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         setMainTopic: function(topic) {
             topic.isMainTopic = true;
             ui_bar.mainTopicLabel.val(topic.text).data('properties', topic);
-            this.resizeForText.call(ui_bar.mainTopicLabel, topic.text, true);
+            util.resizeForText.call(ui_bar.mainTopicLabel, topic.text, true);
         },
         /**
          * Helper to display the provided contextKeywords in the searchBar and automatically
@@ -1009,6 +1009,21 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
     };
     var resultHandler = function(response) {
         if (response.status === 'success') {
+            for (var i = 0; i < tabModel.tabs.length; i++) {
+                if (typeof tabModel.tabs[i].deactivate === 'function') {
+                    if (tabModel.tabs[i].deactivate(response.data.result)) {
+                        var link = $('a.ui-tabs-anchor[title="' + tabModel.tabs[i].name + '"]');
+                        link.css('cursor', 'default');
+                        link.parent().css('opacity', '0.2');
+                        link.attr('title', tabModel.tabs[i].name + tabModel.tabs[i].deactivateMsg);
+                    } else {
+                        var link = $('a.ui-tabs-anchor[title="' + tabModel.tabs[i].name + tabModel.tabs[i].deactivateMsg + '"]');
+                        link.css('cursor', 'pointer');
+                        link.parent().css('opacity', '1.0');
+                        link.attr('title', tabModel.tabs[i].name);
+                    }
+                }
+            }
             results = response.data;
             ui_bar.loader.hide();
             ui_bar.result_indicator.text(response.data.totalResults + ' results');
@@ -1085,30 +1100,30 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
          * @returns {undefined}
          */
         setQuery: function(contextKeywords, immediately) {
-            var delayed = function(){
-            if (immediately) {
-                clearTimeout(util.focusBlurDelayTimer);
-                util.preventQuerySetting = false;
-                util.setQuery(contextKeywords, 0);
-                util.cachedQuery = null;
-                util.cachedSubqueries = null;
-                ui_bar.selectmenu.children('option.subquery').remove();
-            } else {
-                if (util.preventQuerySetting) {
-                    util.cachedSubqueries = null;
-                    util.cachedQuery = contextKeywords;
-                } else {
-                    ui_bar.selectmenu.children('option.subquery').remove();
+            var delayed = function() {
+                if (immediately) {
+                    clearTimeout(util.focusBlurDelayTimer);
+                    util.preventQuerySetting = false;
+                    util.setQuery(contextKeywords, 0);
                     util.cachedQuery = null;
                     util.cachedSubqueries = null;
-                    util.setQuery(contextKeywords);
+                    ui_bar.selectmenu.children('option.subquery').remove();
+                } else {
+                    if (util.preventQuerySetting) {
+                        util.cachedSubqueries = null;
+                        util.cachedQuery = contextKeywords;
+                    } else {
+                        ui_bar.selectmenu.children('option.subquery').remove();
+                        util.cachedQuery = null;
+                        util.cachedSubqueries = null;
+                        util.setQuery(contextKeywords);
+                    }
                 }
-            }
             };
             if (ui_bar.selectmenu) {
                 delayed();
             } else {
-                window.setTimeout(delayed,250);
+                window.setTimeout(delayed, 250);
             }
         },
         /**
@@ -1136,7 +1151,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     util.preventQuerySetting = false;
                     ui_bar.selectmenu.children('option.subquery').remove();
                     ui_bar.selectmenu.children('option').first().data('query', queries.main.contextKeywords);
-                    if(subqueries) {
+                    if (subqueries) {
                         util.setSubQueries(subqueries);
                     }
                     util.setQuery(contextKeywords, 0);
@@ -1149,7 +1164,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     } else {
                         ui_bar.selectmenu.children('option.subquery').remove();
                         ui_bar.selectmenu.children('option').first().data('query', queries.main.contextKeywords);
-                        if(subqueries) {
+                        if (subqueries) {
                             util.setSubQueries(subqueries);
                         }
                         util.setQuery(contextKeywords);
@@ -1163,7 +1178,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                     // initialize with all keywords
                     var subqueries = {
                         full: queries.main.contextKeywords,
-                                highestScore:0,
+                        highestScore: 0,
                         sub: []
                     };
                     // add subs
@@ -1183,7 +1198,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                                 break;
                             }
                         }
-                        subqueries.sub.push({topic:topicToDisplay,keywords:query.contextKeywords,score:query.score});
+                        subqueries.sub.push({topic: topicToDisplay, keywords: query.contextKeywords, score: query.score});
                         if (query.score > subqueries.highestScore) {
                             subqueries.highestScore = query.score;
                             contextKeywords = query.contextKeywords;
@@ -1257,6 +1272,12 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         },
         highlightTags: function(terms) {
             util.highlightTags(terms);
+        },
+        setMainTopic: function(maintopic) {
+            util.preventQuery = true;
+            util.setMainTopic(maintopic);
+            util.preventQuery = false;
+            util.queryUpdater();
         }
     };
 });
