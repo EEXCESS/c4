@@ -42,9 +42,20 @@
                 switch (markup_identifier) {
                     case this.markup.WIKI_CODE:
                         var title = documentInformation.title;
+                        var provider = documentInformation.documentBadge.provider;
+                        var year = documentInformation.date;
+
+                        if (year) {
+                            year = year.substr(0, 4);
+
+                            if (isNaN(parseFloat(year)) || !isFinite(year)) {
+                                year = undefined;
+                            }
+                        }
 
                         if (mediaType === "text") {
-                            return title + ' <ref>[' + documentInformation.documentBadge.uri + ' ' + title + ']</ref>';
+                            var citation = '"' + title + '" <ref>"[' + documentInformation.documentBadge.uri + ' ' + title + ']"' + (provider ? (', ' + provider) : '') + (year ? (', ' + year) : '') + '</ref>'
+                            return citation;
                         } else if (mediaType === "image") {
                             var caption = title.split(/[:.]+/)[1]; // 'File:Example.jpg' -> 'Example'
                             return '[[' + title + '|thumbnail|' + caption + ']]';
