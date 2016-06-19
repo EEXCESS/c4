@@ -42,23 +42,23 @@
                 switch (markup_identifier) {
                     case this.markup.WIKI_CODE:
                         var title = documentInformation.title;
+                        var filename = documentInformation.filename;
                         var provider = documentInformation.documentBadge.provider;
-                        var year = documentInformation.date;
+                        var date = documentInformation.date;
 
-                        if (year) {
-                            year = year.substr(0, 4);
+                        if (date) {
+                            date = date.substr(0, 4);
 
-                            if (isNaN(parseFloat(year)) || !isFinite(year)) {
-                                year = undefined;
+                            if (isNaN(parseFloat(date)) || !isFinite(date)) {
+                                date = undefined;
                             }
                         }
 
                         if (mediaType === "text") {
-                            var citation = '"' + title + '" <ref>"[' + documentInformation.documentBadge.uri + ' ' + title + ']"' + (provider ? (', ' + provider) : '') + (year ? (', ' + year) : '') + '</ref>'
+                            var citation = '"' + title + '" <ref>"[' + documentInformation.documentBadge.uri + ' ' + title + ']"' + (provider ? (', ' + provider) : '') + (date ? (', ' + date) : '') + '</ref>';
                             return citation;
                         } else if (mediaType === "image") {
-                            var caption = title.split(/[:.]+/)[1]; // 'File:Example.jpg' -> 'Example'
-                            return '[[' + title + '|thumbnail|' + caption + ']]';
+                            return '[[' + filename + '|thumbnail|' + title + ']]';
                         }
                 }
 
