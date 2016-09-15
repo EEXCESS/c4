@@ -1,6 +1,6 @@
 {
   "name": "c4",
-  "version": "6.11.0",
+  "version": "6.11.1",
   "homepage": "https://github.com/EEXCESS/c4",
   "authors": [
     "EEXCESS consortium <eexcess-dev@joanneum.at" 
@@ -15,7 +15,7 @@
     "citation",
     "paragraph"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "ignore": [
     "**/.*",
     "node_modules",
